@@ -1,0 +1,46 @@
+Config
+    { font     = "xft:Terminus-8"
+--  , bgColor  = "#000000"
+    , fgColor  = "#06989A"
+    , position = TopW L 95
+    , lowerOnStart = True
+    , commands =
+        [ Run Swap ["-t", "<used> <free>"] 100
+        , Run Memory ["-t", "<usedratio> <used> <free>", "-S", "True"] 10
+        , Run Com "~/Dropbox/bin/cputemp" ["coretemp-isa-0000"] "cputemp" 50
+        , Run CpuFreq [ "-t", "<cpu0> <cpu1> <cpu2> <cpu3>"
+                      , "-L", "2"
+                      , "-H", "3"
+                      , "-l", "lightblue"
+                      , "-n", "yellow"
+                      , "-h", "red"
+                      ] 10
+        , Run MultiCpu [ "-t", "<autototal>"
+                       , "-S", "True"
+                       , "-p", "3"
+                       , "-L", "10"
+                       , "-H", "50"
+                       , "-l", "lightblue"
+                       , "-n", "yellow"
+                       , "-h", "red"
+                       ] 10
+        , Run Com "~/Dropbox/bin/dstatline" [] "dropbox" 20
+        , Run StdinReader
+        , Run MPD ["-t","<artist> - <title> <statei> <lapsed>/<length>"] 10
+        , Run Volume "default" "Master" [ "-t", "<volume> <status>"
+                                        , "-S", "True"
+                                        , "-p", "3"
+                                        ] 20
+        , Run Weather "EGLC" [ "-t", "<tempC>°C <skyCondition>"
+                             , "-L", "15"
+                             , "-H", "25"
+                             , "-n", "green"
+                             , "-h", "red"
+                             , "-l", "lightblue"
+                             ] 600
+        , Run Date "%Y-%m-%d <fc=#ee9a00>%T</fc>" "date" 10
+        ]
+--  , sepChar = "%"
+--  , alignSep = "}{"
+    , template = "%swap% | %memory% | %cputemp% %cpufreq% %multicpu% | %dropbox% | %StdinReader%}{%mpd% %default:Master% | %EGLC% | %date%"
+    }

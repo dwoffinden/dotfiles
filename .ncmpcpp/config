@@ -1,0 +1,5 @@
+user_interface = "alternative"
+mpd_music_dir = "/media/Store/Music"
+media_library_disable_two_column_mode = "yes"
+playlist_separate_albums = "yes"
+playlist_display_mode = "columns"

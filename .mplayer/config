@@ -1,0 +1,4 @@
+msgcolor=1
+ao=alsa
+lavdopts=threads=4
+cdrom-device=/dev/sr0

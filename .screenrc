@@ -1,0 +1,13 @@
+shell "/bin/zsh"
+altscreen on #clear the text after closing editor
+term "screen-256color"
+startup_message off
+
+#attrcolor b ".I"# allow bold colors - necessary for some reason
+#termcapinfo xterm 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'# tell screen how to set colors. AB = background, AF=foreground
+#defbce "on" # erase background with current bg color
+#terminfo rxvt-unicode 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'
+
+hardstatus off
+hardstatus alwayslastline
+hardstatus string '%{= kG}[ %{G}%H %{g}][%= %{= kw}%?%-Lw%?%{r}(%{W}%n*%f%t%?(%u)%?%{r})%{w}%?%+Lw%?%?%= %{g}][%{B} %m-%d %{W} %c %{g}]'
