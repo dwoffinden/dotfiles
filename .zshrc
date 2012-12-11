@@ -7,7 +7,8 @@ ZSH=$HOME/.oh-my-zsh
 # Look in ~/.oh-my-zsh/themes/
 # Optionally, if you set this to "random", it'll load a random theme each
 # time that oh-my-zsh is loaded.
-ZSH_THEME="aussiegeek"
+#ZSH_THEME='xiong-chiamiov-plus'
+ZSH_THEME='woof'
 
 # Set to this to use case-sensitive completion
 # CASE_SENSITIVE="true"
@@ -134,14 +135,18 @@ function bckground {
 }
 
 function oh-my-zsh-clone {
+  local D=`pwd`
   git clone git://github.com/robbyrussell/oh-my-zsh.git "$ZSH" && \
-  git clone git://github.com/zsh-users/zsh-syntax-highlighting.git "$ZSH"/custom/plugins/zsh-syntax-highlighting
+  cd "$ZSH" && git remote add github git@github.com:dwoffinden/oh-my-zsh.git && \
+  git clone git://github.com/zsh-users/zsh-syntax-highlighting.git "$ZSH"/custom/plugins/zsh-syntax-highlighting && \
+  cd "$D"
 }
 
 function oh-my-zsh-update {
   local D=`pwd`
 
   cd "$ZSH" && \
+  git pull github master && \
   git pull origin master && git-repack-aggressive && \
   cd "$ZSH_CUSTOM"/plugins/zsh-syntax-highlighting && \
   git pull origin master && git-repack-aggressive
@@ -276,12 +281,6 @@ case "$CONF" in
   VERA)
     ;;
 esac
-
-#####[ INTERACTIVE PROMPT ]#################################################
-
-PROMPT="%F{cyan}%D %* %f%63<..<%~%<<
-%(?..%F{red}[%?] )%(!.%F{red}.%F{green})%# %f"
-RPROMPT="%(!.%F{red}.%F{cyan})%n@%m:%l%f"
 
 #####[ GREETING ]###########################################################
 

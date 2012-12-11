@@ -63,7 +63,7 @@ getHomes = io $ do
   h <- getHomeDirectory
   return (h, myWP h)
   where
-    myWP = (</> "Dropbox/wallpaper/oceanshore_by_alexiuss.jpg")
+    myWP = (</> "Dropbox/wallpaper/wallpaper-2473668.jpg")
 
 getConfiguration :: (MonadIO m, Integral n) => m (Bool, Bool, n)
 getConfiguration = io $ do
