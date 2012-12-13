@@ -137,8 +137,10 @@ function bckground {
 function oh-my-zsh-clone {
   local D=`pwd`
   git clone git://github.com/robbyrussell/oh-my-zsh.git "$ZSH" && \
-  cd "$ZSH" && git remote add github git@github.com:dwoffinden/oh-my-zsh.git && \
-  git clone git://github.com/zsh-users/zsh-syntax-highlighting.git "$ZSH"/custom/plugins/zsh-syntax-highlighting && \
+  cd "$ZSH" && \
+  git remote add dwoffinden git@github.com:dwoffinden/oh-my-zsh.git && \
+  cd "$ZSH/custom/plugins/zsh-syntax-highlighting" && \
+  git clone git://github.com/zsh-users/zsh-syntax-highlighting.git
   cd "$D"
 }
 
@@ -146,10 +148,13 @@ function oh-my-zsh-update {
   local D=`pwd`
 
   cd "$ZSH" && \
-  git pull github master && \
-  git pull origin master && git-repack-aggressive && \
-  cd "$ZSH_CUSTOM"/plugins/zsh-syntax-highlighting && \
-  git pull origin master && git-repack-aggressive
+  git pull git://github.com/dwoffinden/oh-my-zsh.git master && \
+  git pull git://github.com/robbyrussell/oh-my-zsh.git master && \
+  git-repack-aggressive
+
+  cd "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" && \
+  git pull git://github.com/zsh-users/zsh-syntax-highlighting.git master && \
+  git-repack-aggressive
 
   cd "$D"
 }
