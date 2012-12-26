@@ -1,20 +1,22 @@
 Config
     { font     = "xft:Terminus-8"
---  , bgColor  = "#000000"
+    , bgColor  = "#000000"
     , fgColor  = "#06989A"
     , position = TopW L 95
     , lowerOnStart = True
     , commands =
         [ Run Swap ["-t", "<used> <free>"] 100
-        , Run Memory ["-t", "<usedratio> <used> <free>", "-S", "True"] 10
-        , Run Com "~/Dropbox/bin/cputemp" ["coretemp-isa-0000"] "cputemp" 50
+        , Run Memory [ "-t", "<usedratio> <used> <free>"
+                     , "-S", "True"
+                     ] 10
+        , Run Com "cputemp" ["coretemp-isa-0000"] "cputemp" 50
         , Run CpuFreq [ "-t", "<cpu0> <cpu1> <cpu2> <cpu3>"
                       , "-L", "2"
                       , "-H", "3"
                       , "-l", "lightblue"
                       , "-n", "yellow"
                       , "-h", "red"
-                      ] 10
+                      ] 20
         , Run MultiCpu [ "-t", "<autototal>"
                        , "-S", "True"
                        , "-p", "3"
