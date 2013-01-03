@@ -9,7 +9,7 @@ Config
         , Run Memory [ "-t", "<usedratio> <used> <free>"
                      , "-S", "True"
                      ] 10
-        , Run Com "cputemp" ["coretemp-isa-0000"] "cputemp" 50
+        , Run Com "cputemp" [] "cputemp" 50
         , Run CpuFreq [ "-t", "<cpu0> <cpu1> <cpu2> <cpu3>"
                       , "-L", "2"
                       , "-H", "3"
