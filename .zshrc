@@ -164,9 +164,12 @@ function fliptable {
 }
 
 function sbt-clean() {
+  echo "Cleaning ~/.sbt:"
+  rm -rfv ~/.sbt/{boot,staging,plugins/{project,target}}
+
+  echo "Cleaning current project:"
   for d in ./{,project/{,project/{,project/}}}target ; do
-    echo "${d}:"
-    [[ -d "$d" ]] && rm -rv "$d"
+    [[ -d "$d" ]] && echo "${d}:" && rm -rv "$d"
   done
 
   return 0
