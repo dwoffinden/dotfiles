@@ -149,8 +149,8 @@ function oh-my-zsh-update {
   local D=`pwd`
 
   cd "$ZSH" && \
-  git pull dwoffinden && \
-  git pull origin && \
+  git pull dwoffinden master && \
+  git pull origin master && \
   git-repack-aggressive
 
   cd "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" && \
