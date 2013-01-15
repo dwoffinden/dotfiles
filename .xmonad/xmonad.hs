@@ -184,32 +184,32 @@ myKeys = do
     ]
     {- Workspace Switching -}
     ++ [ (m ++ k, windows $ f k)
-          | k <- XMonad.workspaces c
-          , (f, m) <- [(W.greedyView, "M-"), (W.shift, "M-S-")]
+       | k <- XMonad.workspaces c
+         , (f, m) <- [(W.greedyView, "M-"), (W.shift, "M-S-")]
     ]
     {- Screen Switching -}
     ++ [ (m ++ key, screenWorkspace sc >>= flip whenJust (windows . f))
-          | (key, sc) <- zip ["w", "e", "r"] [0..]
-          , (m, f) <- [("M-", W.view), ("M-S-", W.shift)]
+       | (key, sc) <- zip ["w", "e", "r"] [0..]
+         , (m, f) <- [("M-", W.view), ("M-S-", W.shift)]
     ]
     {- Volume Controls -}
     ++ [ (k, safeSpawn "amixer" ["set", "Master", a])
-        | (k, a) <- [ ("<XF86AudioMute>", "toggle")
-                    , ("<XF86AudioRaiseVolume>", "1+")
-                    , ("<XF86AudioLowerVolume>", "1-")
-                    ]
+       | (k, a) <- [ ("<XF86AudioMute>", "toggle")
+                   , ("<XF86AudioRaiseVolume>", "1+")
+                   , ("<XF86AudioLowerVolume>", "1-")
+                   ]
     ]
     {- Spawning Firefox -}
     ++ [ ( k, runOrRaise "firefox" (className =? "Firefox"))
-        | k <- ["M-f", "<XF86HomePage>"]
+       | k <- ["M-f", "<XF86HomePage>"]
     ]
     {- Screen Locking -}
     ++ [ (k , lock >> screenOff)
-        | k <- ["M-x", "<XF86ScreenSaver>"]
+       | k <- ["M-x", "<XF86ScreenSaver>"]
     ]
     {- WiFi manager -}
     ++ ( guard wifi >>
-        [ ("M-S-n", safeRunProgInTerm "wicd-curses") ]
+      [ ("M-S-n", safeRunProgInTerm "wicd-curses") ]
     )
     {- MPC keys, media player UI -}
     ++ ( guard mpd >>
@@ -221,7 +221,7 @@ myKeys = do
                   ]
       ] ++
       [ (k, safeRunProgInTerm "ncmpcpp")
-        | k <- ["M-S-m", "<XF86AudioMedia>"]
+      | k <- ["M-S-m", "<XF86AudioMedia>"]
       ]
     )
   where
@@ -234,7 +234,7 @@ myKeys = do
     screenOff =
       sleep 1 >> safeSpawn "xset" ["dpms", "force", "off"]
     mpd_ =
-      void . io. withMPD
+      void . io . withMPD
     xmessage m =
       void $ safeSpawn "xmessage" [m]
 
