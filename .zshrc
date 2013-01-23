@@ -260,9 +260,9 @@ case "$CONF" in
     #alias mount-college='sudo mount -t cifs //icfs7.cc.ic.ac.uk/daw10\
     #             /media/college -o user=IC/daw10'
     #alias umount-college='sudo umount /media/college'
-    alias pwoff='sudo poweroff'
-    alias hbernate='sudo pm-hibernate'
-    alias rboot='sudo reboot'
+    alias pwoff='systemctl poweroff'
+    alias hbernate='systemctl hibernate'
+    alias rboot='systemctl reboot'
     alias abcde-mp3-high='abcde -o mp3:"-V0 -q0 -ms"'
     ;|
   GLADYS | WINONA) # Laptops
