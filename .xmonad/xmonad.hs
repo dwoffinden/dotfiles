@@ -53,55 +53,19 @@ myFocusedColour = "#ff0000"
 
 myModMask = mod4Mask
 
-{- If urxvt is not installed, use xterm. If it is, prefer urxvtcd. -}
-myTerminal = io $
-  findExecutable "urxvt"
-  >>= maybe (return "xterm") (\a -> fromMaybe a <$> findExecutable "urxvtcd")
+{- If urxvt is not installed, use xterm. -}
+myTerminal = io $ fromMaybe "xterm" <$> findExecutable "urxvtc"
 
-getHomes :: MonadIO m => m (FilePath, FilePath)
-getHomes = io $ do
-  h <- getHomeDirectory
-  return (h, myWP h)
-  where
-    myWP = (</> "Dropbox/wallpaper/wallpaper-2473668.jpg")
-
-getConfiguration :: (MonadIO m, Integral n) => m (Bool, Bool, n)
+getConfiguration :: (MonadIO m) => m (Bool, Bool)
 getConfiguration = io $ do
   h <- nodeName <$> getSystemID
-  return (hasMpd h, hasWifi h, trayerWidth h)
+  return (hasMpd h, hasWifi h)
   where
     hasMpd      = (== "vera")
     hasWifi     = flip elem ["gladys", "winona"]
-    --trayerWidth = (\x -> (x `div` 320) * 16)
-    trayerWidth = (* 16) . (flip div 320) -- round 5% down to a multiple of 16
-                . (fromMaybe 1280) -- sane default for labs
-                . (flip lookup [ ("winona", 1024)
-                               , ("gladys", 1440)
-                               , ("vera",   1920)
-                               ])
 
-myStartupHook = do
-  safeSpawn "killall" ["trayer"]
+myStartupHook =
   setWMName "LG3D" --fuck java
-  safeSpawn "setxkbmap" ["-layout", "gb"]
-  safeSpawn "xsetroot" ["-cursor_name", "left_ptr"]
-  (home, wp) <- getHomes
-  (_, _, tw) <- getConfiguration
-  safeSpawn "trayer" [ "--edge", "top"
-                     , "--align", "right"
-                     , "--margin", "0"
-                     , "--SetDockType", "true"
-                     , "--SetPartialStrut", "true"
-                     , "--heighttype", "pixel"
-                     , "--height", "16"
-                     , "--widthtype", "pixel"
-                     , "--width", show tw
-                     , "--transparent", "true"
-                     , "--tint", "0"
-                     , "--alpha", "0"
-                     , "--expand", "true"
-                     , "--padding", "0"
-                     ]
 
 myManageHook = composeAll
   [ className =? "MPlayer"        --> doFloat
@@ -138,7 +102,7 @@ myLayout = smartBorders $ avoidStruts $
 myWorkspaces = map (:"") "`1234567890-="
 
 myKeys = do
-  (mpd, wifi, _) <- getConfiguration
+  (mpd, wifi) <- getConfiguration
   lock <- safeSpawnProg . fromMaybe "xlock" <$> findExecutable "slock"
   return $ \c -> mkKeymap c $
     [ ("M-S-<Return>",     safeSpawnProg $ XMonad.terminal c)

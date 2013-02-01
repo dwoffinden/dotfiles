@@ -3,7 +3,7 @@ Wants=xorg.target
 After=xorg.target
 
 [Service]
-ExecStart=/usr/bin/feh --no-fehbg --bg-fill %h/Dropbox/wallpaper/wallpaper-2473668.jpg
+ExecStart=/usr/bin/setxkbmap -layout gb
 
 [Install]
 WantedBy=xmonad.target

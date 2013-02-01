@@ -1,8 +1,9 @@
 [Unit]
 Wants=xorg.target
+After=xorg.target
 
 [Service]
-ExecStart=/usr/bin/xrdb -merge %h/.Xresources
+ExecStart=/usr/bin/urxvtd
 
 [Install]
 WantedBy=xinit.target

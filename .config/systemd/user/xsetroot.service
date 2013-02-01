@@ -1,0 +1,8 @@
+[Unit]
+Wants=xorg.target
+
+[Service]
+ExecStart=/usr/bin/xsetroot -cursor_name left_ptr
+
+[Install]
+WantedBy=xmonad.target
