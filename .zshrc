@@ -130,6 +130,9 @@ alias screensaver-on='xset s on ; xset +dpms'
 
 alias git-repack-aggressive='git repack -Adf --depth=300 --window=300'
 
+alias gitka='gitk --all'
+alias tiga='tig --all'
+
 function bckground {
     nohup $@ </dev/null &>/dev/null &
 }
