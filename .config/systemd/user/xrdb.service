@@ -1,0 +1,9 @@
+[Unit]
+Wants=xorg.target
+After=xorg.target
+
+[Service]
+ExecStart=/usr/bin/xrdb -merge %h/.Xresources
+
+[Install]
+WantedBy=xinit.target

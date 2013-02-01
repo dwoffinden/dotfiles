@@ -1,0 +1,10 @@
+[Unit]
+Description=Window manager target
+Wants=xorg.target
+Wants=xinit.target
+#TODO this is needed to run outside of startx, but doesn't work
+#Requires=dbus.socket
+AllowIsolate=true
+
+[Install]
+Alias=default.target

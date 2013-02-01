@@ -86,8 +86,6 @@ myStartupHook = do
   safeSpawn "setxkbmap" ["-layout", "gb"]
   safeSpawn "xsetroot" ["-cursor_name", "left_ptr"]
   (home, wp) <- getHomes
-  safeSpawn "xrdb" ["-merge", ( home </> ".Xresources" )]
-  safeSpawn "feh" ["--no-fehbg", "--bg-fill", wp]
   (_, _, tw) <- getConfiguration
   safeSpawn "trayer" [ "--edge", "top"
                      , "--align", "right"
