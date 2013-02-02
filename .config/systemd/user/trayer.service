@@ -1,6 +1,5 @@
 [Unit]
-Wants=xorg.target
-After=xorg.target
+#Wants=xorg.target
 
 [Service]
 ExecStart=/usr/bin/trayer --edge top \

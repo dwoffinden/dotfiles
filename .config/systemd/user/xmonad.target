@@ -1,5 +1,5 @@
 [Unit]
-Wants=xorg.target
+#Wants=xorg.target
 Wants=xinit.target
 Wants=xmonad.service
 #TODO this is needed to run outside of startx, but doesn't work

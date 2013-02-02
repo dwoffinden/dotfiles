@@ -1,4 +1,4 @@
 [Unit]
 Description=Xinitrc Stuff
-Requires=xorg.target
+#Requires=xorg.target
 #After=xorg.target

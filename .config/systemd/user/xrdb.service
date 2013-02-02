@@ -1,5 +1,5 @@
 [Unit]
-Wants=xorg.target
+#Wants=xorg.target
 
 [Service]
 ExecStart=/usr/bin/xrdb -merge %h/.Xresources
