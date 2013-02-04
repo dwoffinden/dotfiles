@@ -123,7 +123,7 @@ myKeys = do
     , ("M-t",              withFocused $ windows . W.sink)
     , ("M-,",              sendMessage (IncMasterN 1))
     , ("M-.",              sendMessage (IncMasterN (-1)))
-    , ("M-S-q",            io exitSuccess)
+    , ("M-S-q",            io $ safeSpawn "systemctl" ["--user", "exit"])
     , ("M-q",              recompile False >>= (flip when)
                              (safeSpawn "xmonad" ["--restart"]))
     , ("M-a",              safeRunInTerm "alsamixer" [])
