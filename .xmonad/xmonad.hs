@@ -32,8 +32,6 @@ import qualified XMonad.StackSet as W
 import           XMonad.Util.EZConfig
 import           XMonad.Util.Run hiding (safeRunInTerm)
 
--- TODO bring urxvtcd functionality in here?
-
 {-
 http://hackage.haskell.org/packages/archive/xmonad-contrib/0.8/doc/html/XMonad-Hooks-DynamicLog.html
 TODO: xmobar options on the command line? no?
@@ -102,7 +100,7 @@ myLayout = smartBorders $ avoidStruts $
 myWorkspaces = map (:"") "`1234567890-="
 
 myKeys = do
-  (mpd, wifi) <- getConfiguration
+  (hasMpd, hasWifi) <- getConfiguration
   lock <- safeSpawnProg . fromMaybe "xlock" <$> findExecutable "slock"
   return $ \c -> mkKeymap c $
     [ ("M-S-<Return>",     safeSpawnProg $ XMonad.terminal c)
@@ -131,7 +129,7 @@ myKeys = do
     , ("M-a",              safeRunInTerm "alsamixer" [])
     {- Power off screen -}
     , ("M-S-s",            screenOff)
-    , ("M-s",              screenOff >> (when mpd $ mpd_ $ pause True))
+    , ("M-s",              screenOff >> (when hasMpd $ mpd_ $ pause True))
     {- Take a screenshot, save as 'screenshot.png' -}
     , ("M-<Print>",        safeSpawn "import" [ "-window", "root"
                                               , "screenshot.png" ])
@@ -170,11 +168,11 @@ myKeys = do
        | k <- ["M-x", "<XF86ScreenSaver>"]
     ]
     {- WiFi manager -}
-    ++ ( guard wifi >>
+    ++ ( guard hasWifi >>
       [ ("M-S-n", safeRunProgInTerm "wicd-curses") ]
     )
     {- MPC keys, media player UI -}
-    ++ ( guard mpd >>
+    ++ ( guard hasMpd >>
       [ (k, mpd_ c)
       | (k, c) <- [ ("<XF86AudioPlay>", toggle)
                   , ("<XF86AudioPrev>", previous)
