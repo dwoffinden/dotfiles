@@ -1,0 +1,11 @@
+[Unit]
+#Requires=xorg.target
+#After=xorg.target
+
+# TODO do stuff like what's in startlxde?
+
+[Service]
+#Environment=PATH=uncomment:to:override:your:PATH
+ExecStart=/usr/bin/lxsession
+Restart=always
+RestartSec=5
