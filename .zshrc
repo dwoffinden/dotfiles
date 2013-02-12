@@ -138,6 +138,8 @@ function bckground {
     nohup $@ </dev/null &>/dev/null &
 }
 
+alias cabal-install-xmobar='cabal install xmobar --flags="with_threaded with_utf8 with_xft with_mpd with_alsa"'
+
 function oh-my-zsh-clone {
   local D=`pwd`
   git clone git://github.com/robbyrussell/oh-my-zsh.git "$ZSH" && \
