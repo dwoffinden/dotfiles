@@ -300,7 +300,8 @@ esac
 #####[ GREETING ]###########################################################
 
 tput setaf 2
-uname -nrmp
+uname -nrmo
+[[ -f /proc/cpuinfo ]] && grep "^model name" /proc/cpuinfo -m1 | cut -f2 | tail -c+3
 date
 if (which fortune &> /dev/null); then
   if (which cowsay &> /dev/null); then
