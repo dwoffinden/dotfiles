@@ -130,6 +130,7 @@ alias screensaver-on='xset s on ; xset +dpms'
 
 alias git-repack-aggressive='git repack -Adf --depth=300 --window=300'
 
+alias gfa='git fetch --all'
 alias gdc='git diff --cached'
 alias gds='git diff --stat'
 alias gitka='gitk --all'
