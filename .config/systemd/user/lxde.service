@@ -1,6 +1,5 @@
 [Unit]
-#Requires=xorg.target
-#After=xorg.target
+After=xorg.target
 
 # TODO do stuff like what's in startlxde?
 

@@ -1,5 +1,5 @@
 [Unit]
-#Wants=xorg.target
+After=xorg.target
 
 [Service]
 ExecStart=/usr/bin/setxkbmap -layout gb

@@ -1,6 +1,5 @@
 [Unit]
-#Requires=xorg.target
-#After=xorg.target
+After=xorg.target
 
 [Service]
 #Environment=PATH=uncomment:to:override:your:PATH
