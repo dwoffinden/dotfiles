@@ -143,7 +143,11 @@ function bckground {
 alias cabal-install-xmobar='cabal install xmobar --flags="with_threaded with_utf8 with_xft with_mpd with_alsa"'
 
 function find-loose-git-objects {
-  find ./ -wholename "*.git/*objects/*" -type d \! \( -name info -o -name pack \) -print
+  find ./ -wholename "*/.git/*objects/*" -type d \! \( -name info -o -name pack \) "$@"
+}
+
+function find-dropbox-conflicts {
+  find ~/Dropbox/ -name "*'s conflicted copy *" "$@"
 }
 
 function oh-my-zsh-clone {
