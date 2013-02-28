@@ -14,10 +14,10 @@ ZSH_THEME='woof'
 # CASE_SENSITIVE="true"
 
 # Comment this out to disable weekly auto-update checks
-# DISABLE_AUTO_UPDATE="true"
+DISABLE_AUTO_UPDATE="true"
 
 # Uncomment following line if you want to disable colors in ls
-# DISABLE_LS_COLORS="true"
+DISABLE_LS_COLORS="true"
 
 # Uncomment following line if you want to disable autosetting terminal title.
 # DISABLE_AUTO_TITLE="true"
@@ -105,8 +105,9 @@ fi
 ### UNIVERSAL ALIASES ###
 alias -g G='| grep --color=auto'
 alias -g L='| less'
-alias ls='ls -Fh --color=auto'
+alias ls='ls -Fhv --color=auto --group-directories-first'
 alias l='ls -l'
+alias lg='ls -gG'
 alias la='ls -la'
 alias lR='ls -lR'
 alias v='vim'
@@ -148,32 +149,6 @@ function find-loose-git-objects {
 
 function find-dropbox-conflicts {
   find ~/Dropbox/ -name "*'s conflicted copy *" "$@"
-}
-
-function oh-my-zsh-clone {
-  local D=`pwd`
-  git clone git://github.com/robbyrussell/oh-my-zsh.git "$ZSH" && \
-  cd "$ZSH" && \
-  git remote add dwoffinden git://github.com/dwoffinden/oh-my-zsh.git && \
-  git remote add upstream git@github.com:dwoffinden/oh-my-zsh.git && \
-  cd "$ZSH/custom/plugins/zsh-syntax-highlighting" && \
-  git clone git://github.com/zsh-users/zsh-syntax-highlighting.git
-  cd "$D"
-}
-
-function oh-my-zsh-update {
-  local D=`pwd`
-
-  cd "$ZSH" && \
-  git pull dwoffinden master && \
-  git pull origin master && \
-  git-repack-aggressive
-
-  cd "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" && \
-  git pull git://github.com/zsh-users/zsh-syntax-highlighting.git master && \
-  git-repack-aggressive
-
-  cd "$D"
 }
 
 function fliptable {
@@ -311,20 +286,16 @@ esac
 
 tput setaf 2
 uname -nrmo
-[[ -f /proc/cpuinfo ]] && grep "^model name" /proc/cpuinfo -m1 | cut -f2 | tail -c+3
+[[ -f /proc/cpuinfo ]] && grep "^model name" /proc/cpuinfo -m1 | tail -c+14
 date
-if (which fortune &> /dev/null); then
-  if (which cowsay &> /dev/null); then
-    fortune -as | cowsay -W 74 -f `cowsay -l | tail -n+2 | tr " " "\n" | shuf -n1`
-  else
-    fortune -as
-  fi
+if (command -v fortune &> /dev/null); then
+  fortune -as | cowsay -W 74 -f `cowsay -l | tail -n+2 | tr " " "\n" | shuf -n1`
 else
   echo "No fortunes for you!"
 fi
 tput sgr0
 
-#####[ CLEAR UP ]###########################################################
+#####[ CLEAN UP ]###########################################################
 
 unset CONF
 
@@ -333,7 +304,5 @@ unset CONF
 [[ -f ~/Dropbox/desktop.ini ]] && rm -v ~/Dropbox/desktop.ini
 
 ############################################################################
-
-#export PATH=$PATH:~/Dropbox/uni/2nd_year/pintos/src/utils
 
 true
