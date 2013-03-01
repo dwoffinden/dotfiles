@@ -229,9 +229,9 @@ case "$CONF" in
       sudo systemctl restart dropbox@`whoami`
     }
     alias writer='libreoffice --writer'
-    alias sudo='sudo '
     alias s='sudo'
     alias y='yaourt'
+    alias ysc='yaourt -Sc --noconfirm'
     alias sp='sudo pacman'
     alias sv='sudo vim'
     alias svd='sudo vimdiff'
