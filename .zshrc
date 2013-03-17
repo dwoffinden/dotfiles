@@ -34,9 +34,9 @@ source $ZSH/oh-my-zsh.sh
 
 #####[ CONFIG SELECTION ]###################################################
 #
-#   {LABS,GLADYS,WINONA,VERA}
+#   {LABS,GLADYS,WINONA,VERA,TOMBSTONE}
 #
-#   TODO Archlinux flag, specific options?
+#   TODO flags? eg archlinux, laptop?
 
 [[ -n "$CONF" ]] && echo "CONF already set to \"$CONF\", WTF?"
 
@@ -58,7 +58,7 @@ setopt autopushd
 setopt autocd
 setopt auto_param_slash
 
-HISTFILE=/tmp/.zsh-hist-$(whoami)
+HISTFILE=/tmp/.zsh-hist-`whoami`
 HISTSIZE=1000
 SAVEHIST=1000
 setopt append_history
@@ -95,9 +95,9 @@ export EDITOR=vim
 export VISUAL=$EDITOR
 
 if [[ "$CONF" = LABS ]]; then
-    source ~/.profile
-    #location of the dropbox lock file, LEAVE UNASSIGNED OTHERWISE
-    export DLOCKDIR=~/.dropboxLock
+  source ~/.profile
+  #location of the dropbox lock file, LEAVE UNASSIGNED OTHERWISE
+  export DLOCKDIR=~/.dropboxLock
 fi
 
 #####[ ALIASES ]############################################################
@@ -138,7 +138,7 @@ alias gitka='gitk --all'
 alias tiga='tig --all'
 
 function bckground {
-    nohup $@ </dev/null &>/dev/null &
+  nohup $@ </dev/null &>/dev/null &
 }
 
 alias cabal-install-xmobar='cabal install xmobar --flags="with_threaded with_utf8 with_xft with_mpd with_alsa"'
@@ -155,7 +155,7 @@ function fliptable {
   echo "（╯°□°）╯︵ ┻━┻"
 }
 
-function sbt-clean() {
+function sbt-clean {
   echo "Cleaning ~/.sbt:"
   rm -rfv ~/.sbt/{boot,staging,plugins/{project,target}}
 
@@ -219,13 +219,13 @@ case "$CONF" in
   *)
     ### ALL NON-LABS ###
     alias dstat='dropbox status'
-    function dstart() {
+    function dstart {
       sudo systemctl start dropbox@`whoami`
     }
-    function dstop() {
+    function dstop {
       sudo systemctl stop dropbox@`whoami`
     }
-    function drestart() {
+    function drestart {
       sudo systemctl restart dropbox@`whoami`
     }
     alias writer='libreoffice --writer'
@@ -245,10 +245,10 @@ case "$CONF" in
     alias mount-icfs='mount /media/icfs'
     #//fs-homes.doc.ic.ac.uk /mnt/labs cifs defaults,user,noauto,relatime,domain=WIN,user=daw10 0 0
     #//icfs7.cc.ic.ac.uk     /mnt/icfs cifs defaults,user,noauto,relatime,domain=IC,user=daw10  0 0
-    #alias mount-labs='sudo mount -t cifs //fs-homes.doc.ic.ac.uk/daw10\
+    #alias mount-labs='sudo mount -t cifs //fs-homes.doc.ic.ac.uk/daw10 \
     #             /media/labs -o user=WIN/daw10'
     #alias umount-labs='sudo umount /media/labs'
-    #alias mount-college='sudo mount -t cifs //icfs7.cc.ic.ac.uk/daw10\
+    #alias mount-college='sudo mount -t cifs //icfs7.cc.ic.ac.uk/daw10 \
     #             /media/college -o user=IC/daw10'
     #alias umount-college='sudo umount /media/college'
     alias pwoff='systemctl poweroff'
@@ -258,23 +258,23 @@ case "$CONF" in
     ;|
   GLADYS | WINONA) # Laptops
     alias hdmi-off='xrandr --output HDMI-0 --off'
-    alias hdmi-on='xrandr --output HDMI-0 --mode 1920x1080 --rate 60\
+    alias hdmi-on='xrandr --output HDMI-0 --mode 1920x1080 --rate 60 \
                           --set underscan off --right-of LVDS'
     alias crt-off='xrandr --output CRT1 --off'
-    alias crt-on='xrandr --output CRT1 --mode 1920x1080 --rate 60\
+    alias crt-on='xrandr --output CRT1 --mode 1920x1080 --rate 60 \
                           --right-of LVDS'
     alias vga-off='xrandr --output VGA-0 --off'
-    alias vga-on='xrandr --output VGA-0 --mode 1920x1080 --rate 60\
+    alias vga-on='xrandr --output VGA-0 --mode 1920x1080 --rate 60 \
                           --right-of LVDS'
     ;|
     #aplay -l
   GLADYS)
-    alias hdmi-test='aplay -D plughw:1,3\
+    alias hdmi-test='aplay -D plughw:1,3 \
                      /usr/share/sounds/alsa/Front_Center.wav'
     alias mplayer-hdmi='mplayer -ao alsa:device=hw1.3'
     ;;
   WINONA)
-    alias hdmi-test='aplay -D plughw:0,1\
+    alias hdmi-test='aplay -D plughw:0,1 \
                      /usr/share/sounds/alsa/Front_Center.wav'
     alias mplayer-hdmi='mplayer -ao alsa:device=hw0.1'
     ;;
