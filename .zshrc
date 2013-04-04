@@ -36,7 +36,9 @@ source $ZSH/oh-my-zsh.sh
 #
 #   {LABS,GLADYS,WINONA,VERA,TOMBSTONE}
 #
-#   TODO flags? eg archlinux, laptop?
+#   TODO feature-specific flags? e.g. archlinux, ubuntu, laptop, labs?
+#   TODO use hostname / domainname
+#   TODO add /usr/games to path?
 
 [[ -n "$CONF" ]] && echo "CONF already set to \"$CONF\", WTF?"
 
