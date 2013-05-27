@@ -24,7 +24,7 @@ else
   unit='xmonad.target'
 fi
 
-exec systemd --user --unit=$unit
+exec /usr/lib/systemd/systemd --user --unit=$unit
 
 #[ -n "$1" ] && wm="$1" || wm='xmonad'
 
