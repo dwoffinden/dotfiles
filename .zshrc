@@ -138,7 +138,7 @@ alias gfa='git fetch --all'
 alias gdc='git diff --cached'
 alias gds='git diff --stat'
 alias gitka="gitk --argscmd='git for-each-ref --format=\"%(refname)\" refs/heads refs/tags'"
-alias tiga='tig --all'
+alias tiga='tig $(git for-each-ref --format="%(refname)" refs/heads refs/tags)'
 
 function bckground {
   nohup $@ </dev/null &>/dev/null &
