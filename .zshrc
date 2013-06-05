@@ -137,7 +137,7 @@ alias git-repack-aggressive='git repack -Adf --depth=300 --window=300'
 alias gfa='git fetch --all'
 alias gdc='git diff --cached'
 alias gds='git diff --stat'
-alias gitka='gitk --all'
+alias gitka="gitk --argscmd='git for-each-ref --format=\"%(refname)\" refs/heads refs/tags'"
 alias tiga='tig --all'
 
 function bckground {
