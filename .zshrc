@@ -258,6 +258,7 @@ case "$CONF" in
     alias hbernate='systemctl hibernate'
     alias rboot='systemctl reboot'
     alias abcde-mp3-high='abcde -o mp3:"-V0 -q0 -ms"'
+    alias abcde-flac='abcde -o flac:"--verify --best"'
     ;|
   GLADYS | WINONA) # Laptops
     alias hdmi-off='xrandr --output HDMI-0 --off'
