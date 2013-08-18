@@ -147,7 +147,7 @@ function bckground {
   nohup $@ </dev/null &>/dev/null &
 }
 
-alias cabal-install-xmobar='cabal install xmobar --flags="with_threaded with_utf8 with_xft with_mpd with_alsa"'
+alias cabal-install-xmobar='cabal install xmobar --flags="with_threaded with_utf8 with_xft with_alsa with_iwlib with_mpd"'
 
 function find-loose-git-objects {
   find ./ -wholename "*/.git/*objects/*" -type d \! \( -name info -o -name pack \) "$@"
