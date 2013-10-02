@@ -159,9 +159,12 @@ myKeys = do
                    , ("<XF86AudioLowerVolume>", "1-")
                    ]
     ]
-    {- Spawning Firefox -}
+    {- Spawning Browsers -}
     ++ [ ( k, runOrRaise "firefox" (className =? "Firefox"))
-       | k <- ["M-f", "<XF86HomePage>"]
+       | k <- ["M-f"]
+    ]
+    ++ [ ( k, runOrRaise "chromium" (className =? "Chromium-browser"))
+       | k <- ["M-c", "<XF86HomePage>"]
     ]
     {- Screen Locking -}
     ++ [ (k , lock >> screenOff)
