@@ -101,7 +101,6 @@ myWorkspaces = map (:"") "`1234567890-="
 
 myKeys = do
   (hasMpd, hasWifi) <- getConfiguration
-  lock <- safeSpawnProg . fromMaybe "xlock" <$> findExecutable "slock"
   return $ \c -> mkKeymap c $
     [ ("M-S-<Return>",     safeSpawnProg $ XMonad.terminal c)
     , ("M-p",              safeSpawnProg "dmenu_run")
@@ -188,6 +187,10 @@ myKeys = do
       ]
     )
   where
+    lock =
+      safeSpawn "xdg-screensaver" ["lock"] -- TODO findExecutable ONCE
+    mpd_ =
+      void . io . withMPD
     safeRunInTerm c o =
       asks (terminal . config) >>= flip safeSpawn (["-e", c] ++ o)
     safeRunProgInTerm c =
@@ -196,8 +199,6 @@ myKeys = do
       io . threadDelay . seconds
     screenOff =
       sleep 1 >> safeSpawn "xset" ["dpms", "force", "off"]
-    mpd_ =
-      void . io . withMPD
     xmessage m =
       void $ safeSpawn "xmessage" [m]
 
