@@ -133,7 +133,7 @@ myKeys = do
     , ("M-<Print>",        safeSpawn "import" [ "-window", "root"
                                               , "screenshot.png" ])
     , ("<XF86Eject>",      safeSpawn "eject" ["-T"])
-    , ("<XF86Sleep>",      lock >> sleep 1
+    , ("<XF86Sleep>",      lock >> sleep 2
                            >> safeSpawn "sudo" ["pm-hibernate"])
     , ("<XF86Calculator>", safeSpawnProg "speedcrunch")
     , ("<XF86Search>",     xmessage "search")
@@ -166,7 +166,7 @@ myKeys = do
        | k <- ["M-c", "<XF86HomePage>"]
     ]
     {- Screen Locking -}
-    ++ [ (k , lock >> screenOff)
+    ++ [ (k , lock >> sleep 2 >> screenOff)
        | k <- ["M-x", "<XF86ScreenSaver>"]
     ]
     {- WiFi manager -}
