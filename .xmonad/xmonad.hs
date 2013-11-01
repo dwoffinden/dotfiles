@@ -37,7 +37,7 @@ http://hackage.haskell.org/packages/archive/xmonad-contrib/0.8/doc/html/XMonad-H
 TODO: xmobar options on the command line? no?
  -}
 
-myBar = "xmobar"
+myBar = "~/.cabal/bin/xmobar"
 
 myPP = xmobarPP { ppCurrent = xmobarColor "#429942" "" . wrap "<" ">" }
 

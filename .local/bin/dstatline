@@ -1,0 +1,10 @@
+#!/usr/bin/perl
+
+#use strict;
+#use warnings;
+
+open (D, "dropbox status |");
+
+chomp(my @out = <D>);
+
+print join(" ", @out);

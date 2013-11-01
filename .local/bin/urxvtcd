@@ -1,0 +1,11 @@
+#!/usr/bin/perl
+
+#use strict;
+#use warnings;
+
+my $ec = system("urxvtc", @ARGV) >> 8;
+
+if ($ec == 2) {
+  system("urxvtd", "-q", "-f", "-o");
+  system("urxvtc", @ARGV);
+}
