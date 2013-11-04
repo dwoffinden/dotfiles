@@ -1,5 +1,6 @@
 [Unit]
 Description=XScreensaver
+After=xorg.target
 
 [Service]
 ExecStart=/usr/bin/xscreensaver -no-splash
