@@ -17,6 +17,7 @@ import           System.Process
 import           XMonad
 import           XMonad.Actions.WindowGo
 import           XMonad.Hooks.DynamicLog
+import           XMonad.Hooks.EwmhDesktops
 import           XMonad.Hooks.ManageDocks
 import           XMonad.Hooks.ManageHelpers
 import           XMonad.Hooks.SetWMName
@@ -73,8 +74,7 @@ myManageHook = composeAll
   , isFullscreen                  --> doFullFloat
   ]
 
-myHandleEventHook = mempty
---myHandleEventHook = fullscreenEventHook
+myHandleEventHook = fullscreenEventHook
 
 myLogHook = return ()
 
