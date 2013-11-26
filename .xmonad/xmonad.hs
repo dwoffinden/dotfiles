@@ -68,6 +68,7 @@ myStartupHook =
 
 myManageHook = composeAll
   [ className =? "MPlayer"        --> doFloat
+  , className =? "Zenity"         --> doFloat
   , resource  =? "desktop_window" --> doIgnore
   , resource  =? "kdesktop"       --> doIgnore
 --, isFullscreen                  --> (doF W.focusDown <+> doFullFloat)
