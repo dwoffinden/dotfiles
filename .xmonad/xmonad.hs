@@ -52,8 +52,17 @@ myFocusedColour = "#ff0000"
 
 myModMask = mod4Mask
 
-{- If urxvt is not installed, use xterm. -}
-myTerminal = io $ fromMaybe "xterm" <$> findExecutable "urxvtc"
+{- If urxvt is not installed, use xterm. If it is, prefer urxvtcd. -}
+myTerminal = io $
+  findExecutable "urxvt"
+  >>= maybe (return "xterm") (\a -> fromMaybe a <$> findExecutable "urxvtcd")
+
+getHomes :: MonadIO m => m (FilePath, FilePath)
+getHomes = io $ do
+  h <- getHomeDirectory
+  return (h, myWP h)
+  where
+    myWP = (</> "Dropbox/wallpaper/wallpaper-2473668.jpg")
 
 getConfiguration :: (MonadIO m) => m (Bool, Bool)
 getConfiguration = io $ do
@@ -63,8 +72,29 @@ getConfiguration = io $ do
     hasMpd      = (== "vera")
     hasWifi     = flip elem ["gladys", "winona"]
 
-myStartupHook =
+myStartupHook = do
+  safeSpawn "killall" ["trayer"]
   setWMName "LG3D" --fuck java
+  safeSpawn "setxkbmap" ["-layout", "gb"]
+  safeSpawn "xsetroot" ["-cursor_name", "left_ptr"]
+  (home, wp) <- getHomes
+  safeSpawn "xrdb" ["-merge", ( home </> ".Xresources" )]
+  safeSpawn "feh" ["--no-fehbg", "--bg-fill", wp]
+  safeSpawn "trayer" [ "--edge", "top"
+                     , "--align", "right"
+                     , "--margin", "0"
+                     , "--SetDockType", "true"
+                     , "--SetPartialStrut", "true"
+                     , "--heighttype", "pixel"
+                     , "--height", "16"
+                     , "--widthtype", "pixel"
+                     , "--width", "96"
+                     , "--transparent", "true"
+                     , "--tint", "0"
+                     , "--alpha", "0"
+                     , "--expand", "true"
+                     , "--padding", "0"
+                     ]
 
 myManageHook = composeAll
   [ className =? "MPlayer"        --> doFloat
@@ -123,7 +153,7 @@ myKeys = do
     , ("M-t",              withFocused $ windows . W.sink)
     , ("M-,",              sendMessage (IncMasterN 1))
     , ("M-.",              sendMessage (IncMasterN (-1)))
-    , ("M-S-q",            io $ safeSpawn "systemctl" ["--user", "exit"])
+    , ("M-S-q",            io exitSuccess)
     , ("M-q",              recompile False >>= (flip when)
                              (safeSpawn "xmonad" ["--restart"]))
     , ("M-a",              safeRunInTerm "alsamixer" [])
