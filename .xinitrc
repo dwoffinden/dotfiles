@@ -18,14 +18,13 @@ fi
 #xrandr --output LVDS --mode 1366x768
 #xrandr --output VGA-0 --mode 1920x1080 --rate 60 --right-of LVDS
 
-if [[ -n "$2" ]] ; then
-  unit=$2
-else
-  unit='xmonad.target'
-fi
+#if [[ -n "$2" ]] ; then
+#  unit=$2
+#else
+#  unit='xmonad.target'
+#fi
+#
+#exec /usr/lib/systemd/systemd --user --unit=$unit
 
-exec /usr/lib/systemd/systemd --user --unit=$unit
-
-#[ -n "$1" ] && wm="$1" || wm='xmonad'
-
-#exec $wm
+[ -n "$1" ] && wm="$1" || wm='/usr/bin/xmonad'
+exec $wm

@@ -73,28 +73,27 @@ getConfiguration = io $ do
     hasWifi     = flip elem ["gladys", "winona"]
 
 myStartupHook = do
-  safeSpawn "killall" ["trayer"]
   setWMName "LG3D" --fuck java
   safeSpawn "setxkbmap" ["-layout", "gb"]
   safeSpawn "xsetroot" ["-cursor_name", "left_ptr"]
   (home, wp) <- getHomes
   safeSpawn "xrdb" ["-merge", ( home </> ".Xresources" )]
   safeSpawn "feh" ["--no-fehbg", "--bg-fill", wp]
-  safeSpawn "trayer" [ "--edge", "top"
-                     , "--align", "right"
-                     , "--margin", "0"
-                     , "--SetDockType", "true"
-                     , "--SetPartialStrut", "true"
-                     , "--heighttype", "pixel"
-                     , "--height", "16"
-                     , "--widthtype", "pixel"
-                     , "--width", "96"
-                     , "--transparent", "true"
-                     , "--tint", "0"
-                     , "--alpha", "0"
-                     , "--expand", "true"
-                     , "--padding", "0"
-                     ]
+  spawn $ "killall trayer && trayer"
+                     ++ "--edge top"
+                     ++ "--align right"
+                     ++ "--margin 0"
+                     ++ "--SetDockType true"
+                     ++ "--SetPartialStrut true"
+                     ++ "--heighttype pixel"
+                     ++ "--height 16"
+                     ++ "--widthtype pixel"
+                     ++ "--width 96"
+                     ++ "--transparent true"
+                     ++ "--tint 0"
+                     ++ "--alpha 0"
+                     ++ "--expand true"
+                     ++ "--padding 0"
 
 myManageHook = composeAll
   [ className =? "MPlayer"        --> doFloat
