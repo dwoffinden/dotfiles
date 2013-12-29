@@ -79,6 +79,7 @@ myStartupHook = do
   (home, wp) <- getHomes
   safeSpawn "xrdb" ["-merge", ( home </> ".Xresources" )]
   safeSpawn "feh" ["--no-fehbg", "--bg-fill", wp]
+  safeSpawn "xscreensaver" ["-no-splash"]
   spawn $ "killall trayer && trayer"
                      ++ "--edge top"
                      ++ "--align right"
