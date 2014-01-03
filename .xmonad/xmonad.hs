@@ -80,21 +80,28 @@ myStartupHook = do
   safeSpawn "xrdb" ["-merge", ( home </> ".Xresources" )]
   safeSpawn "feh" ["--no-fehbg", "--bg-fill", wp]
   safeSpawn "xscreensaver" ["-no-splash"]
-  spawn $ "killall trayer ; trayer"
-                     ++ " --edge top"
-                     ++ " --align right"
-                     ++ " --margin 0"
-                     ++ " --SetDockType true"
-                     ++ " --SetPartialStrut true"
-                     ++ " --heighttype pixel"
-                     ++ " --height 16"
-                     ++ " --widthtype pixel"
-                     ++ " --width 96"
-                     ++ " --transparent true"
-                     ++ " --tint 0"
-                     ++ " --alpha 0"
-                     ++ " --expand true"
-                     ++ " --padding 0"
+  ifNotRunning "trayer" $ safeSpawn "trayer"
+                     [ "--edge", "top"
+                     , "--align", "right"
+                     , "--margin", "0"
+                     , "--SetDockType", "true"
+                     , "--SetPartialStrut", "true"
+                     , "--heighttype", "pixel"
+                     , "--height", "16"
+                     , "--widthtype", "pixel"
+                     , "--width", "96"
+                     , "--transparent", "true"
+                     , "--tint", "0"
+                     , "--alpha", "0"
+                     , "--expand", "true"
+                     , "--padding", "0"
+                     ]
+
+ifNotRunning :: (MonadIO m, Functor m) => FilePath -> m () -> m ()
+ifNotRunning prog hook = do
+  noPids <- null <$> runProcessWithInput "pgrep" [prog] ""
+  safeSpawn "zenity" ["--info", "--text", show noPids]
+  if noPids then hook else return ()
 
 myManageHook = composeAll
   [ className =? "MPlayer"        --> doFloat
