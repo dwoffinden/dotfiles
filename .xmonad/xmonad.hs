@@ -115,6 +115,7 @@ ifNotRunning prog hook = do
 myManageHook = composeAll
   [ className =? "MPlayer"        --> doFloat
   , className =? "Zenity"         --> doFloat
+  , className =? "Xmessage"       --> doFloat
   , resource  =? "desktop_window" --> doIgnore
   , resource  =? "kdesktop"       --> doIgnore
 --, isFullscreen                  --> (doF W.focusDown <+> doFullFloat)
