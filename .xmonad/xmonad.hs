@@ -69,8 +69,8 @@ getConfiguration = io $ do
   h <- nodeName <$> getSystemID
   return (hasMpd h, hasWifi h)
   where
-    hasMpd      = (== "vera")
-    hasWifi     = flip elem ["gladys", "winona"]
+    hasMpd   = (== "vera")
+    hasWifi  = flip elem ["gladys", "winona"]
 
 myStartupHook = do
   setWMName "LG3D" --fuck java
@@ -80,21 +80,21 @@ myStartupHook = do
   safeSpawn "xrdb" ["-merge", ( home </> ".Xresources" )]
   safeSpawn "feh" ["--no-fehbg", "--bg-fill", wp]
   safeSpawn "xscreensaver" ["-no-splash"]
-  spawn $ "killall trayer && trayer"
-                     ++ "--edge top"
-                     ++ "--align right"
-                     ++ "--margin 0"
-                     ++ "--SetDockType true"
-                     ++ "--SetPartialStrut true"
-                     ++ "--heighttype pixel"
-                     ++ "--height 16"
-                     ++ "--widthtype pixel"
-                     ++ "--width 96"
-                     ++ "--transparent true"
-                     ++ "--tint 0"
-                     ++ "--alpha 0"
-                     ++ "--expand true"
-                     ++ "--padding 0"
+  spawn $ "killall trayer ; trayer"
+                     ++ " --edge top"
+                     ++ " --align right"
+                     ++ " --margin 0"
+                     ++ " --SetDockType true"
+                     ++ " --SetPartialStrut true"
+                     ++ " --heighttype pixel"
+                     ++ " --height 16"
+                     ++ " --widthtype pixel"
+                     ++ " --width 96"
+                     ++ " --transparent true"
+                     ++ " --tint 0"
+                     ++ " --alpha 0"
+                     ++ " --expand true"
+                     ++ " --padding 0"
 
 myManageHook = composeAll
   [ className =? "MPlayer"        --> doFloat
@@ -219,7 +219,7 @@ myKeys = do
     )
   where
     lock =
-      safeSpawn "xdg-screensaver" ["lock"] -- TODO findExecutable ONCE
+      safeSpawn "xdg-screensaver" ["lock"] -- TODO findExecutable ONCE, else zenity?
     mpd_ =
       void . io . withMPD
     safeRunInTerm c o =
