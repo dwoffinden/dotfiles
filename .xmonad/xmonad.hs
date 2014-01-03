@@ -62,13 +62,14 @@ getHomes = io $ do
   where
     myWP = (</> "Dropbox" </> "wallpaper" </> "wallpaper-2473668.jpg")
 
-getConfiguration :: (MonadIO m) => m (Bool, Bool)
+getConfiguration :: (MonadIO m) => m (Bool, Bool, Bool)
 getConfiguration = io $ do
   h <- nodeName <$> getSystemID
-  return (hasMpd h, hasWifi h)
+  return (hasMpd h, hasWifi h, needsScreensaver h)
   where
-    hasMpd   = (== "vera")
-    hasWifi  = flip elem ["gladys", "winona"]
+    hasMpd  = (== "vera")
+    hasWifi = flip elem ["gladys", "winona"]
+    needsScreensaver = flip elem ["gladys", "vera", "winona"]
 
 myStartupHook = do
   setWMName "LG3D" --fuck java
@@ -77,7 +78,10 @@ myStartupHook = do
   (home, wp) <- getHomes
   safeSpawn "xrdb" ["-merge", ( home </> ".Xresources" )]
   safeSpawn "feh" ["--no-fehbg", "--bg-fill", wp]
-  safeSpawn "xscreensaver" ["-no-splash"]
+  (_, _, needsScreensaver) <- getConfiguration
+  if needsScreensaver
+    then safeSpawn "xscreensaver" ["-no-splash"]
+    else return ()
   ifNotRunning "urxvtd" $ safeSpawn "urxvtd" ["-q", "-o"]
   ifNotRunning "trayer" $ safeSpawn "trayer"
                      [ "--edge", "top"
@@ -136,7 +140,7 @@ myLayout = smartBorders $ avoidStruts $
 myWorkspaces = map (:"") "`1234567890-="
 
 myKeys = do
-  (hasMpd, hasWifi) <- getConfiguration
+  (hasMpd, hasWifi, _) <- getConfiguration
   return $ \c -> mkKeymap c $
     [ ("M-S-<Return>",     safeSpawnProg $ XMonad.terminal c)
     , ("M-p",              safeSpawnProg "dmenu_run")
