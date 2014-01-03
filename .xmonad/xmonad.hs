@@ -62,14 +62,21 @@ getHomes = io $ do
   where
     myWP = (</> "Dropbox" </> "wallpaper" </> "wallpaper-2473668.jpg")
 
-getConfiguration :: (MonadIO m) => m (Bool, Bool, Bool)
+getConfiguration :: (MonadIO m, Integral n) => m (Bool, Bool, Bool, n)
 getConfiguration = io $ do
   h <- nodeName <$> getSystemID
-  return (hasMpd h, hasWifi h, needsScreensaver h)
+  return (hasMpd h, hasWifi h, needsScreensaver h, trayerWidth h)
   where
     hasMpd  = (== "vera")
     hasWifi = flip elem ["gladys", "winona"]
     needsScreensaver = flip elem ["gladys", "vera", "winona"]
+    --trayerWidth = (\x -> (x `div` 320) * 16)
+    trayerWidth = (* 16) . (flip div 320) -- round 5% down to a multiple of 16
+                . (fromMaybe 1280) -- sane default for labs
+                . (flip lookup [ ("winona", 1024)
+                               , ("gladys", 1440)
+                               , ("vera",   1920)
+                               ])
 
 myStartupHook = do
   setWMName "LG3D" --fuck java
@@ -78,8 +85,8 @@ myStartupHook = do
   (home, wp) <- getHomes
   safeSpawn "xrdb" ["-merge", ( home </> ".Xresources" )]
   safeSpawn "feh" ["--no-fehbg", "--bg-fill", wp]
-  (_, _, needsScreensaver) <- getConfiguration
-  if needsScreensaver
+  (_, _, screensaver, tw) <- getConfiguration
+  if screensaver
     then safeSpawn "xscreensaver" ["-no-splash"]
     else return ()
   ifNotRunning "urxvtd" $ safeSpawn "urxvtd" ["-q", "-o"]
@@ -92,7 +99,7 @@ myStartupHook = do
                      , "--heighttype", "pixel"
                      , "--height", "16"
                      , "--widthtype", "pixel"
-                     , "--width", "96"
+                     , "--width", show tw
                      , "--transparent", "true"
                      , "--tint", "0"
                      , "--alpha", "0"
@@ -140,7 +147,7 @@ myLayout = smartBorders $ avoidStruts $
 myWorkspaces = map (:"") "`1234567890-="
 
 myKeys = do
-  (hasMpd, hasWifi, _) <- getConfiguration
+  (hasMpd, hasWifi, _, _) <- getConfiguration
   return $ \c -> mkKeymap c $
     [ ("M-S-<Return>",     safeSpawnProg $ XMonad.terminal c)
     , ("M-p",              safeSpawnProg "dmenu_run")
