@@ -38,7 +38,7 @@ http://hackage.haskell.org/packages/archive/xmonad-contrib/0.8/doc/html/XMonad-H
 TODO: xmobar options on the command line? no?
  -}
 
-myBar = "~/.cabal/bin/xmobar"
+myBar = "~" </> ".cabal" </> "bin" </> "xmobar"
 
 myPP = xmobarPP { ppCurrent = xmobarColor "#429942" "" . wrap "<" ">" }
 
@@ -52,17 +52,15 @@ myFocusedColour = "#ff0000"
 
 myModMask = mod4Mask
 
-{- If urxvt is not installed, use xterm. If it is, prefer urxvtcd. -}
-myTerminal = io $
-  findExecutable "urxvt"
-  >>= maybe (return "xterm") (\a -> fromMaybe a <$> findExecutable "urxvtcd")
+{- If urxvt is not installed, use xterm. -}
+myTerminal = io $ fromMaybe "xterm" <$> findExecutable "urxvtc"
 
 getHomes :: MonadIO m => m (FilePath, FilePath)
 getHomes = io $ do
   h <- getHomeDirectory
   return (h, myWP h)
   where
-    myWP = (</> "Dropbox/wallpaper/wallpaper-2473668.jpg")
+    myWP = (</> "Dropbox" </> "wallpaper" </> "wallpaper-2473668.jpg")
 
 getConfiguration :: (MonadIO m) => m (Bool, Bool)
 getConfiguration = io $ do
@@ -80,6 +78,7 @@ myStartupHook = do
   safeSpawn "xrdb" ["-merge", ( home </> ".Xresources" )]
   safeSpawn "feh" ["--no-fehbg", "--bg-fill", wp]
   safeSpawn "xscreensaver" ["-no-splash"]
+  ifNotRunning "urxvtd" $ safeSpawn "urxvtd" ["-q", "-o"]
   ifNotRunning "trayer" $ safeSpawn "trayer"
                      [ "--edge", "top"
                      , "--align", "right"
@@ -100,7 +99,6 @@ myStartupHook = do
 ifNotRunning :: (MonadIO m, Functor m) => FilePath -> m () -> m ()
 ifNotRunning prog hook = do
   noPids <- null <$> runProcessWithInput "pgrep" [prog] ""
-  safeSpawn "zenity" ["--info", "--text", show noPids]
   if noPids then hook else return ()
 
 myManageHook = composeAll
