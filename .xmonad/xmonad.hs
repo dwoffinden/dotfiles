@@ -70,11 +70,10 @@ getConfiguration = io $ do
     hasMpd  = (== "vera")
     hasWifi = flip elem ["gladys", "winona"]
     needsScreensaver = flip elem ["gladys", "vera", "winona"]
-    --trayerWidth = (\x -> (x `div` 320) * 16)
-    trayerWidth = (* 16) . (flip div 320) -- round 5% down to a multiple of 16
-                . (fromMaybe 1280) -- sane default for labs
+    trayerWidth = (\w -> w - (w * 95 `div` 100) ) -- width, minus a 95% xmobar
+                . (fromMaybe 1920) -- sane default for labs
                 . (flip lookup [ ("winona", 1024)
-                               , ("gladys", 1440)
+                               , ("gladys", 1366)
                                , ("vera",   1920)
                                ])
 
@@ -248,7 +247,7 @@ myKeys = do
     screenOff =
       sleep 1 >> safeSpawn "xset" ["dpms", "force", "off"]
     xmessage m =
-      void $ safeSpawn "xmessage" [m]
+      void $ safeSpawn "xmessage" [m] -- TODO: replace with zenity. fall back to xmessage if not available?
 
 myConfig = do
   t <- myTerminal
