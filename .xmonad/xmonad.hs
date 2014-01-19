@@ -106,10 +106,10 @@ myStartupHook = do
                      , "--padding", "0"
                      ]
 
-ifNotRunning :: (MonadIO m, Functor m) => FilePath -> m () -> m ()
-ifNotRunning prog hook = do
+ifNotRunning :: MonadIO m => FilePath -> IO a -> m ()
+ifNotRunning prog hook = io . void . xfork $ do
   noPids <- null <$> runProcessWithInput "pgrep" [prog] ""
-  if noPids then hook else return ()
+  if noPids then void hook else return ()
 
 myManageHook = composeAll
   [ className =? "MPlayer"        --> doFloat
