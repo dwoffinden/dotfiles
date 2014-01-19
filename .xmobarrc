@@ -9,7 +9,7 @@ Config
         , Run Memory [ "-t", "<usedratio> <used> <free>"
                      , "-S", "True"
                      ] 20
-        , Run Com "~/.local/bin/cputemp" [] "cputemp" 50
+        , Run Com "cputemp" [] "cputemp" 50
         , Run CpuFreq [ "-t", "<cpu0> <cpu1> <cpu2> <cpu3>"
                       , "-L", "2"
                       , "-H", "3"
@@ -26,7 +26,7 @@ Config
                        , "-n", "yellow"
                        , "-h", "red"
                        ] 20
-        , Run Com "~/.local/bin/dstatline" [] "dropbox" 50
+        , Run Com "dstatline" [] "dropbox" 50
         , Run StdinReader
         , Run MPD ["-t","<artist> - <title> <statei> <lapsed>/<length>"] 10
         , Run Volume "default" "Master" [ "-t", "<volume> <status>"
