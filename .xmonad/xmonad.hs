@@ -65,11 +65,11 @@ getHomes = io $ do
 getConfiguration :: (MonadIO m, Integral n) => m (Bool, Bool, Bool, n)
 getConfiguration = io $ do
   h <- nodeName <$> getSystemID
-  return (hasMpd h, hasWifi h, needsScreensaver h, trayerWidth h)
+  return (hasMpd h, hasWifi h, needsXScreensaver h, trayerWidth h)
   where
     hasMpd  = (== "vera")
     hasWifi = flip elem ["gladys", "winona"]
-    needsScreensaver = flip elem ["gladys", "vera", "winona"]
+    needsXScreensaver = flip elem ["gladys", "vera", "winona"]
     trayerWidth = (\w -> w - (w * 95 `div` 100) ) -- width, minus a 95% xmobar
                 . (fromMaybe 1920) -- sane default for labs
                 . (flip lookup [ ("winona", 1024)
@@ -84,8 +84,8 @@ myStartupHook = do
   (home, wp) <- getHomes
   safeSpawn "xrdb" ["-merge", ( home </> ".Xresources" )]
   safeSpawn "feh" ["--no-fehbg", "--bg-fill", wp]
-  (_, _, screensaver, tw) <- getConfiguration
-  if screensaver
+  (_, _, xScreensaver, tw) <- getConfiguration
+  if xScreensaver
     then safeSpawn "xscreensaver" ["-no-splash"]
     else return ()
   ifNotRunning "urxvtd" $ safeSpawn "urxvtd" ["-q", "-o"]
@@ -148,6 +148,8 @@ myWorkspaces = map (:"") "`1234567890-="
 
 myKeys = do
   (hasMpd, hasWifi, _, _) <- getConfiguration
+  warn <- maybe (\msg -> safeSpawn "xmessage" [msg])
+    (\zty msg -> safeSpawn zty ["--warning", "--text", msg]) <$> findExecutable "zenity"
   return $ \c -> mkKeymap c $
     [ ("M-S-<Return>",     safeSpawnProg $ XMonad.terminal c)
     , ("M-p",              safeSpawnProg "dmenu_run")
@@ -174,8 +176,8 @@ myKeys = do
                              (safeSpawn "xmonad" ["--restart"]))
     , ("M-a",              safeRunInTerm "alsamixer" [])
     {- Power off screen -}
-    , ("M-S-s",            screenOff)
-    , ("M-s",              screenOff >> (when hasMpd $ mpd_ $ pause True))
+    , ("M-S-s",            sleep 2 >> screenOff)
+    , ("M-s",              sleep 2 >> screenOff >> (when hasMpd $ mpd_ $ pause True))
     {- Take a screenshot, save as 'screenshot.png' -}
     , ("M-<Print>",        safeSpawn "import" [ "-window", "root"
                                               , "screenshot.png" ])
@@ -183,9 +185,9 @@ myKeys = do
     , ("<XF86Sleep>",      lock >> sleep 2
                            >> safeSpawn "sudo" ["pm-hibernate"])
     , ("<XF86Calculator>", safeSpawnProg "speedcrunch")
-    , ("<XF86Search>",     xmessage "search")
-    , ("<XF86Mail>",       xmessage "mail")
-    , ("<XF86WebCam>",     xmessage "smile")
+    , ("<XF86Search>",     warn "search")
+    , ("<XF86Mail>",       warn "mail")
+    , ("<XF86WebCam>",     warn "smile")
     , ("<XF86Eject>",      safeSpawnProg "eject")
     ]
     {- Workspace Switching -}
@@ -213,7 +215,7 @@ myKeys = do
        | k <- ["M-c", "<XF86HomePage>"]
     ]
     {- Screen Locking -}
-    ++ [ (k , lock >> sleep 2 >> screenOff)
+    ++ [ (k , lock >> sleep 4 >> screenOff)
        | k <- ["M-x", "<XF86ScreenSaver>"]
     ]
     {- WiFi manager -}
@@ -235,7 +237,7 @@ myKeys = do
     )
   where
     lock =
-      safeSpawn "xdg-screensaver" ["lock"] -- TODO findExecutable ONCE, else zenity?
+      safeSpawn "xdg-screensaver" ["lock"]
     mpd_ =
       void . io . withMPD
     safeRunInTerm c o =
@@ -245,9 +247,7 @@ myKeys = do
     sleep =
       io . threadDelay . seconds
     screenOff =
-      sleep 1 >> safeSpawn "xset" ["dpms", "force", "off"]
-    xmessage m =
-      void $ safeSpawn "xmessage" [m] -- TODO: replace with zenity. fall back to xmessage if not available?
+      safeSpawn "xset" ["dpms", "force", "off"]
 
 myConfig = do
   t <- myTerminal
