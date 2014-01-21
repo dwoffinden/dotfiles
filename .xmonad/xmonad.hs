@@ -2,6 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 import           Control.Applicative
 import           Control.Concurrent
+import           Control.Exception
 import           Control.Monad
 import           Data.Maybe
 import           Data.Monoid
@@ -11,9 +12,11 @@ import           System.Directory
 import           System.Exit
 import           System.FilePath
 import           System.IO
+import           System.IO.Error
 import           System.Info
 import           System.Posix.Unistd hiding (sleep)
 import           System.Process
+import           Text.Read
 import           XMonad
 import           XMonad.Actions.WindowGo
 import           XMonad.Hooks.DynamicLog
@@ -108,8 +111,23 @@ myStartupHook = do
 
 ifNotRunning :: MonadIO m => FilePath -> IO a -> m ()
 ifNotRunning prog hook = io . void . xfork $ do
-  noPids <- null <$> runProcessWithInput "pgrep" [prog] ""
+  noPids <- null <$> pgrep prog
   if noPids then void hook else return ()
+
+pgrep :: String -> IO [Integer]
+pgrep comm = do
+  allPids <- mapMaybe readMaybe <$> getDirectoryContents "/proc"
+  filterM (\p -> maybe False (==comm) <$>
+    readFileMaybe ("/proc" </> show p </> "comm")) allPids
+  where
+    readFileMaybe f =
+       either (const Nothing) Just <$>
+        tryJust (guard . isDoesNotExistError) (readFirstLine f)
+    readFirstLine f = do
+      h <- openFile f ReadMode
+      str <- hGetLine h
+      hClose h
+      return str
 
 myManageHook = composeAll
   [ className =? "MPlayer"        --> doFloat

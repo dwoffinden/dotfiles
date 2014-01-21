@@ -2,5 +2,5 @@ msgcolor=1
 ao=alsa
 lavdopts=threads=4
 cdrom-device=/dev/sr0
-vo=vdpau
-vc=ffmpeg12vdpau,ffwmv3vdpau,ffvc1vdpau,ffh264vdpau,ffodivxvdpau,
+#vo=vdpau
+#vc=ffmpeg12vdpau,ffwmv3vdpau,ffvc1vdpau,ffh264vdpau,ffodivxvdpau,
