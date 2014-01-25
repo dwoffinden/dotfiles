@@ -1,5 +1,5 @@
 # XScreenSaver Preferences File
-# Written by xscreensaver-demo 5.26 for woof on Tue Jan 21 11:59:34 2014.
+# Written by xscreensaver-demo 5.26 for woof on Sat Jan 25 19:22:13 2014.
 # http://www.jwz.org/xscreensaver/
 
 timeout:	0:10:00
@@ -24,11 +24,11 @@ fadeTicks:	20
 captureStderr:	True
 ignoreUninstalledPrograms:False
 font:		*-medium-r-*-140-*-m-*
-dpmsEnabled:	False
+dpmsEnabled:	True
 dpmsQuickOff:	False
-dpmsStandby:	2:00:00
-dpmsSuspend:	2:00:00
-dpmsOff:	4:00:00
+dpmsStandby:	0:20:00
+dpmsSuspend:	0:20:00
+dpmsOff:	0:20:00
 grabDesktopImages:  False
 grabVideoFrames:    False
 chooseRandomImages: False
