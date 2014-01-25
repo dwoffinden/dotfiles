@@ -198,7 +198,7 @@ myKeys = do
     , ("M-S-s",            sleep 2 >> screenOff)
     , ("M-s",              sleep 2 >> screenOff >> (when hasMpd $ mpd_ $ pause True))
     {- Take a screenshot, save as 'screenshot.png' -}
-    , ("M-<Print>",        safeSpawn "import" [ "-window", "root"
+    , ("<Print>",          safeSpawn "import" [ "-window", "root"
                                               , "screenshot.png" ])
     , ("<XF86Eject>",      safeSpawn "eject" ["-T"])
     , ("<XF86Sleep>",      lock >> sleep 2
