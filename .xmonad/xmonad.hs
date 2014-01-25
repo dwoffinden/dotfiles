@@ -58,17 +58,16 @@ myModMask = mod4Mask
 {- If urxvt is not installed, use xterm. -}
 myTerminal = io $ fromMaybe "xterm" <$> findExecutable "urxvtc"
 
-getHomes :: MonadIO m => m (FilePath, FilePath)
-getHomes = io $ do
-  h <- getHomeDirectory
+getHomes = do
+  h <- io getHomeDirectory
   return (h, wp h)
   where
     wp = (</> "Dropbox" </> "wallpaper" </> "wallpaper-2473668.jpg")
 
  -- TODO unfix the type of suspend
-getConfiguration :: (MonadIO m, Functor m, Integral i) => m (Bool, Bool, Bool, i, X ())
+getConfiguration :: (MonadIO m, Integral i) => m (Bool, Bool, Bool, i, X ())
 getConfiguration = do
-  h <- nodeName <$> io getSystemID
+  h <- io $ nodeName <$> getSystemID
   return (hasMpd h, hasWifi h, needsXScreensaver h, trayerWidth h, suspend h)
   where
     isVera = (=="vera")
@@ -85,15 +84,17 @@ getConfiguration = do
                                ])
     suspend h =
       if (isHomeMachine h)
-        then io $ safeSpawn "systemctl" ["suspend"]
+        then safeSpawn "systemctl" ["suspend"]
         else screenOff
 
--- TODO BLOCKING
 lock :: MonadIO m => m ()
 lock = safeSpawn "xdg-screensaver" ["lock"]
 
 screenOff :: MonadIO m => m ()
 screenOff = safeSpawn "xset" ["dpms", "force", "off"]
+
+sleep :: MonadIO m => Rational -> m ()
+sleep = io . threadDelay . seconds
 
 myStartupHook = do
   setWMName "LG3D" --fuck java
@@ -134,8 +135,8 @@ ifNotRunning prog hook = io . void . forkIO $ do -- TODO bench forkIO vs xfork?
 
 -- TODO: A Bool version that can stop as soon as it finds a PID.
 --       Alternatively: Use lazy IO/conduit to delay reading the later files?
-pgrep :: (Integral n, Read n, Show n) => String -> IO [n]
-pgrep comm = do
+pgrep :: (MonadIO m, Integral i, Read i, Show i) => String -> m [i]
+pgrep comm = io $ do
   allPids <- mapMaybe readMaybe <$> getDirectoryContents "/proc"
   filterM (\p -> maybe False (==comm) <$>
     readFileMaybe ("/proc" </> show p </> "comm")) allPids
@@ -213,8 +214,8 @@ myKeys = do
     , ("M-q",              recompile False >>= (flip when) (safeSpawn "xmonad" ["--restart"]))
     , ("M-a",              safeRunInTerm "alsamixer" [])
     {- Power off screen -}
-    , ("M-S-s",            sleep 2 >> screenOff)
-    , ("M-s",              sleep 2 >> screenOff >> (when hasMpd $ mpd_ $ pause True))
+    , ("M-S-s",            sleep 1 >> screenOff)
+    , ("M-s",              (when hasMpd $ mpd_ $ pause True) >> sleep 1 >> screenOff)
     {- Take a screenshot, save as 'screenshot.png' -}
     , ("<Print>",          safeSpawn "import" [ "-window", "root"
                                               , "screenshot.png" ])
@@ -250,10 +251,10 @@ myKeys = do
        | k <- ["M-c", "<XF86HomePage>"]
     ]
     {- Screen Locking -}
-    ++ [ (k , lock >> sleep 2 >> screenOff)
+    ++ [ (k , lock >> sleep 1 >> screenOff)
        | k <- ["M-S-x", "<XF86ScreenSaver>"]
     ]
-    ++ [ (k , lock >> sleep 2 >> suspend)
+    ++ [ (k , lock >> sleep 1 >> suspend)
        | k <- ["M-x", "<XF86Sleep>"]
     ]
 {-
@@ -277,13 +278,11 @@ myKeys = do
     )
   where
     mpd_ =
-      void . io . withMPD
+      io . void . withMPD
     safeRunInTerm c o =
       asks (terminal . config) >>= flip safeSpawn (["-e", c] ++ o)
-    safeRunProgInTerm c =
-      safeRunInTerm c []
-    sleep =
-      io . threadDelay . seconds
+    safeRunProgInTerm =
+      flip safeRunInTerm []
 
 myConfig = do
   t <- myTerminal
