@@ -39,7 +39,19 @@ import           XMonad.Util.Run hiding (safeRunInTerm)
 {-
 http://hackage.haskell.org/packages/archive/xmonad-contrib/0.8/doc/html/XMonad-Hooks-DynamicLog.html
 TODO: xmobar options on the command line? no?
- -}
+-}
+
+ -- TODO unfix the type of suspend
+ -- TODO parameterise by type of trayerWidth (some Integral)? suspend/warn?
+data LocalConfig = LocalConfig { hasMpd :: Bool
+                               , hasWifi :: Bool
+                               , needsXScreensaver :: Bool
+                               , trayerWidth :: Int
+                               , suspend :: X ()
+                               , warn :: String -> X()
+                               , homeDir :: FilePath
+                               , wallpaper :: FilePath
+                               }
 
 myBar = "~" </> ".cabal" </> "bin" </> "xmobar"
 
@@ -58,31 +70,35 @@ myModMask = mod4Mask
 {- If urxvt is not installed, use xterm. -}
 myTerminal = io $ fromMaybe "xterm" <$> findExecutable "urxvtc"
 
-getHomes = do
-  h <- io getHomeDirectory
-  return (h, wp h)
-  where
-    wp = (</> "Dropbox" </> "wallpaper" </> "wallpaper-2473668.jpg")
+myWp = (</> "Dropbox" </> "wallpaper" </> "wallpaper-2473668.jpg")
 
- -- TODO unfix the type of suspend
-getConfiguration :: (MonadIO m, Integral i) => m (Bool, Bool, Bool, i, X ())
+getConfiguration :: (MonadIO m) => m LocalConfig
 getConfiguration = do
-  h <- io $ nodeName <$> getSystemID
-  return (hasMpd h, hasWifi h, needsXScreensaver h, trayerWidth h, suspend h)
+  home <- io getHomeDirectory
+  host <- io $ nodeName <$> getSystemID
+  warn' <- io $ maybe (\msg -> safeSpawn "xmessage" [msg])
+    (\zty msg -> safeSpawn zty ["--warning", "--text", msg]) <$> findExecutable "zenity"
+  return LocalConfig
+    { hasMpd  = isVera host
+    , hasWifi = isLaptop host
+    , needsXScreensaver = isHomeMachine host
+    , trayerWidth = tw host
+    , suspend = suspend' host
+    , warn = warn'
+    , homeDir = home
+    , wallpaper = myWp home
+    }
   where
     isVera = (=="vera")
     isLaptop = flip elem ["gladys", "winona"]
     isHomeMachine h = isVera h || isLaptop h
-    hasMpd  = isVera
-    hasWifi = isLaptop
-    needsXScreensaver = isHomeMachine
-    trayerWidth = (\w -> w - (w * 95 `div` 100) ) -- width, minus a 95% xmobar
-                . (fromMaybe 1920) -- sane default for labs
-                . (flip lookup [ ("winona", 1024)
-                               , ("gladys", 1366)
-                               , ("vera",   1920)
-                               ])
-    suspend h =
+    tw = (\w -> w - (w * 95 `div` 100) ) -- width, minus a 95% xmobar
+         . (fromMaybe 1920) -- sane default for labs
+         . (flip lookup [ ("winona", 1024)
+                        , ("gladys", 1366)
+                        , ("vera",   1920)
+                        ])
+    suspend' h =
       if (isHomeMachine h)
         then safeSpawn "systemctl" ["suspend"]
         else screenOff
@@ -96,15 +112,14 @@ screenOff = safeSpawn "xset" ["dpms", "force", "off"]
 sleep :: MonadIO m => Rational -> m ()
 sleep = io . threadDelay . seconds
 
-myStartupHook = do
+-- TODO pattern match on conf record?
+myStartupHook conf = do
   setWMName "LG3D" --fuck java
   safeSpawn "setxkbmap" ["-layout", "gb"]
   safeSpawn "xsetroot" ["-cursor_name", "left_ptr"]
-  (home, wp) <- getHomes
-  safeSpawn "xrdb" ["-merge", ( home </> ".Xresources" )]
-  safeSpawn "feh" ["--no-fehbg", "--bg-fill", wp]
-  (_, _, xScreensaver, tw, _) <- getConfiguration
-  if xScreensaver
+  safeSpawn "xrdb" ["-merge", ( (homeDir conf) </> ".Xresources" )]
+  safeSpawn "feh" ["--no-fehbg", "--bg-fill", wallpaper conf]
+  if needsXScreensaver conf
     then safeSpawn "xscreensaver" ["-no-splash"]
     else return ()
   ifNotRunning "urxvtd" $ safeSpawn "urxvtd" ["-q", "-o"]
@@ -117,7 +132,7 @@ myStartupHook = do
                      , "--heighttype", "pixel"
                      , "--height", "16"
                      , "--widthtype", "pixel"
-                     , "--width", show tw
+                     , "--width", show $ trayerWidth conf
                      , "--transparent", "true"
                      , "--tint", "0"
                      , "--alpha", "0"
@@ -185,11 +200,7 @@ myLayout = smartBorders $ avoidStruts $
 --myWorkspaces = ["`"] ++ map show [1..9] ++ ["0", "-", "="]
 myWorkspaces = map (:"") "`1234567890-="
 
-myKeys = do
-  (hasMpd, hasWifi, _, _, suspend) <- getConfiguration
-  warn <- maybe (\msg -> safeSpawn "xmessage" [msg])
-    (\zty msg -> safeSpawn zty ["--warning", "--text", msg]) <$> findExecutable "zenity"
-  return $ \c -> mkKeymap c $
+myKeys conf c = mkKeymap c $
     [ ("M-S-<Return>",     safeSpawnProg $ XMonad.terminal c)
     , ("M-p",              safeSpawnProg "dmenu_run")
 --  , ("M-S-p",            spawn "gmrun")
@@ -215,15 +226,15 @@ myKeys = do
     , ("M-a",              safeRunInTerm "alsamixer" [])
     {- Power off screen -}
     , ("M-S-s",            sleep 1 >> screenOff)
-    , ("M-s",              (when hasMpd $ mpd_ $ pause True) >> sleep 1 >> screenOff)
+    , ("M-s",              (when (hasMpd conf) $ mpd_ $ pause True) >> sleep 1 >> screenOff)
     {- Take a screenshot, save as 'screenshot.png' -}
     , ("<Print>",          safeSpawn "import" [ "-window", "root"
                                               , "screenshot.png" ])
     , ("<XF86Eject>",      safeSpawn "eject" ["-T"])
     , ("<XF86Calculator>", safeSpawnProg "speedcrunch")
-    , ("<XF86Search>",     warn "search")
-    , ("<XF86Mail>",       warn "mail")
-    , ("<XF86WebCam>",     warn "smile")
+    , ("<XF86Search>",     (warn conf) "search")
+    , ("<XF86Mail>",       (warn conf) "mail")
+    , ("<XF86WebCam>",     (warn conf) "smile")
     , ("<XF86Eject>",      safeSpawnProg "eject")
     ]
     {- Workspace Switching -}
@@ -254,17 +265,17 @@ myKeys = do
     ++ [ (k , lock >> sleep 1 >> screenOff)
        | k <- ["M-S-x", "<XF86ScreenSaver>"]
     ]
-    ++ [ (k , lock >> sleep 1 >> suspend)
+    ++ [ (k , lock >> sleep 1 >> (suspend conf))
        | k <- ["M-x", "<XF86Sleep>"]
     ]
 {-
     {- WiFi manager -}
-    ++ ( guard hasWifi >>
+    ++ ( guard (hasWifi conf) >>
       [ ("M-S-n", safeRunProgInTerm "wicd-curses") ]
     )
 -}
     {- MPC keys, media player UI -}
-    ++ ( guard hasMpd >>
+    ++ ( guard (hasMpd conf) >>
       [ (k, mpd_ c)
       | (k, c) <- [ ("<XF86AudioPlay>", toggle)
                   , ("<XF86AudioPrev>", previous)
@@ -285,20 +296,20 @@ myKeys = do
       flip safeRunInTerm []
 
 myConfig = do
+  c <- getConfiguration
   t <- myTerminal
-  k <- myKeys
   return defaultConfig
     { normalBorderColor  = myNormalColour
     , focusedBorderColor = myFocusedColour
     , modMask            = myModMask
     , terminal           = t
-    , startupHook        = myStartupHook
+    , startupHook        = myStartupHook c
     , manageHook         = myManageHook
     , handleEventHook    = myHandleEventHook
     , logHook            = myLogHook
     , layoutHook         = myLayout
     , workspaces         = myWorkspaces
-    , keys               = k
+    , keys               = myKeys c
     }
 
 main = myConfig >>= statusBar myBar myPP toggleStrutsKey >>= xmonad
