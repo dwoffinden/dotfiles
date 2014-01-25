@@ -108,6 +108,7 @@ myStartupHook = do
                      , "--expand", "true"
                      , "--padding", "0"
                      ]
+  safeSpawn "xcompmgr" ["-cC"]
 
 ifNotRunning :: MonadIO m => FilePath -> IO a -> m ()
 ifNotRunning prog hook = io . void . xfork $ do
