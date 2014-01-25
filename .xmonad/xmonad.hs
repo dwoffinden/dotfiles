@@ -61,24 +61,39 @@ myTerminal = io $ fromMaybe "xterm" <$> findExecutable "urxvtc"
 getHomes :: MonadIO m => m (FilePath, FilePath)
 getHomes = io $ do
   h <- getHomeDirectory
-  return (h, myWP h)
+  return (h, wp h)
   where
-    myWP = (</> "Dropbox" </> "wallpaper" </> "wallpaper-2473668.jpg")
+    wp = (</> "Dropbox" </> "wallpaper" </> "wallpaper-2473668.jpg")
 
-getConfiguration :: (MonadIO m, Integral n) => m (Bool, Bool, Bool, n)
-getConfiguration = io $ do
-  h <- nodeName <$> getSystemID
-  return (hasMpd h, hasWifi h, needsXScreensaver h, trayerWidth h)
+ -- TODO unfix the type of suspend
+getConfiguration :: (MonadIO m, Functor m, Integral i) => m (Bool, Bool, Bool, i, X ())
+getConfiguration = do
+  h <- nodeName <$> io getSystemID
+  return (hasMpd h, hasWifi h, needsXScreensaver h, trayerWidth h, suspend h)
   where
-    hasMpd  = (== "vera")
-    hasWifi = flip elem ["gladys", "winona"]
-    needsXScreensaver = flip elem ["gladys", "vera", "winona"]
+    isVera = (=="vera")
+    isLaptop = flip elem ["gladys", "winona"]
+    isHomeMachine h = isVera h || isLaptop h
+    hasMpd  = isVera
+    hasWifi = isLaptop
+    needsXScreensaver = isHomeMachine
     trayerWidth = (\w -> w - (w * 95 `div` 100) ) -- width, minus a 95% xmobar
                 . (fromMaybe 1920) -- sane default for labs
                 . (flip lookup [ ("winona", 1024)
                                , ("gladys", 1366)
                                , ("vera",   1920)
                                ])
+    suspend h =
+      if (isHomeMachine h)
+        then io $ safeSpawn "systemctl" ["suspend"]
+        else screenOff
+
+-- TODO BLOCKING
+lock :: MonadIO m => m ()
+lock = safeSpawn "xdg-screensaver" ["lock"]
+
+screenOff :: MonadIO m => m ()
+screenOff = safeSpawn "xset" ["dpms", "force", "off"]
 
 myStartupHook = do
   setWMName "LG3D" --fuck java
@@ -87,7 +102,7 @@ myStartupHook = do
   (home, wp) <- getHomes
   safeSpawn "xrdb" ["-merge", ( home </> ".Xresources" )]
   safeSpawn "feh" ["--no-fehbg", "--bg-fill", wp]
-  (_, _, xScreensaver, tw) <- getConfiguration
+  (_, _, xScreensaver, tw, _) <- getConfiguration
   if xScreensaver
     then safeSpawn "xscreensaver" ["-no-splash"]
     else return ()
@@ -111,11 +126,15 @@ myStartupHook = do
   safeSpawn "xcompmgr" ["-cC"]
 
 ifNotRunning :: MonadIO m => FilePath -> IO a -> m ()
-ifNotRunning prog hook = io . void . xfork $ do
+ifNotRunning prog hook = io . void . forkIO $ do -- TODO bench forkIO vs xfork?
   noPids <- null <$> pgrep prog
-  if noPids then void hook else return ()
+  if noPids
+    then void hook
+    else return ()
 
-pgrep :: String -> IO [Integer]
+-- TODO: A Bool version that can stop as soon as it finds a PID.
+--       Alternatively: Use lazy IO/conduit to delay reading the later files?
+pgrep :: (Integral n, Read n, Show n) => String -> IO [n]
 pgrep comm = do
   allPids <- mapMaybe readMaybe <$> getDirectoryContents "/proc"
   filterM (\p -> maybe False (==comm) <$>
@@ -158,15 +177,15 @@ myLayout = smartBorders $ avoidStruts $
     doubleIM n i l lp r rp =
       renamed [Replace n] $
         withIM l lp $ reflectHoriz $ withIM r rp $ layoutHints i
-    imLayout   = doubleIM "IM"   Grid 0.15 (Role "buddy_list")
-                                      0.2  (ClassName "Skype")
+    imLayout   = doubleIM "IM" Grid 0.15 (Role "buddy_list")
+                                    0.2  (ClassName "Skype")
 
 {- Workspace Identifiers. Must correspond to keys in mkKeyMap format. -}
 --myWorkspaces = ["`"] ++ map show [1..9] ++ ["0", "-", "="]
 myWorkspaces = map (:"") "`1234567890-="
 
 myKeys = do
-  (hasMpd, hasWifi, _, _) <- getConfiguration
+  (hasMpd, hasWifi, _, _, suspend) <- getConfiguration
   warn <- maybe (\msg -> safeSpawn "xmessage" [msg])
     (\zty msg -> safeSpawn zty ["--warning", "--text", msg]) <$> findExecutable "zenity"
   return $ \c -> mkKeymap c $
@@ -191,8 +210,7 @@ myKeys = do
     , ("M-,",              sendMessage (IncMasterN 1))
     , ("M-.",              sendMessage (IncMasterN (-1)))
     , ("M-S-q",            io exitSuccess)
-    , ("M-q",              recompile False >>= (flip when)
-                             (safeSpawn "xmonad" ["--restart"]))
+    , ("M-q",              recompile False >>= (flip when) (safeSpawn "xmonad" ["--restart"]))
     , ("M-a",              safeRunInTerm "alsamixer" [])
     {- Power off screen -}
     , ("M-S-s",            sleep 2 >> screenOff)
@@ -201,8 +219,6 @@ myKeys = do
     , ("<Print>",          safeSpawn "import" [ "-window", "root"
                                               , "screenshot.png" ])
     , ("<XF86Eject>",      safeSpawn "eject" ["-T"])
-    , ("<XF86Sleep>",      lock >> sleep 2
-                           >> safeSpawn "sudo" ["pm-hibernate"])
     , ("<XF86Calculator>", safeSpawnProg "speedcrunch")
     , ("<XF86Search>",     warn "search")
     , ("<XF86Mail>",       warn "mail")
@@ -230,17 +246,22 @@ myKeys = do
     ++ [ ( k, runOrRaise "firefox" (className =? "Firefox"))
        | k <- ["M-f"]
     ]
-    ++ [ ( k, runOrRaise "chromium" (className =? "Chromium-browser"))
+    ++ [ ( k, runOrRaise "chromium" (className =? "Chromium"))
        | k <- ["M-c", "<XF86HomePage>"]
     ]
     {- Screen Locking -}
-    ++ [ (k , lock >> sleep 4 >> screenOff)
-       | k <- ["M-x", "<XF86ScreenSaver>"]
+    ++ [ (k , lock >> sleep 2 >> screenOff)
+       | k <- ["M-S-x", "<XF86ScreenSaver>"]
     ]
+    ++ [ (k , lock >> sleep 2 >> suspend)
+       | k <- ["M-x", "<XF86Sleep>"]
+    ]
+{-
     {- WiFi manager -}
     ++ ( guard hasWifi >>
       [ ("M-S-n", safeRunProgInTerm "wicd-curses") ]
     )
+-}
     {- MPC keys, media player UI -}
     ++ ( guard hasMpd >>
       [ (k, mpd_ c)
@@ -255,8 +276,6 @@ myKeys = do
       ]
     )
   where
-    lock =
-      safeSpawn "xdg-screensaver" ["lock"]
     mpd_ =
       void . io . withMPD
     safeRunInTerm c o =
@@ -265,8 +284,6 @@ myKeys = do
       safeRunInTerm c []
     sleep =
       io . threadDelay . seconds
-    screenOff =
-      safeSpawn "xset" ["dpms", "force", "off"]
 
 myConfig = do
   t <- myTerminal
