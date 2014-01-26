@@ -51,14 +51,14 @@ data LocalConfig m i =
     , warnAction :: String -> m ()
     , homeDir :: FilePath
     , wallpaper :: FilePath
+    , chromiumName :: String
     }
 
 myBar = "~" </> ".cabal" </> "bin" </> "xmobar"
 
 myPP = xmobarPP { ppCurrent = xmobarColor "#429942" "" . wrap "<" ">" }
 
---toggleStrutsKey XConfig { XMonad.modMask = mask } = (mask, xK_b)
-toggleStrutsKey conf = ( XMonad.modMask conf, xK_b )
+toggleStrutsKey XConfig { XMonad.modMask = mask } = (mask, xK_b)
 
 myNormalColour = "#202020"
 
@@ -67,13 +67,15 @@ myFocusedColour = "#ff0000"
 myModMask = mod4Mask
 
 {- If urxvt is not installed, use xterm. -}
-myTerminal = io $ fromMaybe "xterm" <$> findExecutable "urxvtc"
+myTerminal = fromMaybe "xterm" <$> findExecutable "urxvtc"
 
-getConfiguration = io $ do
+getConfiguration = do
   home <- getHomeDirectory
   host <- nodeName <$> getSystemID
-  warn <- maybe (\msg -> safeSpawn "xmessage" [msg])
-    (\zty msg -> safeSpawn zty ["--warning", "--text", msg]) <$> findExecutable "zenity"
+  warn <- maybe
+    (\msg -> safeSpawn "xmessage" [msg])
+    (\zty msg -> safeSpawn zty ["--warning", "--text", msg])
+    <$> findExecutable "zenity"
   return LocalConfig
     { hasMpd  = isVera host
     , hasWifi = isLaptop host
@@ -83,12 +85,14 @@ getConfiguration = io $ do
     , warnAction = warn
     , homeDir = home
     , wallpaper = wp home
+    , chromiumName = chromium host
     }
   where
     wp = (</> "Dropbox" </> "wallpaper" </> "wallpaper-2473668.jpg")
     isVera = (=="vera")
     isLaptop = flip elem ["gladys", "winona"]
     isHomeMachine h = isVera h || isLaptop h
+    -- TODO explicit isLabs / isWork
     tw = (\w -> w - (w * 95 `div` 100) ) -- width, minus a 95% xmobar
          . (fromMaybe 1920) -- sane default for labs
          . (flip lookup [ ("winona", 1024)
@@ -99,63 +103,59 @@ getConfiguration = io $ do
       if (isHomeMachine h)
         then safeSpawn "systemctl" ["suspend"]
         else screenOff
+    chromium h =
+      if (isHomeMachine h) then "chromium" else "chromium-browser"
 
-lock :: MonadIO m => m ()
 lock = safeSpawn "xdg-screensaver" ["lock"]
 
-screenOff :: MonadIO m => m ()
 screenOff = safeSpawn "xset" ["dpms", "force", "off"]
 
-sleep :: MonadIO m => Rational -> m ()
 sleep = io . threadDelay . seconds
 
--- TODO pattern match on conf record?
-myStartupHook LocalConfig { homeDir = home, wallpaper = wp, trayerWidth = tw, needsXScreensaver = xScreensaver } = do
+myStartupHook LocalConfig { homeDir = home
+                          , wallpaper = wp
+                          , trayerWidth = tw
+                          , needsXScreensaver = xScreensaver
+                          } = do
   setWMName "LG3D" --fuck java
   safeSpawn "setxkbmap" ["-layout", "gb"]
   safeSpawn "xsetroot" ["-cursor_name", "left_ptr"]
-  safeSpawn "xrdb" ["-merge", ( home </> ".Xresources" )]
+  safeSpawn "xrdb" ["-merge", (home </> ".Xresources")]
   safeSpawn "feh" ["--no-fehbg", "--bg-fill", wp]
-  if xScreensaver
-    then safeSpawn "xscreensaver" ["-no-splash"]
-    else return ()
+  when xScreensaver $ safeSpawn "xscreensaver" ["-no-splash"]
   ifNotRunning "urxvtd" $ safeSpawn "urxvtd" ["-q", "-o"]
   ifNotRunning "trayer" $ safeSpawn "trayer"
-                     [ "--edge", "top"
-                     , "--align", "right"
-                     , "--margin", "0"
-                     , "--SetDockType", "true"
-                     , "--SetPartialStrut", "true"
-                     , "--heighttype", "pixel"
-                     , "--height", "16"
-                     , "--widthtype", "pixel"
-                     , "--width", show tw
-                     , "--transparent", "true"
-                     , "--tint", "0"
-                     , "--alpha", "0"
-                     , "--expand", "true"
-                     , "--padding", "0"
-                     ]
+    [ "--edge", "top"
+    , "--align", "right"
+    , "--margin", "0"
+    , "--SetDockType", "true"
+    , "--SetPartialStrut", "true"
+    , "--heighttype", "pixel"
+    , "--height", "16"
+    , "--widthtype", "pixel"
+    , "--width", show tw
+    , "--transparent", "true"
+    , "--tint", "0"
+    , "--alpha", "0"
+    , "--expand", "true"
+    , "--padding", "0"
+    ]
   safeSpawn "xcompmgr" ["-cC"]
 
-ifNotRunning :: MonadIO m => FilePath -> IO a -> m ()
-ifNotRunning prog hook = io . void . forkIO $ do -- TODO bench forkIO vs xfork?
-  noPids <- null <$> pgrep prog
-  if noPids
-    then void hook
-    else return ()
+ifNotRunning prog hook = io $ void $ forkIO $ do -- TODO bench forkIO vs xfork?
+  noPids <- null <$> pidof prog
+  when noPids (void hook)
 
--- TODO: A Bool version that can stop as soon as it finds a PID.
+-- TODO: A Bool version that can stop as soon as it finds one PID.
 --       Alternatively: Use lazy IO/conduit to delay reading the later files?
-pgrep :: (MonadIO m, Integral i, Read i, Show i) => String -> m [i]
-pgrep comm = io $ do
-  allPids <- mapMaybe readMaybe <$> getDirectoryContents "/proc"
-  filterM (\p -> maybe False (==comm) <$>
-    readFileMaybe ("/proc" </> show p </> "comm")) allPids
+pidof :: (MonadIO m, Integral i, Read i, Show i) => String -> m [i]
+pidof comm = io $
+  mapMaybe readMaybe <$> getDirectoryContents "/proc" >>= filterM matchesComm
   where
-    readFileMaybe f =
-       either (const Nothing) Just <$>
-        tryJust (guard . isDoesNotExistError) (readFirstLine f)
+    matchesComm pid =
+      either (const False) (== comm) <$> tryReadLine ("/proc" </> show pid </> "comm")
+    tryReadLine f =
+      tryJust (guard . isDoesNotExistError) (readFirstLine f)
     readFirstLine f = do
       h <- openFile f ReadMode
       str <- hGetLine h
@@ -176,8 +176,7 @@ myHandleEventHook = fullscreenEventHook
 
 myLogHook = return ()
 
-myLayout = smartBorders $ avoidStruts $
-  onWorkspace "=" imLayout $
+myLayout = smartBorders $ avoidStruts $ onWorkspace "=" imLayout $
 --layoutHintsToCenter $
       (Tall 1 (2/100) (1/2))
   ||| (ThreeColMid 1 (2/100) (1/2))
@@ -185,19 +184,21 @@ myLayout = smartBorders $ avoidStruts $
   ||| Grid
   where
     wide a b c =
-      renamed [Replace "Wide"] $
-        Mirror $ Tall a b c
+      renamed [Replace "Wide"] $ Mirror $ Tall a b c
     doubleIM n i l lp r rp =
-      renamed [Replace n] $
-        withIM l lp $ reflectHoriz $ withIM r rp $ layoutHints i
-    imLayout   = doubleIM "IM" Grid 0.15 (Role "buddy_list")
-                                    0.2  (ClassName "Skype")
+      renamed [Replace n] $ withIM l lp $ reflectHoriz $ withIM r rp $ layoutHints i
+    imLayout =
+      doubleIM "IM" Grid 0.15 (Role "buddy_list") 0.2 (ClassName "Skype")
 
 {- Workspace Identifiers. Must correspond to keys in mkKeyMap format. -}
---myWorkspaces = ["`"] ++ map show [1..9] ++ ["0", "-", "="]
-myWorkspaces = map (:"") "`1234567890-="
+myWorkspaces = map pure "`1234567890-="
 
-myKeys LocalConfig { warnAction = warn, hasMpd = mpd, hasWifi = wifi , suspendAction = suspend } c =
+myKeys LocalConfig { warnAction = warn
+                   , hasMpd = mpd
+                   , hasWifi = wifi
+                   , suspendAction = suspend
+                   , chromiumName = chromium
+                   } c =
   mkKeymap c $
     [ ("M-S-<Return>",     safeSpawnProg $ XMonad.terminal c)
     , ("M-p",              safeSpawnProg "dmenu_run")
@@ -226,8 +227,7 @@ myKeys LocalConfig { warnAction = warn, hasMpd = mpd, hasWifi = wifi , suspendAc
     , ("M-S-s",            sleep 1 >> screenOff)
     , ("M-s",              (when mpd $ doMpd $ pause True) >> sleep 1 >> screenOff)
     {- Take a screenshot, save as 'screenshot.png' -}
-    , ("<Print>",          safeSpawn "import" [ "-window", "root"
-                                              , "screenshot.png" ])
+    , ("<Print>",          safeSpawn "import" [ "-window", "root", "screenshot.png" ])
     , ("<XF86Eject>",      safeSpawn "eject" ["-T"])
     , ("<XF86Calculator>", safeSpawnProg "speedcrunch")
     , ("<XF86Search>",     warn "search")
@@ -237,13 +237,11 @@ myKeys LocalConfig { warnAction = warn, hasMpd = mpd, hasWifi = wifi , suspendAc
     ]
     {- Workspace Switching -}
     ++ [ (m ++ k, windows $ f k)
-       | k <- XMonad.workspaces c
-         , (f, m) <- [(W.greedyView, "M-"), (W.shift, "M-S-")]
+       | k <- XMonad.workspaces c, (f, m) <- [(W.greedyView, "M-"), (W.shift, "M-S-")]
     ]
     {- Screen Switching -}
     ++ [ (m ++ key, screenWorkspace sc >>= flip whenJust (windows . f))
-       | (key, sc) <- zip ["w", "e", "r"] [0..]
-         , (m, f) <- [("M-", W.view), ("M-S-", W.shift)]
+       | (key, sc) <- zip ["w", "e", "r"] [0..], (m, f) <- [("M-", W.view), ("M-S-", W.shift)]
     ]
     {- Volume Controls -}
     ++ [ (k, safeSpawn "amixer" ["set", "Master", a])
@@ -256,7 +254,7 @@ myKeys LocalConfig { warnAction = warn, hasMpd = mpd, hasWifi = wifi , suspendAc
     ++ [ ( k, runOrRaise "firefox" (className =? "Firefox"))
        | k <- ["M-f"]
     ]
-    ++ [ ( k, runOrRaise "chromium" (className =? "Chromium"))
+    ++ [ ( k, runOrRaise chromium (className =? chromium))
        | k <- ["M-c", "<XF86HomePage>"]
     ]
     {- Screen Locking -}
@@ -311,3 +309,4 @@ myConfig = do
     }
 
 main = myConfig >>= statusBar myBar myPP toggleStrutsKey >>= xmonad
+
