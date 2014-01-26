@@ -1,4 +1,4 @@
-{-# OPTIONS_GHC -O2 -tmpdir /tmp -optc -O2 -optl -O #-}
+{-# OPTIONS_GHC -O2 -tmpdir /tmp -optc -O2 #-}
 {-# LANGUAGE GADTs, OverloadedStrings #-}
 import           Control.Applicative
 import           Control.Concurrent
