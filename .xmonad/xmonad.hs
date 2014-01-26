@@ -140,7 +140,7 @@ myStartupHook LocalConfig { homeDir = home
     , "--expand", "true"
     , "--padding", "0"
     ]
-  safeSpawn "xcompmgr" ["-cC"]
+  safeSpawn "xcompmgr" ["-c"]
 
 ifNotRunning prog hook = io $ void $ forkIO $ do -- TODO bench forkIO vs xfork?
   noPids <- null <$> pidof prog
