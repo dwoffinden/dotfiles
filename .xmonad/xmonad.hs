@@ -5,7 +5,6 @@ import           Control.Concurrent
 import           Control.Exception
 import           Control.Monad
 import           Data.Maybe
-import           Data.Monoid
 import           Network.MPD (withMPD, pause, previous, next, stop)
 import           Network.MPD.Commands.Extensions (toggle)
 import           System.Directory
@@ -13,9 +12,7 @@ import           System.Exit
 import           System.FilePath
 import           System.IO
 import           System.IO.Error
-import           System.Info
 import           System.Posix.Unistd hiding (sleep)
-import           System.Process
 import           Text.Read
 import           XMonad
 import           XMonad.Actions.WindowGo
@@ -25,11 +22,8 @@ import           XMonad.Hooks.ManageDocks
 import           XMonad.Hooks.ManageHelpers
 import           XMonad.Hooks.SetWMName
 import           XMonad.Layout.Grid
-import           XMonad.Layout.IM
 import           XMonad.Layout.LayoutHints
 import           XMonad.Layout.NoBorders
-import           XMonad.Layout.PerWorkspace
-import           XMonad.Layout.Reflect
 import           XMonad.Layout.Renamed
 import           XMonad.Layout.ThreeColumns
 import qualified XMonad.StackSet as W
@@ -42,7 +36,7 @@ TODO: xmobar options on the command line? no?
 -}
 
 data LocalConfig m i =
-  (MonadIO m, Integral i) => LocalConfig
+  (MonadIO m, Integral i, Num i, Show i) => LocalConfig
     { hasMpd :: Bool
     , hasWifi :: Bool
     , needsXScreensaver :: Bool
@@ -58,7 +52,7 @@ myBar = "~" </> ".cabal" </> "bin" </> "xmobar"
 
 myPP = xmobarPP { ppCurrent = xmobarColor "#429942" "" . wrap "<" ">" }
 
-toggleStrutsKey XConfig { XMonad.modMask = mask } = (mask, xK_b)
+toggleStrutsKey XConfig { XMonad.modMask = myMask } = (myMask, xK_b)
 
 myNormalColour = "#202020"
 
@@ -106,10 +100,13 @@ getConfiguration = do
     chromium h =
       if (isHomeMachine h) then "chromium" else "chromium-browser"
 
+lock :: MonadIO m => m ()
 lock = safeSpawn "xdg-screensaver" ["lock"]
 
+screenOff :: MonadIO m => m()
 screenOff = safeSpawn "xset" ["dpms", "force", "off"]
 
+sleep :: MonadIO m => Rational -> m ()
 sleep = io . threadDelay . seconds
 
 myStartupHook LocalConfig { homeDir = home
@@ -268,12 +265,12 @@ myKeys LocalConfig { warnAction = warn
 -}
     {- MPC keys, media player UI -}
     ++ ( guard mpd >>
-      [ (k, doMpd c)
-      | (k, c) <- [ ("<XF86AudioPlay>", toggle)
-                  , ("<XF86AudioPrev>", previous)
-                  , ("<XF86AudioNext>", next)
-                  , ("<XF86AudioStop>", stop)
-                  ]
+      [ (k, doMpd comm)
+      | (k, comm) <- [ ("<XF86AudioPlay>", toggle)
+                     , ("<XF86AudioPrev>", previous)
+                     , ("<XF86AudioNext>", next)
+                     , ("<XF86AudioStop>", stop)
+                     ]
       ] ++
       [ (k, safeRunProgInTerm "ncmpcpp")
       | k <- ["M-S-m", "<XF86AudioMedia>"]
