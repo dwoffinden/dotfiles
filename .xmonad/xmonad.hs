@@ -1,5 +1,5 @@
 {-# OPTIONS_GHC -O2 -tmpdir /tmp -optc -O2 -optl -O #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE GADTs, OverloadedStrings #-}
 import           Control.Applicative
 import           Control.Concurrent
 import           Control.Exception
@@ -41,17 +41,17 @@ http://hackage.haskell.org/packages/archive/xmonad-contrib/0.8/doc/html/XMonad-H
 TODO: xmobar options on the command line? no?
 -}
 
- -- TODO unfix the type of suspend
- -- TODO parameterise by type of trayerWidth (some Integral)? suspend/warn?
-data LocalConfig = LocalConfig { hasMpd :: Bool
-                               , hasWifi :: Bool
-                               , needsXScreensaver :: Bool
-                               , trayerWidth :: Int
-                               , suspend :: X ()
-                               , warn :: String -> X()
-                               , homeDir :: FilePath
-                               , wallpaper :: FilePath
-                               }
+data LocalConfig m i =
+  (MonadIO m, Integral i) => LocalConfig
+    { hasMpd :: Bool
+    , hasWifi :: Bool
+    , needsXScreensaver :: Bool
+    , trayerWidth :: i
+    , suspend :: m ()
+    , warn :: String -> m ()
+    , homeDir :: FilePath
+    , wallpaper :: FilePath
+    }
 
 myBar = "~" </> ".cabal" </> "bin" </> "xmobar"
 
@@ -72,11 +72,10 @@ myTerminal = io $ fromMaybe "xterm" <$> findExecutable "urxvtc"
 
 myWp = (</> "Dropbox" </> "wallpaper" </> "wallpaper-2473668.jpg")
 
-getConfiguration :: (MonadIO m) => m LocalConfig
-getConfiguration = do
-  home <- io getHomeDirectory
-  host <- io $ nodeName <$> getSystemID
-  warn' <- io $ maybe (\msg -> safeSpawn "xmessage" [msg])
+getConfiguration = io $ do
+  home <- getHomeDirectory
+  host <- nodeName <$> getSystemID
+  warn' <- maybe (\msg -> safeSpawn "xmessage" [msg])
     (\zty msg -> safeSpawn zty ["--warning", "--text", msg]) <$> findExecutable "zenity"
   return LocalConfig
     { hasMpd  = isVera host
