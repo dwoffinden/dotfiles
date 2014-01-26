@@ -176,7 +176,7 @@ myHandleEventHook = fullscreenEventHook
 
 myLogHook = return ()
 
-myLayout = smartBorders $ avoidStruts $ onWorkspace "=" imLayout $
+myLayout = smartBorders $ avoidStruts $
 --layoutHintsToCenter $
       (Tall 1 (2/100) (1/2))
   ||| (ThreeColMid 1 (2/100) (1/2))
@@ -185,10 +185,6 @@ myLayout = smartBorders $ avoidStruts $ onWorkspace "=" imLayout $
   where
     wide a b c =
       renamed [Replace "Wide"] $ Mirror $ Tall a b c
-    doubleIM n i l lp r rp =
-      renamed [Replace n] $ withIM l lp $ reflectHoriz $ withIM r rp $ layoutHints i
-    imLayout =
-      doubleIM "IM" Grid 0.15 (Role "buddy_list") 0.2 (ClassName "Skype")
 
 {- Workspace Identifiers. Must correspond to keys in mkKeyMap format. -}
 myWorkspaces = map pure "`1234567890-="
