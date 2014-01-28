@@ -154,14 +154,14 @@ myStartupHook LocalConfig { homeDir = home
 
 ifNotRunning :: MonadIO m => String -> IO () -> m ()
 ifNotRunning prog hook = io $ void $ forkIO $ do
-  noPids <- null <$> pidof prog
-  when noPids hook
+  notRunning <- isNothing <$> findPid prog
+  when notRunning hook
 
--- TODO: A Bool version that can stop as soon as it finds one PID.
---       Alternatively: Use lazy IO/conduit to delay reading the later files?
-pidof :: MonadIO m => String -> m [ProcessID]
-pidof comm = io $
-  mapMaybe readMaybe <$> getDirectoryContents "/proc" >>= filterM matchesComm
+-- Find the first PID with given `comm', if one exists.
+-- We could find all of them by replacing `findM' with `filterM'...
+findPid :: String -> IO (Maybe ProcessID)
+findPid comm =
+  mapMaybe readMaybe <$> getDirectoryContents "/proc" >>= findM matchesComm
   where
     matchesComm pid =
       either (const False) (== comm) <$> tryReadLine ("/proc" </> show pid </> "comm")
@@ -172,6 +172,12 @@ pidof comm = io $
       str <- hGetLine h
       hClose h
       return str
+
+findM :: Monad m => (a -> m Bool) -> [a] -> m (Maybe a)
+findM _ [] = return Nothing
+findM f (x:xs) = do
+  y <- f x
+  if y then return (Just x) else findM f xs
 
 myManageHook = composeAll
   [ className =? "MPlayer"        --> doFloat
