@@ -5,6 +5,7 @@ import           Control.Concurrent
 import           Control.Exception
 import           Control.Monad
 import           Data.Maybe
+import qualified Data.Map as M
 import           Network.MPD (withMPD, pause, previous, next, stop)
 import           Network.MPD.Commands.Extensions (toggle)
 import           System.Directory
@@ -12,6 +13,7 @@ import           System.Exit
 import           System.FilePath
 import           System.IO
 import           System.IO.Error
+import           System.Posix.Types (ProcessID)
 import           System.Posix.Unistd hiding (sleep)
 import           Text.Read
 import           XMonad
@@ -19,10 +21,12 @@ import           XMonad.Actions.WindowGo
 import           XMonad.Hooks.DynamicLog
 import           XMonad.Hooks.EwmhDesktops
 import           XMonad.Hooks.ManageDocks
-import           XMonad.Hooks.ManageHelpers
+import           XMonad.Hooks.ManageHelpers hiding (pid)
 import           XMonad.Hooks.SetWMName
 import           XMonad.Layout.Grid
+{-
 import           XMonad.Layout.LayoutHints
+-}
 import           XMonad.Layout.NoBorders
 import           XMonad.Layout.Renamed
 import           XMonad.Layout.ThreeColumns
@@ -48,21 +52,29 @@ data LocalConfig m i =
     , chromiumName :: String
     }
 
+myBar :: FilePath
 myBar = "~" </> ".cabal" </> "bin" </> "xmobar"
 
+myPP :: PP
 myPP = xmobarPP { ppCurrent = xmobarColor "#429942" "" . wrap "<" ">" }
 
+toggleStrutsKey :: XConfig l -> (KeyMask, KeySym)
 toggleStrutsKey XConfig { XMonad.modMask = myMask } = (myMask, xK_b)
 
+myNormalColour :: String
 myNormalColour = "#202020"
 
+myFocusedColour :: String
 myFocusedColour = "#ff0000"
 
+myModMask :: KeyMask
 myModMask = mod4Mask
 
 {- If urxvt is not installed, use xterm. -}
+myTerminal :: IO FilePath
 myTerminal = fromMaybe "xterm" <$> findExecutable "urxvtc"
 
+getConfiguration :: IO (LocalConfig X Int)
 getConfiguration = do
   home <- getHomeDirectory
   host <- nodeName <$> getSystemID
@@ -109,6 +121,7 @@ screenOff = safeSpawn "xset" ["dpms", "force", "off"]
 sleep :: MonadIO m => Rational -> m ()
 sleep = io . threadDelay . seconds
 
+myStartupHook :: LocalConfig m t -> X ()
 myStartupHook LocalConfig { homeDir = home
                           , wallpaper = wp
                           , trayerWidth = tw
@@ -139,13 +152,14 @@ myStartupHook LocalConfig { homeDir = home
     ]
   safeSpawn "xcompmgr" ["-c"]
 
-ifNotRunning prog hook = io $ void $ forkIO $ do -- TODO bench forkIO vs xfork?
+ifNotRunning :: MonadIO m => String -> IO () -> m ()
+ifNotRunning prog hook = io $ void $ forkIO $ do
   noPids <- null <$> pidof prog
-  when noPids (void hook)
+  when noPids hook
 
 -- TODO: A Bool version that can stop as soon as it finds one PID.
 --       Alternatively: Use lazy IO/conduit to delay reading the later files?
-pidof :: (MonadIO m, Integral i, Read i, Show i) => String -> m [i]
+pidof :: MonadIO m => String -> m [ProcessID]
 pidof comm = io $
   mapMaybe readMaybe <$> getDirectoryContents "/proc" >>= filterM matchesComm
   where
@@ -171,6 +185,7 @@ myManageHook = composeAll
 
 myHandleEventHook = fullscreenEventHook
 
+myLogHook :: X ()
 myLogHook = return ()
 
 myLayout = smartBorders $ avoidStruts $
@@ -184,11 +199,13 @@ myLayout = smartBorders $ avoidStruts $
       renamed [Replace "Wide"] $ Mirror $ Tall a b c
 
 {- Workspace Identifiers. Must correspond to keys in mkKeyMap format. -}
+myWorkspaces :: [String]
 myWorkspaces = map pure "`1234567890-="
 
+myKeys :: LocalConfig X t -> XConfig Layout -> M.Map (KeyMask, KeySym) (X())
 myKeys LocalConfig { warnAction = warn
                    , hasMpd = mpd
-                   , hasWifi = wifi
+--                   , hasWifi = wifi
                    , suspendAction = suspend
                    , chromiumName = chromium
                    } c =
@@ -279,8 +296,8 @@ myKeys LocalConfig { warnAction = warn
   where
     doMpd =
       io . void . withMPD
-    safeRunInTerm c o =
-      asks (terminal . config) >>= flip safeSpawn (["-e", c] ++ o)
+    safeRunInTerm comm args =
+      asks (terminal . config) >>= flip safeSpawn (["-e", comm] ++ args)
     safeRunProgInTerm =
       flip safeRunInTerm []
 
