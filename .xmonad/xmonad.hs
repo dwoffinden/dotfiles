@@ -52,8 +52,8 @@ data LocalConfig m i =
     , chromiumName :: String
     }
 
-myBar :: FilePath
-myBar = "~" </> ".cabal" </> "bin" </> "xmobar"
+myBar :: String
+myBar = "exec " ++ "~" </> ".cabal" </> "bin" </> "xmobar"
 
 myPP :: PP
 myPP = xmobarPP { ppCurrent = xmobarColor "#429942" "" . wrap "<" ">" }
@@ -74,6 +74,9 @@ myModMask = mod4Mask
 myTerminal :: IO FilePath
 myTerminal = fromMaybe "xterm" <$> findExecutable "urxvtc"
 
+myWp :: FilePath -> FilePath
+myWp = (</> "Dropbox" </> "wallpaper" </> "wallpaper-2473668.jpg")
+
 getConfiguration :: IO (LocalConfig X Int)
 getConfiguration = do
   home <- getHomeDirectory
@@ -90,12 +93,10 @@ getConfiguration = do
     , suspendAction = suspend host
     , warnAction = warn
     , homeDir = home
-    , wallpaper = wp home
+    , wallpaper = myWp home
     , chromiumName = chromium host
     }
   where
-    wp =
-      (</> "Dropbox" </> "wallpaper" </> "wallpaper-2473668.jpg")
     isVera =
       (=="vera")
     isLaptop =
@@ -332,5 +333,6 @@ myConfig = do
     , keys               = myKeys conf
     }
 
+main :: IO ()
 main = myConfig >>= statusBar myBar myPP toggleStrutsKey >>= xmonad
 
