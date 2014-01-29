@@ -94,23 +94,31 @@ getConfiguration = do
     , chromiumName = chromium host
     }
   where
-    wp = (</> "Dropbox" </> "wallpaper" </> "wallpaper-2473668.jpg")
-    isVera = (=="vera")
-    isLaptop = flip elem ["gladys", "winona"]
-    isHomeMachine h = isVera h || isLaptop h
-    -- TODO explicit isLabs / isWork
-    tw = (\w -> w - (w * 95 `div` 100) ) -- width, minus a 95% xmobar
-         . (fromMaybe 1920) -- sane default for labs
-         . (flip lookup [ ("winona", 1024)
-                        , ("gladys", 1366)
-                        , ("vera",   1920)
-                        ])
-    suspend h =
-      if (isHomeMachine h)
-        then safeSpawn "systemctl" ["suspend"]
-        else screenOff
-    chromium h =
-      if (isHomeMachine h) then "chromium" else "chromium-browser"
+    wp =
+      (</> "Dropbox" </> "wallpaper" </> "wallpaper-2473668.jpg")
+    isVera =
+      (=="vera")
+    isLaptop =
+      flip elem ["gladys", "winona"]
+    isHomeMachine h =
+      isVera h || isLaptop h
+    isLabs =
+      (== "doc.ic.ac.uk") . getDomain
+    tw =
+      (\w -> w - (w * 95 `div` 100) ) -- width, minus a 95% xmobar
+      . (fromMaybe 1920) -- sane default for labs
+      . (flip lookup [ ("winona", 1024)
+                     , ("gladys", 1366)
+                     , ("vera",   1920)
+                     ])
+    suspend h
+      | isHomeMachine h = safeSpawn "systemctl" ["suspend"]
+      | otherwise       = screenOff
+    chromium h
+      | isLabs h  = "chromium-browser"
+      | otherwise = "chromium"
+    getDomain =
+      dropWhile (== '.') . dropWhile (/= '.')
 
 lock :: MonadIO m => m ()
 lock = safeSpawn "xdg-screensaver" ["lock"]
