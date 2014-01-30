@@ -98,7 +98,7 @@ getConfiguration = do
     }
   where
     isVera =
-      (=="vera")
+      (== "vera")
     isLaptop =
       flip elem ["gladys", "winona"]
     isHomeMachine h =
@@ -113,8 +113,9 @@ getConfiguration = do
                      , ("vera",   1920)
                      ])
     suspend h
-      | isHomeMachine h = safeSpawn "systemctl" ["suspend"]
-      | otherwise       = screenOff
+      | isLaptop h = safeSpawn "systemctl" ["hibernate"] -- Stupid radeon drivers
+      | isVera h   = safeSpawn "systemctl" ["suspend"]
+      | otherwise  = screenOff
     chromium h
       | isLabs h  = "chromium-browser"
       | otherwise = "chromium"
