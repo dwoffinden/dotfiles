@@ -4,10 +4,10 @@ import           Control.Applicative
 import           Control.Concurrent
 import           Control.Exception
 import           Control.Monad
+import           Data.Map (Map)
 import           Data.Maybe
-import qualified Data.Map as M
-import           Network.MPD (withMPD, pause, previous, next, stop)
-import           Network.MPD.Commands.Extensions (toggle)
+import qualified Network.MPD as MPD (withMPD, pause, previous, next, stop)
+import qualified Network.MPD.Commands.Extensions as MPD (toggle)
 import           System.Directory
 import           System.Exit
 import           System.FilePath
@@ -15,6 +15,7 @@ import           System.IO
 import           System.IO.Error
 import           System.Posix.Types (ProcessID)
 import           System.Posix.Unistd hiding (sleep)
+import           System.Random (randomRIO)
 import           Text.Read
 import           XMonad
 import           XMonad.Actions.WindowGo
@@ -74,9 +75,6 @@ myModMask = mod4Mask
 myTerminal :: IO FilePath
 myTerminal = fromMaybe "xterm" <$> findExecutable "urxvtc"
 
-myWp :: FilePath -> FilePath
-myWp = (</> "Dropbox" </> "wallpaper" </> "wallpaper-2473668.jpg")
-
 getConfiguration :: IO (LocalConfig X Int)
 getConfiguration = do
   home <- getHomeDirectory
@@ -85,6 +83,7 @@ getConfiguration = do
     (\msg -> safeSpawn "xmessage" [msg])
     (\zty msg -> safeSpawn zty ["--warning", "--text", msg])
     <$> findExecutable "zenity"
+  wp <- pickRandomWallpaper home
   return LocalConfig
     { hasMpd  = isVera host
     , hasWifi = isLaptop host
@@ -93,7 +92,7 @@ getConfiguration = do
     , suspendAction = suspend host
     , warnAction = warn
     , homeDir = home
-    , wallpaper = myWp home
+    , wallpaper = wp
     , chromiumName = chromium host
     }
   where
@@ -121,6 +120,11 @@ getConfiguration = do
       | otherwise = "chromium"
     getDomain =
       dropWhile (== '.') . dropWhile (/= '.')
+    pickRandomWallpaper home = do
+      let wps = home </> "Dropbox" </> "wallpaper"
+      candidates <- getDirectoryContents wps >>= return . (map (wps </>)) >>= filterM doesFileExist
+      index <- randomRIO (0, length candidates - 1)
+      return $ candidates !! index
 
 lock :: MonadIO m => m ()
 lock = safeSpawn "xdg-screensaver" ["lock"]
@@ -218,7 +222,7 @@ myLayout = smartBorders $ avoidStruts $
 myWorkspaces :: [String]
 myWorkspaces = map pure "`1234567890-="
 
-myKeys :: LocalConfig X t -> XConfig Layout -> M.Map (KeyMask, KeySym) (X())
+myKeys :: LocalConfig X t -> XConfig Layout -> Map (KeyMask, KeySym) (X())
 myKeys LocalConfig { warnAction = warn
                    , hasMpd = mpd
 --                   , hasWifi = wifi
@@ -251,7 +255,7 @@ myKeys LocalConfig { warnAction = warn
     , ("M-a",              safeRunInTerm "alsamixer" [])
     {- Power off screen -}
     , ("M-S-s",            sleep 1 >> screenOff)
-    , ("M-s",              (when mpd $ doMpd $ pause True) >> sleep 1 >> screenOff)
+    , ("M-s",              (when mpd $ doMpd $ MPD.pause True) >> sleep 1 >> screenOff)
     {- Take a screenshot, save as 'screenshot.png' -}
     , ("<Print>",          safeSpawn "import" [ "-window", "root", "screenshot.png" ])
     , ("<XF86Eject>",      safeSpawn "eject" ["-T"])
@@ -299,10 +303,10 @@ myKeys LocalConfig { warnAction = warn
     {- MPC keys, media player UI -}
     ++ ( guard mpd >>
       [ (k, doMpd comm)
-      | (k, comm) <- [ ("<XF86AudioPlay>", toggle)
-                     , ("<XF86AudioPrev>", previous)
-                     , ("<XF86AudioNext>", next)
-                     , ("<XF86AudioStop>", stop)
+      | (k, comm) <- [ ("<XF86AudioPlay>", MPD.toggle)
+                     , ("<XF86AudioPrev>", MPD.previous)
+                     , ("<XF86AudioNext>", MPD.next)
+                     , ("<XF86AudioStop>", MPD.stop)
                      ]
       ] ++
       [ (k, safeRunProgInTerm "ncmpcpp")
@@ -311,7 +315,7 @@ myKeys LocalConfig { warnAction = warn
     )
   where
     doMpd =
-      io . void . withMPD
+      io . void . MPD.withMPD
     safeRunInTerm comm args =
       asks (terminal . config) >>= flip safeSpawn (["-e", comm] ++ args)
     safeRunProgInTerm =
