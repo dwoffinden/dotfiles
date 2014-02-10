@@ -1,39 +1,39 @@
 {-# OPTIONS_GHC -O2 -tmpdir /tmp -optc -O2 #-}
 {-# LANGUAGE GADTs, OverloadedStrings #-}
-import           Control.Applicative
-import           Control.Concurrent
-import           Control.Exception
-import           Control.Monad
+import           Control.Applicative ((<$>),pure)
+import           Control.Concurrent (forkIO,threadDelay)
+import           Control.Exception (tryJust)
+import           Control.Monad (filterM,guard,void,when)
 import           Data.Map (Map)
-import           Data.Maybe
+import           Data.Maybe (fromMaybe,isNothing,mapMaybe)
 import qualified Network.MPD as MPD (withMPD, pause, previous, next, stop)
 import qualified Network.MPD.Commands.Extensions as MPD (toggle)
-import           System.Directory
-import           System.Exit
-import           System.FilePath
-import           System.IO
-import           System.IO.Error
+import           System.Directory (doesFileExist,findExecutable,getDirectoryContents,getHomeDirectory)
+import           System.Exit (exitSuccess)
+import           System.FilePath ((</>))
+import           System.IO (hClose,hGetLine,IOMode(ReadMode),openFile)
+import           System.IO.Error (isDoesNotExistError)
 import           System.Posix.Types (ProcessID)
-import           System.Posix.Unistd hiding (sleep)
+import           System.Posix.Unistd (getSystemID,nodeName)
 import           System.Random (randomRIO)
-import           Text.Read
+import           Text.Read (readMaybe)
 import           XMonad
-import           XMonad.Actions.WindowGo
-import           XMonad.Hooks.DynamicLog
-import           XMonad.Hooks.EwmhDesktops
-import           XMonad.Hooks.ManageDocks
-import           XMonad.Hooks.ManageHelpers hiding (pid)
-import           XMonad.Hooks.SetWMName
+import           XMonad.Actions.WindowGo (runOrRaise)
+import           XMonad.Hooks.DynamicLog (PP,ppCurrent,statusBar,wrap,xmobarColor,xmobarPP)
+import           XMonad.Hooks.EwmhDesktops (fullscreenEventHook)
+import           XMonad.Hooks.ManageDocks (avoidStruts)
+import           XMonad.Hooks.ManageHelpers (doFullFloat,isFullscreen)
+import           XMonad.Hooks.SetWMName (setWMName)
 import           XMonad.Layout.Grid
 {-
 import           XMonad.Layout.LayoutHints
 -}
-import           XMonad.Layout.NoBorders
+import           XMonad.Layout.NoBorders (smartBorders)
 import           XMonad.Layout.Renamed
 import           XMonad.Layout.ThreeColumns
 import qualified XMonad.StackSet as W
-import           XMonad.Util.EZConfig
-import           XMonad.Util.Run hiding (safeRunInTerm)
+import           XMonad.Util.EZConfig (mkKeymap)
+import           XMonad.Util.Run (safeSpawn,safeSpawnProg,seconds)
 
 {-
 http://hackage.haskell.org/packages/archive/xmonad-contrib/0.8/doc/html/XMonad-Hooks-DynamicLog.html
