@@ -104,6 +104,8 @@ getConfiguration = do
       isVera h || isLaptop h
     isLabs =
       (== "doc.ic.ac.uk") . getDomain
+    getDomain =
+      dropWhile (== '.') . dropWhile (/= '.')
     tw =
       (\w -> w - (w * 95 `div` 100) ) -- width, minus a 95% xmobar
       . (fromMaybe 1920) -- sane default for labs
@@ -118,11 +120,9 @@ getConfiguration = do
     chromium h
       | isLabs h  = "chromium-browser"
       | otherwise = "chromium"
-    getDomain =
-      dropWhile (== '.') . dropWhile (/= '.')
     pickRandomWallpaper home = do
       let wps = home </> "Dropbox" </> "wallpaper"
-      candidates <- getDirectoryContents wps >>= return . (map (wps </>)) >>= filterM doesFileExist
+      candidates <- getDirectoryContents wps >>= filterM doesFileExist . map (wps </>)
       index <- randomRIO (0, length candidates - 1)
       return $ candidates !! index
 
@@ -171,11 +171,11 @@ ifNotRunning prog hook = io $ void $ forkIO $ do
   notRunning <- isNothing <$> findPid prog
   when notRunning hook
 
--- Find the first PID with given `comm', if one exists.
+-- | Find the first PID of the first process with given `comm', if one exists.
 -- We could find all of them by replacing `findM' with `filterM'...
 findPid :: String -> IO (Maybe ProcessID)
 findPid comm =
-  mapMaybe readMaybe <$> getDirectoryContents "/proc" >>= findM matchesComm
+  getDirectoryContents "/proc" >>= findM matchesComm . mapMaybe readMaybe
   where
     matchesComm pid =
       either (const False) (== comm) <$> tryReadLine ("/proc" </> show pid </> "comm")
@@ -187,6 +187,7 @@ findPid comm =
       hClose h
       return str
 
+-- | This generalizes the list-based 'find' function.
 findM :: Monad m => (a -> m Bool) -> [a] -> m (Maybe a)
 findM _ [] = return Nothing
 findM f (x:xs) = do
