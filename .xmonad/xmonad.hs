@@ -286,14 +286,14 @@ myKeys LocalConfig { warnAction = warn
        | k <- ["M-c", "<XF86HomePage>"]
     ]
     {- Screen Locking -}
-    ++ [ (k , lock >> sleep 1 >> screenOff)
-       | k <- ["M-S-s", "M-S-x", "<XF86ScreenSaver>"]
+    ++ [ (k , (when mpd $ doMpd $ MPD.pause True) >> lock >> sleep 1 >> screenOff)
+       | k <- ["M-s", "<XF86ScreenSaver>"]
     ]
-    ++ [ (k , (when mpd $ doMpd $ MPD.pause True) >> lock >> sleep 1 >> suspend)
-       | k <- ["M-s"]
+    ++ [ (k , lock >> sleep 1 >> screenOff)
+       | k <- ["M-S-s"]
     ]
     ++ [ (k , lock >> sleep 1 >> suspend)
-       | k <- ["M-x", "<XF86Sleep>"]
+       | k <- ["M-C-S-s", "<XF86Sleep>"]
     ]
 {-
     {- WiFi manager -}
