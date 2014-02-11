@@ -286,13 +286,13 @@ myKeys LocalConfig { warnAction = warn
        | k <- ["M-c", "<XF86HomePage>"]
     ]
     {- Screen Locking -}
-    ++ [ (k , (when mpd $ doMpd $ MPD.pause True) >> lock >> sleep 1 >> screenOff)
+    ++ [ (k , (when mpd $ doMpd $ MPD.pause True) >> lock >> sleep 4 >> screenOff)
        | k <- ["M-s", "<XF86ScreenSaver>"]
     ]
-    ++ [ (k , lock >> sleep 1 >> screenOff)
+    ++ [ (k , lock >> sleep 4 >> screenOff)
        | k <- ["M-S-s"]
     ]
-    ++ [ (k , lock >> sleep 1 >> suspend)
+    ++ [ (k , lock >> sleep 4 >> suspend)
        | k <- ["M-C-S-s", "<XF86Sleep>"]
     ]
 {-
