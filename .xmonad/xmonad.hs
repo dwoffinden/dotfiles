@@ -254,9 +254,6 @@ myKeys LocalConfig { warnAction = warn
     , ("M-S-q",            io exitSuccess)
     , ("M-q",              recompile False >>= (flip when) (safeSpawn "xmonad" ["--restart"]))
     , ("M-a",              safeRunInTerm "alsamixer" [])
-    {- Power off screen -}
-    , ("M-S-s",            sleep 1 >> screenOff)
-    , ("M-s",              (when mpd $ doMpd $ MPD.pause True) >> sleep 1 >> screenOff)
     {- Take a screenshot, save as 'screenshot.png' -}
     , ("<Print>",          safeSpawn "import" [ "-window", "root", "screenshot.png" ])
     , ("<XF86Eject>",      safeSpawn "eject" ["-T"])
@@ -290,7 +287,10 @@ myKeys LocalConfig { warnAction = warn
     ]
     {- Screen Locking -}
     ++ [ (k , lock >> sleep 1 >> screenOff)
-       | k <- ["M-S-x", "<XF86ScreenSaver>"]
+       | k <- ["M-S-s", "M-S-x", "<XF86ScreenSaver>"]
+    ]
+    ++ [ (k , (when mpd $ doMpd $ MPD.pause True) >> lock >> sleep 1 >> suspend)
+       | k <- ["M-s"]
     ]
     ++ [ (k , lock >> sleep 1 >> suspend)
        | k <- ["M-x", "<XF86Sleep>"]
