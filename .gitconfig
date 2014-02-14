@@ -1,0 +1,21 @@
+[include]
+  # ~/.gitconfig.local should contain user.name, user.email etc.
+  path = ~/.gitconfig.local
+[core]
+  autocrlf = input
+  safecrlf = true
+  editor = vim
+  fileMode = false
+  whitespace = tab-in-indent
+  pager = less -F -X
+[color]
+  ui = auto
+[diff]
+  tool = vimdiff
+[difftool]
+  prompt = false
+[merge]
+  tool = vimdiff
+  defaultToUpstream = true
+[push]
+  default = simple
