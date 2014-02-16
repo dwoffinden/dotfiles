@@ -157,7 +157,7 @@ function find-loose-git-objects {
 }
 
 function find-dropbox-conflicts {
-  find ~/Dropbox/ -name "*'s conflicted copy *" "$@"
+  find ~/Dropbox/ \( -name "*'s conflicted copy *" -o -name "*(Case Conflict)*" \) "$@"
 }
 
 function fliptable {
