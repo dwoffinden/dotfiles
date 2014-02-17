@@ -177,10 +177,13 @@ findPid :: String -> IO (Maybe ProcessID)
 findPid comm =
   getDirectoryContents "/proc" >>= findM matchesComm . mapMaybe readMaybe
   where
+    matchesComm :: ProcessID -> IO Bool
     matchesComm pid =
       either (const False) (== comm) <$> tryReadLine ("/proc" </> show pid </> "comm")
+    tryReadLine :: FilePath -> IO (Either () String)
     tryReadLine f =
       tryJust (guard . isDoesNotExistError) (readFirstLine f)
+    readFirstLine :: FilePath -> IO String
     readFirstLine f = do
       h <- openFile f ReadMode
       str <- hGetLine h
