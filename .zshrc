@@ -299,7 +299,11 @@ uname -nrmo
 [[ -f /proc/cpuinfo ]] && grep "^model name" /proc/cpuinfo -m1 | tail -c+14
 date
 if (command -v fortune &> /dev/null); then
-  fortune -as | cowsay -W 74 -f `cowsay -l | tail -n+2 | tr " " "\n" | shuf -n1`
+  if (command -v cowsay &> /dev/null); then
+    fortune -as | cowsay -W 74 -f `cowsay -l | tail -n+2 | tr " " "\n" | shuf -n1`
+  else
+    fortune -a
+  fi
 else
   echo "No fortunes for you!"
 fi
