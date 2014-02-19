@@ -1,12 +1,11 @@
 set nocompatible
 
-set cindent
-"setlocal cinoptions={.5s,:.5s,+.5s,t0,g0,^-2,e-2,n-2,p2s,(0,=.5s
-"setlocal cinoptions=>4,n-2,{2,^-2,:2,=2,g0,h2,p5,t0,+2,(0,u0,w1,m1
 set tabstop=8
-set softtabstop=2
 set expandtab
 set shiftwidth=2
+set softtabstop=2
+
+set smartindent
 
 set showmatch
 set incsearch
@@ -17,52 +16,61 @@ set showcmd
 
 set history=100
 
-set bs=eol,indent,start
+set backspace=indent,eol,start
 
 set wildmenu
-set wildmode=list:longest,full
+"set wildmode=list:longest,full
+set wildmode=longest:full,full
 
 set foldmethod=syntax
 set foldnestmax=2
 set foldlevelstart=99
 
-set fileformats=unix,dos
-set fileencodings=ucs-bom,utf-8
-setglobal fileencoding=utf-8
-setglobal encoding=utf-8
+if has("multi_byte")
+  if &termencoding == ""
+    let &termencoding = &encoding
+  endif
+  set encoding=utf-8
+  setglobal fileencoding=utf-8
+  set fileencodings=ucs-bom,utf-8,latin1
+endif
 
-" set textwidth=78
+set fileformats=unix,dos
+
+"set textwidth=78
 
 set spelllang=en_gb
-" set spell
+"set spell
 
 set directory=/tmp,/dev/shm,$TMP,$TEMP
 
 if &t_Co > 2 || has("gui_running")
-    syntax on
-    set hlsearch
-    colorscheme desert
-    if &t_Co >= 256 || has("gui_running")
-        colorscheme wombat256mod
-    endif
+  syntax on
+  set hlsearch
+  set cursorline
+  "set cursorcolumn
+  colorscheme desert
+  if &t_Co >= 256 || has("gui_running")
+    colorscheme wombat256mod
+  endif
 endif
 
 if has("gui_running")
-    set guifont=Terminus,Inconsolata-g,Inconsolata,Consolas
-    set lines=50 columns=100
+  set guifont=Terminus,Inconsolata-g,Inconsolata,Consolas
+  set lines=50 columns=100
 endif
 
 if has('mouse')
-    set mouse=a
+  set mouse=a
 endif
 
 if version >= 703
-    set colorcolumn=80
-    if &t_Co >= 256 || has("gui_running")
-        hi ColorColumn ctermbg=236 guibg=#2d2d2d
-    endif
-    set undofile
-    set undodir=/tmp,/dev/shm,$TMP,$TEMP
+  set colorcolumn=80
+  if &t_Co >= 256 || has("gui_running")
+    hi ColorColumn ctermbg=236 guibg=#2d2d2d
+  endif
+  set undofile
+  set undodir=/tmp,/dev/shm,$TMP,$TEMP
 endif
 
 " inoremap {      {}<Left>
