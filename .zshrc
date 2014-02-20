@@ -125,13 +125,6 @@ alias du='du -h'
 alias dls='dropbox filestatus -l'
 alias dwstat='watch -n 1 dropbox status'
 
-alias timetable='elinks www3.imperial.ac.uk/computing/internal/timetables'
-
-alias screen-off='xset dpms force off'
-alias screen-on='xset dpms force on'
-alias screensaver-off='xset s off ; xset -dpms'
-alias screensaver-on='xset s on ; xset +dpms'
-
 alias git-repack-aggressive='git repack -Adf --depth=300 --window=300'
 
 alias gfa='git fetch --all'
@@ -164,6 +157,7 @@ function fliptable {
   echo "（╯°□°）╯︵ ┻━┻"
 }
 
+#TODO update this
 function sbt-clean {
   echo "Cleaning ~/.sbt:"
   rm -rfv ~/.sbt/{boot,staging,plugins/{project,target}}
@@ -237,32 +231,16 @@ case "$CONF" in
     function drestart {
       sudo systemctl restart dropbox@`whoami`
     }
-    alias writer='libreoffice --writer'
     alias s='sudo'
     alias y='yaourt'
     alias ysc='yaourt -Sc --noconfirm'
     alias sp='sudo pacman'
     alias sv='sudo vim'
     alias svd='sudo vimdiff'
-    alias start='sudo systemctl start'
-    alias stop='sudo systemctl stop'
     alias update-grub='sudo grub-mkconfig -o /boot/grub/grub.cfg'
     alias mkinitcpio-all='sudo sh -c "mkinitcpio -p linux & \
                                       mkinitcpio -p linux-ck & \
                                       mkinitcpio -p linux-lts &"'
-    alias mount-labs='mount /media/labs'
-    alias mount-icfs='mount /media/icfs'
-    #//fs-homes.doc.ic.ac.uk /mnt/labs cifs defaults,user,noauto,relatime,domain=WIN,user=daw10 0 0
-    #//icfs7.cc.ic.ac.uk     /mnt/icfs cifs defaults,user,noauto,relatime,domain=IC,user=daw10  0 0
-    #alias mount-labs='sudo mount -t cifs //fs-homes.doc.ic.ac.uk/daw10 \
-    #             /media/labs -o user=WIN/daw10'
-    #alias umount-labs='sudo umount /media/labs'
-    #alias mount-college='sudo mount -t cifs //icfs7.cc.ic.ac.uk/daw10 \
-    #             /media/college -o user=IC/daw10'
-    #alias umount-college='sudo umount /media/college'
-    alias pwoff='systemctl poweroff'
-    alias hbernate='systemctl hibernate'
-    alias rboot='systemctl reboot'
     alias abcde-mp3-high='abcde -o mp3:"-V0 -q0 -ms"'
     alias abcde-flac='abcde -o flac:"--verify --best"'
     ;|
