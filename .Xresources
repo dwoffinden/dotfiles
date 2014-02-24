@@ -17,12 +17,12 @@ URxvt.font: xft:Terminus:antialias=false:size=8
 !URxvt.fading: 25
 
 ! pseudo-transparency
-URxvt.shading: 10
-URxvt.transparent: true
+!URxvt.shading: 10
+!URxvt.transparent: true
 
-! actual transparency, requires compositing wm
-!URxvt.depth: 32
-!URxvt.background: rgba:0000/0000/0000/d000
+! actual transparency, requires compositor
+URxvt.depth: 32
+URxvt.background: rgba:0000/0000/0000/e000
 
 ! Tangoish Theme
 *.background: #111111

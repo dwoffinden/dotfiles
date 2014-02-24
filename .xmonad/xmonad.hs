@@ -164,7 +164,7 @@ myStartupHook LocalConfig { homeDir = home
     , "--expand", "true"
     , "--padding", "0"
     ]
-  safeSpawn "xcompmgr" ["-c"]
+  safeSpawn "compton" ["-cCz", "--backend=glx", "--paint-on-overlay"]
 
 ifNotRunning :: MonadIO m => String -> IO () -> m ()
 ifNotRunning prog hook = io $ void $ forkIO $ do
