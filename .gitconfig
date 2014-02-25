@@ -12,6 +12,7 @@
   ui = auto
 [diff]
   tool = vimdiff
+  algorithm = patience
 [difftool]
   prompt = false
 [merge]
