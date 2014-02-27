@@ -108,7 +108,7 @@ getConfiguration = do
       dropWhile (== '.') . dropWhile (/= '.')
     tw =
       (\w -> w - (w * 95 `div` 100) ) -- width, minus a 95% xmobar
-      . (fromMaybe 1920) -- sane default for labs
+      . (fromMaybe 1680) -- sane default for labs
       . (flip lookup [ ("winona", 1024)
                      , ("gladys", 1366)
                      , ("vera",   1920)
