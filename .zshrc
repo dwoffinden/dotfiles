@@ -34,22 +34,58 @@ source $ZSH/oh-my-zsh.sh
 
 #####[ CONFIG SELECTION ]###################################################
 #
-#   {LABS,GLADYS,WINONA,VERA,TOMBSTONE}
-#
-#   TODO feature-specific flags? e.g. archlinux, ubuntu, laptop, labs?
-#   TODO use domainname
 #   TODO add /usr/games to path?
+#   TODO tolerate the case that I set a machine's hostname to "ac.uk" or "com"?
 
-[[ -n "$CONF" ]] && echo "CONF already set to \"$CONF\", WTF?"
+[[ -z "$_HOST" ]] && [[ -z "$_IS_LABS" ]] && [[ -z "$_IS_ARCH" ]] && \
+  [[ -z "$_IS_LAPTOP" ]] && [[ -z "$_IS_SUDOER" ]] && [[ -z "$_HAS_YAOURT" ]] && \
+  [[ -z "$_HAS_OPTICAL_DRIVE" ]] || echo "Somethings being used?! :("
 
-CONF=${(U)HOST}
-case $CONF in
-  GLADYS | TOMESTONE | VERA | WATCHTOWER | WINONA)
-    ;;
-  *)
-    CONF=LABS
-    ;;
+# Lowercase $HOST, and split by '.' into an array
+_HOST=("${(Ls/./)HOST}")
+
+_HAS_OPTICAL_DRIVE=false
+_HAS_YAOURT=false
+_IS_ARCH=false
+_IS_LABS=false
+_IS_LAPTOP=false
+_IS_SUDOER=false
+
+if [[ "${(j/./)_HOST[-2,-1]}" = 'ac.uk' ]]; then
+  echo "You're in labs!"
+  _IS_LABS=true
+fi
+
+if [[ "${_HOST[-1]}" = 'com' ]]; then
+  echo "You're at work!"
+fi
+
+case ${_HOST[1]} in
+  gladys | winona)
+    _IS_LAPTOP=true
+    ;| # break but continue scanning
+  gladys | vera)
+    _HAS_OPTICAL_DRIVE=true
+    ;& # fall through
+  tombstone | winona)
+    _HAS_YAOURT=true
+    ;& # fall through
+  watchtower)
+    _IS_ARCH=true
+    ;& # fall through
+  buzzard)
+    _IS_SUDOER=true
+    ;| # break but continue scanning
 esac
+
+echo "_HAS_OPTICAL_DRIVE=$_HAS_OPTICAL_DRIVE"
+echo "_HAS_YAOURT=$_HAS_YAOURT"
+echo "_IS_ARCH=$_IS_ARCH"
+echo "_IS_LABS=$_IS_LABS"
+echo "_IS_LAPTOP=$_IS_LAPTOP"
+echo "_IS_SUDOER=$_IS_SUDOER"
+
+unset _HOST
 
 #####[ ZSH OPTIONS ]########################################################
 
@@ -96,10 +132,10 @@ bindkey ' ' magic-space # history expansion on space
 export EDITOR=vim
 export VISUAL=$EDITOR
 
-if [[ "$CONF" = LABS ]]; then
+if [[ $_IS_LABS = true ]]; then
   source ~/.profile
   #location of the dropbox lock file, LEAVE UNASSIGNED OTHERWISE
-  export DLOCKDIR=~/.dropboxLock
+  DLOCKDIR=~/.dropboxLock
 fi
 
 #####[ ALIASES ]############################################################
@@ -131,12 +167,12 @@ alias gfa='git fetch --all'
 alias gdc='git diff --cached'
 alias gds='git diff --stat'
 alias gdcs='git diff --cached --stat'
-alias gitka="gitk --argscmd='git for-each-ref --format=\"%(refname)\" refs/heads refs/stash'"
+alias gitkaaa="gitk --argscmd='git for-each-ref --format=\"%(refname)\" refs/heads refs/stash'"
 alias gitkaa="gitk --argscmd='git for-each-ref --format=\"%(refname)\" refs/heads refs/tags refs/stash'"
-alias gitkaaa='gitk --all'
-alias tiga='tig $(git for-each-ref --format="%(refname)" refs/heads refs/stash)'
+alias gitka='gitk --all'
+alias tigaaa='tig $(git for-each-ref --format="%(refname)" refs/heads refs/stash)'
 alias tigaa='tig $(git for-each-ref --format="%(refname)" refs/heads refs/tags refs/stash)'
-alias tigaaa='tig --all'
+alias tiga='tig --all'
 
 function bckground {
   nohup $@ </dev/null &>/dev/null &
@@ -170,81 +206,81 @@ function sbt-clean {
   return 0
 }
 
-case "$CONF" in
-  LABS)
-    alias quota='quota -sQ'
-    alias locked='startx -display :1 -- :1 vt9'
-    function dstat {
-      if [[ -n "$DLOCKDIR" ]]; then
-        if [[ -e "$DLOCKDIR" ]]; then
-          echo -n "dropbox running on "
-          cat "$DLOCKDIR"
-        else
-          echo "no dropbox lock detected"
-        fi
-      fi
-      dropbox status
-    }
-    function dstart {
-      if [[ -n "$DLOCKDIR" ]]; then
-        if [[ -e "$DLOCKDIR" ]]; then
-          echo -n "Dropbox is already running on "
-          cat "$DLOCKDIR"
-          return 1
-        else
-          echo "Creating $DLOCKDIR..."
-          uname -n > "$DLOCKDIR"
-          dropbox start
-        fi
-      else
-        dropbox start
-      fi
-    }
-    function dstop {
-      if [[ -z "$DLOCKDIR" ]]; then
-        dropbox stop
-        return
-      fi
-      if [[ ! -e "$DLOCKDIR" ]]; then
-        echo "Dropbox *shouldn't* be running..."
-        # dropbox stop
-        return 1
-      fi
-      if [[ `uname -n` != `cat $DLOCKDIR` ]]; then
-        echo -n "dropbox is running on "
-        cat $DLOCKDIR
-        return 1
-      fi
-      dropbox stop && rm -v $DLOCKDIR
-    }
-    alias drestart='dstop && sleep 1 && dstart'
-    ;;
-  *)
-    ### ALL NON-LABS ###
-    alias dstat='dropbox status'
-    function dstart {
-      sudo systemctl start dropbox@`whoami`
-    }
-    function dstop {
-      sudo systemctl stop dropbox@`whoami`
-    }
-    function drestart {
-      sudo systemctl restart dropbox@`whoami`
-    }
+if [[ $_IS_LABS = true ]]; then
+  ### Labs aliases ###
+  alias quota='quota -sQ'
+  alias locked='startx -display :1 -- :1 vt9'
+  function dstat {
+    if [[ -e "$DLOCKDIR" ]]; then
+      echo -n "dropbox running on "
+      cat "$DLOCKDIR"
+    else
+      echo "no dropbox lock detected"
+    fi
+    dropbox status
+  }
+  function dstart {
+    if [[ -e "$DLOCKDIR" ]]; then
+      echo -n "Dropbox is already running on "
+      cat "$DLOCKDIR"
+      return 1
+    else
+      echo "Creating $DLOCKDIR..."
+      uname -n > "$DLOCKDIR"
+      dropbox start
+    fi
+  }
+  function dstop {
+    if [[ ! -e "$DLOCKDIR" ]]; then
+      echo "Dropbox *shouldn't* be running..."
+      # dropbox stop
+      return 1
+    fi
+    if [[ `uname -n` != `cat $DLOCKDIR` ]]; then
+      echo -n "dropbox is running on "
+      cat $DLOCKDIR
+      return 1
+    fi
+    dropbox stop && rm -v $DLOCKDIR
+  }
+  function drestart {
+    dstop && sleep 1 && dstart
+  }
+else
+  ### ALL NON-LABS ###
+  alias dstat='dropbox status'
+  function dstart {
+    sudo systemctl start dropbox@`whoami`
+  }
+  function dstop {
+    sudo systemctl stop dropbox@`whoami`
+  }
+  function drestart {
+    sudo systemctl restart dropbox@`whoami`
+  }
+  if [[ $_IS_SUDOER = true ]]; then
     alias s='sudo'
-    alias y='yaourt'
-    alias ysc='yaourt -Sc --noconfirm'
-    alias sp='sudo pacman'
     alias sv='sudo vim'
     alias svd='sudo vimdiff'
-    alias update-grub='sudo grub-mkconfig -o /boot/grub/grub.cfg'
-    alias mkinitcpio-all='sudo sh -c "mkinitcpio -p linux & \
-                                      mkinitcpio -p linux-ck & \
-                                      mkinitcpio -p linux-lts &"'
+    if [[ $_IS_ARCH = true ]]; then
+      alias sp='sudo pacman'
+      alias update-grub='sudo grub-mkconfig -o /boot/grub/grub.cfg'
+      alias mkinitcpio-all='sudo sh -c "mkinitcpio -p linux & \
+                                        mkinitcpio -p linux-ck & \
+                                        mkinitcpio -p linux-lts &"'
+      if [[ $_HAS_YAOURT = true ]]; then
+        alias y='yaourt'
+        alias ysc='yaourt -Sc --noconfirm'
+      else
+        alias p='pacman'
+      fi
+    fi
+  fi
+  if [[ $_HAS_OPTICAL_DRIVE = true ]]; then
     alias abcde-mp3-high='abcde -o mp3:"-V0 -q0 -ms"'
     alias abcde-flac='abcde -o flac:"--verify --best"'
-    ;|
-  GLADYS | WINONA) # Laptops
+  fi
+  if [[ $_IS_LAPTOP = true ]]; then
     alias hdmi-off='xrandr --output HDMI-0 --off'
     alias hdmi-on='xrandr --output HDMI-0 --mode 1920x1080 --rate 60 \
                           --set underscan off --right-of LVDS'
@@ -254,33 +290,36 @@ case "$CONF" in
     alias vga-off='xrandr --output VGA-0 --off'
     alias vga-on='xrandr --output VGA-0 --mode 1920x1080 --rate 60 \
                           --right-of LVDS'
-    ;|
-    #aplay -l
-  GLADYS)
-    alias hdmi-test='aplay -D plughw:1,3 \
-                     /usr/share/sounds/alsa/Front_Center.wav'
-    alias mplayer-hdmi='mplayer -ao alsa:device=hw1.3'
-    ;;
-  WINONA)
-    alias hdmi-test='aplay -D plughw:0,1 \
-                     /usr/share/sounds/alsa/Front_Center.wav'
-    alias mplayer-hdmi='mplayer -ao alsa:device=hw0.1'
-    ;;
-  VERA)
-    ;;
-esac
+  fi
+  case "${(L)HOST}" in
+    GLADYS)
+      alias hdmi-test='aplay -D plughw:1,3 \
+                       /usr/share/sounds/alsa/Front_Center.wav'
+      alias mplayer-hdmi='mplayer -ao alsa:device=hw1.3'
+      ;;
+    WINONA)
+      alias hdmi-test='aplay -D plughw:0,1 \
+                       /usr/share/sounds/alsa/Front_Center.wav'
+      alias mplayer-hdmi='mplayer -ao alsa:device=hw0.1'
+      ;;
+  esac
+fi
 
 #####[ GREETING ]###########################################################
 
+# TODO more readable method for colouring?
 tput setaf 2
 uname -nrmo
 [[ -f /proc/cpuinfo ]] && grep "^model name" /proc/cpuinfo -m1 | tail -c+14
 date
-if (command -v fortune &> /dev/null); then
-  if (command -v cowsay &> /dev/null); then
+if command -v fortune &> /dev/null; then
+  if command -v cowsay &> /dev/null; then
+    # TODO rewrite this with zsh-isms?
     fortune -as | cowsay -W 74 -f `cowsay -l | tail -n+2 | tr " " "\n" | shuf -n1`
   else
+    echo
     fortune -a
+    echo
   fi
 else
   echo "No fortunes for you!"
@@ -289,7 +328,12 @@ tput sgr0
 
 #####[ CLEAN UP ]###########################################################
 
-unset CONF
+unset _HAS_OPTICAL_DRIVE
+unset _HAS_YAOURT
+unset _IS_ARCH
+unset _IS_LABS
+unset _IS_LAPTOP
+unset _IS_SUDOER
 
 [[ -d ~/Desktop ]] && rm -rv ~/Desktop
 [[ -d ~/Downloads ]] && rm -rv ~/Downloads
@@ -298,3 +342,4 @@ unset CONF
 ############################################################################
 
 true
+

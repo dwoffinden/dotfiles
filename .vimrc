@@ -77,6 +77,13 @@ if version >= 703
   set undodir=/tmp,/dev/shm,$TMP,$TEMP
 endif
 
+map <ESC>[H <Home>
+map <ESC>[F <End>
+imap <ESC>[H <C-O><Home>
+imap <ESC>[F <C-O><End>
+cmap <ESC>[H <Home>
+cmap <ESC>[F <End>
+
 " inoremap {      {}<Left>
 " inoremap (      ()<Left>
 " inoremap [      []<Left>
