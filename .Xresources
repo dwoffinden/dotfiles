@@ -1,4 +1,7 @@
 ! URxvt Settings
+!
+URxvt*keysym.Home: \033[H
+URxvt*keysym.End: \033[F
 
 URxvt.perl-ext-common: default,matcher
 URxvt.url-launcher: /usr/bin/xdg-open
