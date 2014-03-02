@@ -53,9 +53,12 @@ if &t_Co > 2 || has("gui_running")
   set hlsearch
   set cursorline
   "set cursorcolumn
+  set background=dark
   colorscheme desert
   if &t_Co >= 256 || has("gui_running")
-    colorscheme wombat256mod
+    "let g:solarized_termcolors=256
+    "let g:solarized_termtrans=1
+    colorscheme solarized
   endif
 endif
 
@@ -69,9 +72,9 @@ if has('mouse')
 endif
 
 if version >= 703
-  set colorcolumn=80
+  set colorcolumn=81,101
   if &t_Co >= 256 || has("gui_running")
-    hi ColorColumn ctermbg=236 guibg=#2d2d2d
+    highlight ColorColumn ctermbg=0 guibg=#Grey40
   endif
   set undofile
   set undodir=/tmp,/dev/shm,$TMP,$TEMP
