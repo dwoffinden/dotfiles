@@ -10,3 +10,6 @@
 [submodule ".vim/bundle/vim-scala"]
 	path = .vim/bundle/vim-scala
 	url = git://github.com/derekwyatt/vim-scala
+[submodule ".vim/bundle/vim-glsl"]
+	path = .vim/bundle/vim-glsl
+	url = git://github.com/tikhomirov/vim-glsl
