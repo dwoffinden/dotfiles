@@ -13,15 +13,6 @@
 [submodule ".vim/bundle/vim-glsl"]
 	path = .vim/bundle/vim-glsl
 	url = git://github.com/tikhomirov/vim-glsl
-[submodule ".vim/bundle/molokai"]
-	path = .vim/bundle/vim-colors-molokai
-	url = git://github.com/tomasr/molokai
-[submodule "vim-colors-solarized"]
-	path = vim-colors-solarized
-	url = git://github.com/altercation/vim-colors-solarized
-[submodule ".vim/bundle/vim-colors-solarized"]
-	path = .vim/bundle/vim-colors-solarized
-	url = git://github.com/altercation/vim-colors-solarized
 [submodule ".vim/bundle/vim-opencl"]
 	path = .vim/bundle/vim-opencl
 	url = git://github.com/petRUShka/vim-opencl

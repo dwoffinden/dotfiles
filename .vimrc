@@ -56,9 +56,7 @@ if &t_Co > 2 || has("gui_running")
   set background=dark
   colorscheme desert
   if &t_Co >= 256 || has("gui_running")
-    "let g:solarized_termcolors=256
-    "let g:solarized_termtrans=1
-    colorscheme solarized
+    colorscheme Tomorrow-Night
   endif
 endif
 
@@ -73,9 +71,6 @@ endif
 
 if version >= 703
   set colorcolumn=81,101
-  if &t_Co >= 256 || has("gui_running")
-    highlight ColorColumn ctermbg=0 guibg=#Grey40
-  endif
   set undofile
   set undodir=/tmp,/dev/shm,$TMP,$TEMP
 endif

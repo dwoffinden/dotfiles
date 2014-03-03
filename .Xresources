@@ -1,5 +1,5 @@
 ! URxvt Settings
-!
+
 URxvt*keysym.Home: \033[H
 URxvt*keysym.End: \033[F
 
@@ -17,106 +17,71 @@ URxvt.visualBell: True
 URxvt.font: xft:Terminus:antialias=false:size=8
 !URxvt.font: xft:Deja Vu Sans Mono:size=8
 
-!URxvt.fading: 25
-
-! pseudo-transparency
-!URxvt.shading: 10
-!URxvt.transparent: true
+URxvt.fading: 0
 
 ! actual transparency, requires compositor
 URxvt.depth: 32
-!URxvt.background: rgba:0000/0000/0000/e000
-URxvt.background: [90]#002b36
+URxvt.background: [95]#1d1f21
 
-! Tangoish Theme
-!*.background: #111111
-!*.foreground: #ebebff
-!*.color0:  #2e3436
-!*.color1:  #cc0000
-!*.color2:  #4e9a06
-!*.color3:  #c4a000
-!*.color4:  #3465a4
-!*.color5:  #75507b
-!*.color6:  #0b939b
-!*.color7:  #d3d7cf
-!*.color8:  #555753
-!*.color9:  #ef2929
-!*.color10: #8ae234
-!*.color11: #fce94f
-!*.color12: #729fcf
-!*.color13: #ad7fa8
-!*.color14: #00f5e9
-!*.color15: #eeeeec
+! Tomorrow Night
+! Scheme: Chris Kempson (http://chriskempson.com)
+*foreground:   #c5c8c6
+*background:   #1d1f21
+*cursorColor:  #aeafad
+*color0:       #000000
+*color1:       #912226
+*color2:       #778900
+*color3:       #ae7b00
+*color4:       #1d2594
+*color5:       #682a9b
+*color6:       #2b6651
+*color7:       #929593
+*color8:       #666666
+*color9:       #cc6666
+*color10:      #b5bd68
+*color11:      #f0c674
+*color12:      #81a2be
+*color13:      #b294bb
+*color14:      #8abeb7
+*color15:      #ecebec
 
+! Base16 Tomorrow
+! Scheme: Chris Kempson (http://chriskempson.com)
 
-! Solarized color scheme for the X Window System
+!#define base00 #1d1f21
+!#define base01 #282a2e
+!#define base02 #373b41
+!#define base03 #969896
+!#define base04 #b4b7b4
+!#define base05 #c5c8c6
+!#define base06 #e0e0e0
+!#define base07 #ffffff
+!#define base08 #cc6666
+!#define base09 #de935f
+!#define base0A #f0c674
+!#define base0B #b5bd68
+!#define base0C #8abeb7
+!#define base0D #81a2be
+!#define base0E #b294bb
+!#define base0F #a3685a
 !
-! http://ethanschoonover.com/solarized
-
-
-! Common
-
-#define S_yellow        #b58900
-#define S_orange        #cb4b16
-#define S_red           #dc322f
-#define S_magenta       #d33682
-#define S_violet        #6c71c4
-#define S_blue          #268bd2
-#define S_cyan          #2aa198
-#define S_green         #859900
-
-
-! Dark
-
-#define S_base03        #002b36
-#define S_base02        #073642
-#define S_base01        #586e75
-#define S_base00        #657b83
-#define S_base0         #839496
-#define S_base1         #93a1a1
-#define S_base2         #eee8d5
-#define S_base3         #fdf6e3
-
-
-! Light
-
-! #define S_base03        #fdf6e3
-! #define S_base02        #eee8d5
-! #define S_base01        #93a1a1
-! #define S_base00        #839496
-! #define S_base0         #657b83
-! #define S_base1         #586e75
-! #define S_base2         #073642
-! #define S_base3         #002b36
-
-
-! To only apply colors to your terminal, for example, prefix
-! the color assignment statement with its name. Example:
-!
-! URxvt*background:            S_base03
-
-*background:              S_base03
-*foreground:              S_base0
-*fading:                  40
-*fadeColor:               S_base03
-*cursorColor:             S_base1
-*pointerColorBackground:  S_base01
-*pointerColorForeground:  S_base1
-
-*color0:                  S_base02
-*color1:                  S_red
-*color2:                  S_green
-*color3:                  S_yellow
-*color4:                  S_blue
-*color5:                  S_magenta
-*color6:                  S_cyan
-*color7:                  S_base2
-*color9:                  S_orange
-*color8:                  S_base03
-*color10:                 S_base01
-*color11:                 S_base00
-*color12:                 S_base0
-*color13:                 S_violet
-*color14:                 S_base1
-*color15:                 S_base3
+!*.foreground:   base05
+!*.background:   base00
+!*.cursorColor:  base05
+!*.color0:       base00
+!*.color1:       base08
+!*.color2:       base0B
+!*.color3:       base0A
+!*.color4:       base0D
+!*.color5:       base0E
+!*.color6:       base0C
+!*.color7:       base05
+!*.color8:       base03
+!*.color9:       base09
+!*.color10:      base01
+!*.color11:      base02
+!*.color12:      base04
+!*.color13:      base06
+!*.color14:      base0F
+!*.color15:      base07
 
