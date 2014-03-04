@@ -78,13 +78,6 @@ case ${_HOST[1]} in
     ;| # break but continue scanning
 esac
 
-echo "_HAS_OPTICAL_DRIVE=$_HAS_OPTICAL_DRIVE"
-echo "_HAS_YAOURT=$_HAS_YAOURT"
-echo "_IS_ARCH=$_IS_ARCH"
-echo "_IS_LABS=$_IS_LABS"
-echo "_IS_LAPTOP=$_IS_LAPTOP"
-echo "_IS_SUDOER=$_IS_SUDOER"
-
 unset _HOST
 
 #####[ ZSH OPTIONS ]########################################################
