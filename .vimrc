@@ -57,7 +57,7 @@ if &t_Co > 2 || has("gui_running")
   "set cursorcolumn
   set background=dark
   colorscheme desert
-  if &t_Co >= 256 || has("gui_running")
+  if &t_Co >= 88 || has("gui_running")
     colorscheme Tomorrow-Night
   endif
 endif
