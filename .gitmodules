@@ -16,3 +16,6 @@
 [submodule ".vim/bundle/vim-opencl"]
 	path = .vim/bundle/vim-opencl
 	url = git://github.com/petRUShka/vim-opencl
+[submodule ".vim/bundle/vim-bufferline"]
+	path = .vim/bundle/vim-bufferline
+	url = git://github.com/bling/vim-bufferline

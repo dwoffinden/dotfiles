@@ -1,6 +1,7 @@
 runtime bundle/vim-pathogen/autoload/pathogen.vim
 
 execute pathogen#infect()
+Helptags
 
 set nocompatible
 
@@ -29,6 +30,7 @@ set wildmode=longest:full,full
 set foldmethod=syntax
 set foldnestmax=2
 set foldlevelstart=99
+set foldcolumn=1
 
 if has("multi_byte")
   if &termencoding == ""
