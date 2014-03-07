@@ -1,5 +1,8 @@
 runtime bundle/vim-pathogen/autoload/pathogen.vim
 
+let g:airline#extensions#tabline#enabled = 1
+set laststatus=2
+
 execute pathogen#infect()
 Helptags
 
