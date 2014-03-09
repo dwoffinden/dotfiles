@@ -1,0 +1,4 @@
+[extensions]
+hgk =
+[trusted]
+users = root
