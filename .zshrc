@@ -201,6 +201,7 @@ function sbt-clean {
 
 if [[ $_IS_LABS = true ]]; then
   ### Labs aliases ###
+  alias lp-staple='lp -d ICTMono -o "OutputBin=UStapler HPStaplerOptions=1diagonal"'
   alias quota='quota -sQ'
   alias locked='startx -display :1 -- :1 vt9'
   function dstat {
