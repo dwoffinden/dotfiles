@@ -49,7 +49,7 @@ data LocalConfig m i =
     , suspendAction :: m ()
     , warnAction :: String -> m ()
     , homeDir :: FilePath
-    , wallpaper :: FilePath
+    , wallpaper :: FilePath -- TODO make this Maybe FilePath?
     , chromiumName :: String
     }
 
@@ -99,7 +99,7 @@ getConfiguration = do
     isVera =
       (== "vera")
     isLaptop =
-      flip elem ["gladys", "winona"]
+      (`elem` ["gladys", "winona"])
     isHomeMachine h =
       isVera h || isLaptop h
     isLabs =
@@ -109,7 +109,7 @@ getConfiguration = do
     tw =
       (\w -> w - (w * 95 `div` 100) ) -- width, minus a 95% xmobar
       . (fromMaybe 1680) -- sane default for labs
-      . (flip lookup [ ("winona", 1024)
+      . (`lookup` [ ("winona", 1024)
                      , ("gladys", 1366)
                      , ("vera",   1920)
                      ])
@@ -120,6 +120,7 @@ getConfiguration = do
     chromium h
       | isLabs h  = "chromium-browser"
       | otherwise = "chromium"
+    -- TODO fail gracefully if ~/Dropbox/wallpaper isn't there
     pickRandomWallpaper home = do
       let wps = home </> "Dropbox" </> "wallpaper"
       candidates <- getDirectoryContents wps >>= filterM doesFileExist . map (wps </>)
@@ -255,7 +256,7 @@ myKeys LocalConfig { warnAction = warn
     , ("M-,",              sendMessage (IncMasterN 1))
     , ("M-.",              sendMessage (IncMasterN (-1)))
     , ("M-S-q",            io exitSuccess)
-    , ("M-q",              recompile False >>= (flip when) (safeSpawn "xmonad" ["--restart"]))
+    , ("M-q",              recompile False >>= (`when` (safeSpawn "xmonad" ["--restart"])))
     , ("M-a",              safeRunInTerm "alsamixer" [])
     {- Take a screenshot, save as 'screenshot.png' -}
     , ("<Print>",          safeSpawn "import" [ "-window", "root", "screenshot.png" ])
@@ -271,7 +272,7 @@ myKeys LocalConfig { warnAction = warn
        | k <- XMonad.workspaces c, (f, m) <- [(W.greedyView, "M-"), (W.shift, "M-S-")]
     ]
     {- Screen Switching -}
-    ++ [ (m ++ key, screenWorkspace sc >>= flip whenJust (windows . f))
+    ++ [ (m ++ key, screenWorkspace sc >>= (`whenJust` (windows . f)))
        | (key, sc) <- zip ["w", "e", "r"] [0..], (m, f) <- [("M-", W.view), ("M-S-", W.shift)]
     ]
     {- Volume Controls -}
@@ -321,9 +322,9 @@ myKeys LocalConfig { warnAction = warn
     doMpd =
       io . void . MPD.withMPD
     safeRunInTerm comm args =
-      asks (terminal . config) >>= flip safeSpawn (["-e", comm] ++ args)
+      asks (terminal . config) >>= (`safeSpawn` (["-e", comm] ++ args))
     safeRunProgInTerm =
-      flip safeRunInTerm []
+      (`safeRunInTerm` [])
 
 myConfig = do
   conf <- getConfiguration
