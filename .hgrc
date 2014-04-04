@@ -1,5 +1,6 @@
 %include ~/.hgrc.local
 [extensions]
+color =
 hgk =
 [trusted]
 users = root
