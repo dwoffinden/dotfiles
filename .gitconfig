@@ -18,5 +18,6 @@
 [merge]
   tool = vimdiff
   defaultToUpstream = true
+  conflictstyle = diff3
 [push]
   default = simple
