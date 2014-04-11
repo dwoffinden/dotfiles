@@ -1,14 +1,14 @@
 Config
-    { font     = "xft:Terminus-8"
+    { font     = "xft:Deja Vu Sans-9"
     , bgColor  = "#000000"
     , fgColor  = "#06989A"
     , position = TopW L 95
     , lowerOnStart = True
     , commands =
-        [ Run Swap ["-t", "<used> <free>"] 100
-        , Run Memory [ "-t", "<usedratio> <used> <free>"
+        [ Run Swap ["-t", "Swap <used>"] 100
+        , Run Memory [ "-t", "RAM <usedratio>"
                      , "-S", "True"
-                     ] 20
+                     ] 50
         , Run Com "cputemp" ["coretemp-isa-0000"] "cputemp" 50
         , Run CpuFreq [ "-t", "<cpu0> <cpu1> <cpu2> <cpu3>"
                       , "-L", "2"

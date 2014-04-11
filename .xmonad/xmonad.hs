@@ -156,7 +156,7 @@ myStartupHook LocalConfig { homeDir = home
     , "--SetDockType", "true"
     , "--SetPartialStrut", "true"
     , "--heighttype", "pixel"
-    , "--height", "16"
+    , "--height", "18"
     , "--widthtype", "pixel"
     , "--width", show tw
     , "--transparent", "true"
