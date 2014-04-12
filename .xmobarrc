@@ -1,5 +1,5 @@
 Config
-    { font     = "xft:Deja Vu Sans-9"
+    { font     = "xft:Source Sans Pro-9"
     , bgColor  = "#000000"
     , fgColor  = "#06989A"
     , position = TopW L 95
