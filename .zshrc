@@ -271,8 +271,8 @@ else
     fi
   fi
   if [[ $_HAS_OPTICAL_DRIVE = true ]]; then
-    alias abcde-mp3-high='abcde -o mp3:"-V0 -q0 -ms"'
-    alias abcde-flac='abcde -o flac:"--verify --best"'
+    alias abcde-mp3-high='abcde -o mp3'
+    alias abcde-flac='abcde -o flac'
   fi
   if [[ $_IS_LAPTOP = true ]]; then
     alias hdmi-off='xrandr --output HDMI-0 --off'
