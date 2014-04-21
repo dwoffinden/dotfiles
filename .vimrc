@@ -7,6 +7,7 @@ execute pathogen#infect()
 Helptags
 
 set nocompatible
+set hidden
 
 set tabstop=8
 set expandtab
