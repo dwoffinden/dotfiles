@@ -102,6 +102,9 @@ setopt hist_verify
 setopt share_history
 setopt no_hist_beep
 
+# Disable the VCS prompt in the managed mount points
+zstyle ':vcs_info:*' disable-patterns "/run/user/*/gvfs/*"
+
 #####[ KEYBINDINGS ]########################################################
 
 #bindkey -e
