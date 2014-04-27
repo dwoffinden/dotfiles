@@ -41,15 +41,15 @@ source $ZSH/oh-my-zsh.sh
   [[ -z "$_IS_LAPTOP" ]] && [[ -z "$_IS_SUDOER" ]] && [[ -z "$_HAS_YAOURT" ]] && \
   [[ -z "$_HAS_OPTICAL_DRIVE" ]] || echo "Somethings being used?! :("
 
-# Lowercase $HOST, and split by '.' into an array
-_HOST=("${(Ls/./)HOST}")
-
 _HAS_OPTICAL_DRIVE=false
 _HAS_YAOURT=false
 _IS_ARCH=false
 _IS_LABS=false
 _IS_LAPTOP=false
 _IS_SUDOER=false
+
+# Lowercase $HOST, and split by '.' into an array
+_HOST=("${(Ls/./)HOST}")
 
 if [[ "${(j/./)_HOST[-2,-1]}" = 'ac.uk' ]]; then
   echo "You're in labs!"
@@ -130,15 +130,13 @@ export VISUAL=$EDITOR
 
 if [[ $_IS_LABS = true ]]; then
   source ~/.profile
-  #location of the dropbox lock file, LEAVE UNASSIGNED OTHERWISE
+  #location of the dropbox lock file
   DLOCKDIR=~/.dropboxLock
 fi
 
 #####[ ALIASES ]############################################################
 
 ### UNIVERSAL ALIASES ###
-alias -g G='| grep --color=auto'
-alias -g L='| less'
 alias ls='ls -Fhv --color=auto --group-directories-first'
 alias l='ls -l'
 alias ll='ls -la'
@@ -149,8 +147,7 @@ alias v='vim'
 alias vd='vimdiff'
 alias df='df -h'
 alias mountc='mount | column -t'
-#alias -g less='less -R'
-alias -g grep='grep --color=auto'
+alias grep='grep --color=auto'
 alias hd='hexdump -C'
 alias du='du -h'
 ### DROPBOX ###
@@ -332,9 +329,10 @@ unset _IS_LABS
 unset _IS_LAPTOP
 unset _IS_SUDOER
 
-[[ -d ~/Desktop ]] && rm -rv ~/Desktop
-[[ -d ~/Downloads ]] && rm -rv ~/Downloads
+[[ -d ~/Desktop ]] && rmdir ~/Desktop
+[[ -d ~/Downloads ]] && rmdir ~/Downloads
 [[ -f ~/Dropbox/desktop.ini ]] && rm -v ~/Dropbox/desktop.ini
+[[ -d ~/Templates ]] && rmdir ~/Templates
 
 ############################################################################
 
