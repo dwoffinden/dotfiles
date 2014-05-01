@@ -37,18 +37,18 @@ source $ZSH/oh-my-zsh.sh
 #   TODO add /usr/games to path?
 #   TODO tolerate the case that I set a machine's hostname to "ac.uk" or "com"?
 
-[[ -z "$_HOST" ]] && [[ -z "$_IS_LABS" ]] && [[ -z "$_IS_ARCH" ]] && \
-  [[ -z "$_IS_LAPTOP" ]] && [[ -z "$_IS_SUDOER" ]] && [[ -z "$_HAS_YAOURT" ]] && \
-  [[ -z "$_HAS_OPTICAL_DRIVE" ]] || echo "Somethings being used?! :("
+# Use an anonymous function to scope the configuration variables
+function {
 
-_HAS_OPTICAL_DRIVE=false
-_HAS_YAOURT=false
-_IS_ARCH=false
-_IS_LABS=false
-_IS_LAPTOP=false
-_IS_SUDOER=false
+local _HAS_OPTICAL_DRIVE=false
+local _HAS_YAOURT=false
+local _IS_ARCH=false
+local _IS_LABS=false
+local _IS_LAPTOP=false
+local _IS_SUDOER=false
 
 # Lowercase $HOST, and split by '.' into an array
+local _HOST
 _HOST=("${(Ls/./)HOST}")
 
 if [[ "${(j/./)_HOST[-2,-1]}" = 'ac.uk' ]]; then
@@ -77,8 +77,6 @@ case ${_HOST[1]} in
     _IS_SUDOER=true
     ;| # break but continue scanning
 esac
-
-unset _HOST
 
 #####[ ZSH OPTIONS ]########################################################
 
@@ -322,12 +320,7 @@ tput sgr0
 
 #####[ CLEAN UP ]###########################################################
 
-unset _HAS_OPTICAL_DRIVE
-unset _HAS_YAOURT
-unset _IS_ARCH
-unset _IS_LABS
-unset _IS_LAPTOP
-unset _IS_SUDOER
+} # close the anonymous function started in CONFIG
 
 [[ -d ~/Desktop ]] && rmdir ~/Desktop
 [[ -d ~/Downloads ]] && rmdir ~/Downloads
