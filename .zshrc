@@ -1,3 +1,7 @@
+#####[ PRELIMINARIES ]######################################################
+
+[[ -d /tmp/$USER ]] || mkdir /tmp/$USER && chmod 700 /tmp/$USER
+
 #####[ OH-MY-ZSH ]##########################################################
 
 # Path to your oh-my-zsh configuration.
@@ -87,7 +91,7 @@ setopt autopushd
 setopt autocd
 setopt auto_param_slash
 
-HISTFILE=/tmp/.zsh-hist-`whoami`
+HISTFILE=/tmp/$USER/zsh-history
 HISTSIZE=1000
 SAVEHIST=1000
 setopt append_history
@@ -241,20 +245,20 @@ if [[ $_IS_LABS = true ]]; then
 else
   ### ALL NON-LABS ###
   alias dstat='dropbox status'
-  function dstart {
-    sudo systemctl start dropbox@`whoami`
-  }
-  function dstop {
-    sudo systemctl stop dropbox@`whoami`
-  }
-  function drestart {
-    sudo systemctl restart dropbox@`whoami`
-  }
   if [[ $_IS_SUDOER = true ]]; then
     alias s='sudo'
     alias sv='sudo vim'
     alias svd='sudo vimdiff'
     if [[ $_IS_ARCH = true ]]; then
+      function dstart {
+        sudo systemctl start dropbox@$USER
+      }
+      function dstop {
+        sudo systemctl stop dropbox@$USER
+      }
+      function drestart {
+        sudo systemctl restart dropbox@$USER
+      }
       alias sp='sudo pacman'
       alias update-grub='sudo grub-mkconfig -o /boot/grub/grub.cfg'
       alias mkinitcpio-all='sudo sh -c "mkinitcpio -p linux & \

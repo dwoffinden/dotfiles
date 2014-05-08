@@ -28,7 +28,6 @@ set history=100
 set backspace=indent,eol,start
 
 set wildmenu
-"set wildmode=list:longest,full
 set wildmode=longest:full,full
 
 set foldmethod=syntax
@@ -52,7 +51,7 @@ set fileformats=unix,dos
 set spelllang=en_gb
 "set spell
 
-set directory=/tmp,/dev/shm,$TMP,$TEMP
+set directory=/tmp/$USER,/tmp,$TEMP
 
 if &t_Co > 2 || has("gui_running")
   syntax on
@@ -78,7 +77,7 @@ endif
 if version >= 703
   set colorcolumn=81,101
   set undofile
-  set undodir=/tmp,/dev/shm,$TMP,$TEMP
+  set undodir=/tmp/$USER,/tmp,$TEMP
 endif
 
 map <ESC>[H <Home>
