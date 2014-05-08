@@ -287,13 +287,13 @@ else
     alias vga-on='xrandr --output VGA-0 --mode 1920x1080 --rate 60 \
                           --right-of LVDS'
   fi
-  case "${(L)HOST}" in
-    GLADYS)
+  case ${_HOST[1]} in
+    gladys)
       alias hdmi-test='aplay -D plughw:1,3 \
                        /usr/share/sounds/alsa/Front_Center.wav'
       alias mplayer-hdmi='mplayer -ao alsa:device=hw1.3'
       ;;
-    WINONA)
+    winona)
       alias hdmi-test='aplay -D plughw:0,1 \
                        /usr/share/sounds/alsa/Front_Center.wav'
       alias mplayer-hdmi='mplayer -ao alsa:device=hw0.1'
