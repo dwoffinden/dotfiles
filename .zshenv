@@ -1,7 +1,7 @@
 #####[ PRELIMINARIES ]######################################################
 
 [[ -d /tmp/$USER ]] || mkdir /tmp/$USER && chmod 700 /tmp/$USER
-#
+
 #####[ CONFIG SELECTION ]###################################################
 #
 #   TODO add /usr/games to path?
