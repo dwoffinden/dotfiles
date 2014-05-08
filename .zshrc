@@ -303,8 +303,7 @@ fi
 
 #####[ GREETING ]###########################################################
 
-# TODO more readable method for colouring?
-tput setaf 2
+echo -n $fg[green]
 uname -nrmo
 [[ -f /proc/cpuinfo ]] && grep "^model name" /proc/cpuinfo -m1 | tail -c+14
 date
@@ -320,7 +319,7 @@ if command -v fortune &> /dev/null; then
 else
   echo "No fortunes for you!"
 fi
-tput sgr0
+echo -n $reset_color
 
 #####[ CLEAN UP ]###########################################################
 
