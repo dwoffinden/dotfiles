@@ -1,7 +1,3 @@
-#####[ PRELIMINARIES ]######################################################
-
-[[ -d /tmp/$USER ]] || mkdir /tmp/$USER && chmod 700 /tmp/$USER
-
 #####[ OH-MY-ZSH ]##########################################################
 
 # Path to your oh-my-zsh configuration.
@@ -35,52 +31,6 @@ COMPLETION_WAITING_DOTS="true"
 plugins=(archlinux battery cabal coffee colored-man git git-extras safe-paste screen zsh-syntax-highlighting)
 
 source $ZSH/oh-my-zsh.sh
-
-#####[ CONFIG SELECTION ]###################################################
-#
-#   TODO add /usr/games to path?
-#   TODO tolerate the case that I set a machine's hostname to "ac.uk" or "com"?
-
-# Use an anonymous function to scope the configuration variables
-function {
-
-local _HAS_OPTICAL_DRIVE=false
-local _HAS_YAOURT=false
-local _IS_ARCH=false
-local _IS_LABS=false
-local _IS_LAPTOP=false
-local _IS_SUDOER=false
-
-# Lowercase $HOST, and split by '.' into an array
-local _HOST
-_HOST=("${(Ls/./)HOST}")
-
-if [[ "${(j/./)_HOST[-2,-1]}" = 'ac.uk' ]]; then
-  echo "You're in labs!"
-  _IS_LABS=true
-fi
-
-if [[ "${_HOST[-1]}" = 'com' ]]; then
-  echo "You're at work!"
-fi
-
-case ${_HOST[1]} in
-  gladys | winona)
-    _IS_LAPTOP=true
-    ;| # break but continue scanning
-  gladys | vera)
-    _HAS_OPTICAL_DRIVE=true
-    ;& # fall through
-  tombstone | winona)
-    _HAS_YAOURT=true
-    ;& # fall through
-  watchtower)
-    _IS_ARCH=true
-    ;& # fall through
-  buzzard)
-    _IS_SUDOER=true
-    ;| # break but continue scanning
-esac
 
 #####[ ZSH OPTIONS ]########################################################
 
@@ -124,17 +74,6 @@ bindkey "\e[8~" end-of-line # End
 bindkey "^[[A" history-search-backward
 bindkey "^[[B" history-search-forward
 bindkey ' ' magic-space # history expansion on space
-
-#####[ ENVIRONMENTAL VARIABLES ]############################################
-
-export EDITOR=vim
-export VISUAL=$EDITOR
-
-if [[ $_IS_LABS = true ]]; then
-  source ~/.profile
-  #location of the dropbox lock file
-  DLOCKDIR=~/.dropboxLock
-fi
 
 #####[ ALIASES ]############################################################
 
@@ -322,8 +261,6 @@ fi
 echo -n $reset_color
 
 #####[ CLEAN UP ]###########################################################
-
-} # close the anonymous function started in CONFIG
 
 [[ -d ~/Desktop ]] && rmdir ~/Desktop
 [[ -d ~/Downloads ]] && rmdir ~/Downloads
