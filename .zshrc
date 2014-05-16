@@ -91,16 +91,21 @@ alias mountc='mount | column -t'
 alias grep='grep --color=auto'
 alias hd='hexdump -C'
 alias du='du -h'
+
 ### DROPBOX ###
 alias dls='dropbox filestatus -l'
 alias dwstat='watch -n 1 dropbox status'
 
 alias git-repack-aggressive='git repack -Adf --depth=300 --window=300'
 
+alias gf='git fetch'
 alias gfa='git fetch --all'
 alias gdc='git diff --cached'
 alias gds='git diff --stat'
 alias gdcs='git diff --cached --stat'
+alias gra='git rebase --abort'
+alias grc='git rebase --continue'
+
 alias gitkaaa="gitk --argscmd='git for-each-ref --format=\"%(refname)\" refs/heads refs/stash'"
 alias gitkaa="gitk --argscmd='git for-each-ref --format=\"%(refname)\" refs/heads refs/tags refs/stash'"
 alias gitka='gitk --all'
