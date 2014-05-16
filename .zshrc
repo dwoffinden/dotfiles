@@ -107,11 +107,11 @@ alias gra='git rebase --abort'
 alias grc='git rebase --continue'
 
 alias gitkaaa="gitk --argscmd='git for-each-ref --format=\"%(refname)\" refs/heads refs/stash'"
-alias gitkaa="gitk --argscmd='git for-each-ref --format=\"%(refname)\" refs/heads refs/tags refs/stash'"
-alias gitka='gitk --all'
+alias gitkaa="gitk --argscmd='git for-each-ref --format=\"%(refname)\" refs/heads refs/stash refs/tags'"
+alias gitka="gitk --argscmd='git for-each-ref --format=\"%(refname)\" refs/heads refs/remotes refs/stash refs/tags'"
 alias tigaaa='tig $(git for-each-ref --format="%(refname)" refs/heads refs/stash)'
-alias tigaa='tig $(git for-each-ref --format="%(refname)" refs/heads refs/tags refs/stash)'
-alias tiga='tig --all'
+alias tigaa='tig $(git for-each-ref --format="%(refname)" refs/heads refs/stash refs/tags)'
+alias tiga='tig $(git for-each-ref --format="%(refname)" refs/heads refs/remotes refs/stash refs/tags)'
 
 function bckground {
   nohup $@ </dev/null &>/dev/null &
