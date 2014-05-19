@@ -118,7 +118,7 @@ function bckground {
 }
 
 alias cabal-install-xmobar='cabal install xmobar --flags="with_threaded with_utf8 with_xft with_alsa with_iwlib with_mpd"'
-alias cabal-install-everything='cabal update && cabal install happy alex && cabal install cabal-install && cabal install c2hs -j && cabal-install-xmobar -j'
+alias cabal-install-everything='cabal update && cabal install happy alex cabal-install libmpd -j && cabal install c2hs -j && cabal-install-xmobar -j'
 
 function find-loose-git-objects {
   find ./ -wholename "*/.git/*objects/*" -type d \! \( -name info -o -name pack \) "$@"
