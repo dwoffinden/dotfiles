@@ -18,6 +18,7 @@ import           System.Posix.Unistd (getSystemID,nodeName)
 import           System.Random (randomRIO)
 import           Text.Read (readMaybe)
 import           XMonad
+import           XMonad.Actions.CopyWindow (copyToAll,killAllOtherCopies)
 import           XMonad.Actions.WindowGo (runOrRaise)
 import           XMonad.Hooks.DynamicLog (PP,ppCurrent,statusBar,wrap,xmobarColor,xmobarPP)
 import           XMonad.Hooks.EwmhDesktops (fullscreenEventHook)
@@ -257,6 +258,8 @@ myKeys LocalConfig { warnAction = warn
     , ("M-.",              sendMessage (IncMasterN (-1)))
     , ("M-S-q",            io exitSuccess)
     , ("M-q",              recompile False >>= (`when` (safeSpawn "xmonad" ["--restart"])))
+    , ("M-v",              windows copyToAll)
+    , ("M-S-v",            killAllOtherCopies)
     , ("M-a",              safeRunInTerm "alsamixer" [])
     {- Take a screenshot, save as 'screenshot.png' -}
     , ("<Print>",          safeSpawn "import" [ "-window", "root", "screenshot.png" ])
