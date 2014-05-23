@@ -80,6 +80,8 @@ if version >= 703
   set undodir=/tmp/$USER,/tmp,$TEMP
 endif
 
+nmap ; :
+
 nnoremap Q <nop>
 
 map <ESC>[H <Home>
