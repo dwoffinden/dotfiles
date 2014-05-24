@@ -27,6 +27,7 @@
 /.ncmpcpp/error.log
 
 !/.oh-my-zsh
+!/.pentadactylrc
 !/.screenrc
 
 !/.vim/
