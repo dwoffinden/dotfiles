@@ -8,7 +8,7 @@ import           Data.Map (Map)
 import           Data.Maybe (fromMaybe,isNothing,mapMaybe)
 import qualified Network.MPD as MPD (withMPD, pause, previous, next, stop)
 import qualified Network.MPD.Commands.Extensions as MPD (toggle)
-import           System.Directory (doesFileExist,findExecutable,getDirectoryContents,getHomeDirectory)
+import           System.Directory (doesDirectoryExist,doesFileExist,findExecutable,getDirectoryContents,getHomeDirectory)
 import           System.Exit (exitSuccess)
 import           System.FilePath ((</>))
 import           System.IO (hClose,hGetLine,IOMode(ReadMode),openFile)
@@ -50,7 +50,7 @@ data LocalConfig m i =
     , suspendAction :: m ()
     , warnAction :: String -> m ()
     , homeDir :: FilePath
-    , wallpaper :: FilePath -- TODO make this Maybe FilePath?
+    , wallpaper :: Maybe FilePath
     , chromiumName :: String
     }
 
@@ -121,12 +121,15 @@ getConfiguration = do
     chromium h
       | isLabs h  = "chromium-browser"
       | otherwise = "chromium"
-    -- TODO fail gracefully if ~/Dropbox/wallpaper isn't there
     pickRandomWallpaper home = do
       let wps = home </> "Dropbox" </> "wallpaper"
-      candidates <- getDirectoryContents wps >>= filterM doesFileExist . map (wps </>)
-      index <- randomRIO (0, length candidates - 1)
-      return $ candidates !! index
+      abort <- not <$> doesDirectoryExist wps
+      if abort
+        then return Nothing
+        else do
+          candidates <- getDirectoryContents wps >>= filterM doesFileExist . map (wps </>)
+          index <- randomRIO (0, length candidates - 1)
+          return $ Just $ candidates !! index
 
 lock :: MonadIO m => m ()
 lock = safeSpawn "xdg-screensaver" ["lock"]
@@ -137,17 +140,20 @@ screenOff = safeSpawn "xset" ["dpms", "force", "off"]
 sleep :: MonadIO m => Rational -> m ()
 sleep = io . threadDelay . seconds
 
-myStartupHook :: LocalConfig m t -> X ()
+myStartupHook :: LocalConfig X t -> X ()
 myStartupHook LocalConfig { homeDir = home
                           , wallpaper = wp
                           , trayerWidth = tw
+                          , warnAction = warn
                           , needsXScreensaver = xScreensaver
                           } = do
   setWMName "LG3D" --fuck java
   safeSpawn "setxkbmap" ["-layout", "gb"]
   safeSpawn "xsetroot" ["-cursor_name", "left_ptr"]
   safeSpawn "xrdb" ["-merge", (home </> ".Xresources")]
-  safeSpawn "feh" ["--no-fehbg", "--bg-fill", wp]
+  maybe
+    (warn "couldn't set wallpaper!")
+    (\w -> safeSpawn "feh" ["--no-fehbg", "--bg-fill", w]) wp
   when xScreensaver $ safeSpawn "xscreensaver" ["-no-splash"]
   ifNotRunning "urxvtd" $ safeSpawn "urxvtd" ["-q", "-o"]
   ifNotRunning "trayer" $ safeSpawn "trayer"
