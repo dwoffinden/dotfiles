@@ -50,9 +50,11 @@ data LocalConfig m i =
     , suspendAction :: m ()
     , warnAction :: String -> m ()
     , homeDir :: FilePath
-    , wallpaper :: Maybe FilePath
+    , wallpaper :: Wallpaper
     , chromiumName :: String
     }
+
+data Wallpaper = Fill FilePath | Tile FilePath | None
 
 myBar :: String
 myBar = "exec " ++ "~" </> ".cabal" </> "bin" </> "xmobar"
@@ -122,14 +124,18 @@ getConfiguration = do
       | isLabs h  = "chromium-browser"
       | otherwise = "chromium"
     pickRandomWallpaper home = do
-      let wps = home </> "Dropbox" </> "wallpaper"
-      abort <- not <$> doesDirectoryExist wps
-      if abort
-        then return Nothing
+      wps <- filterM (doesDirectoryExist . snd)
+        [ (Tile, home </> "Dropbox" </> "wallpaper" </> "tile")
+        , (Fill, home </> "Dropbox" </> "wallpaper" </> "simple")
+        , (Fill, home </> "Dropbox" </> "wallpaper")
+        ]
+      if null wps
+        then return None
         else do
-          candidates <- getDirectoryContents wps >>= filterM doesFileExist . map (wps </>)
-          index <- randomRIO (0, length candidates - 1)
-          return $ Just $ candidates !! index
+          candidates <- mapM (\(m, dir) -> getDirectoryContents dir >>= filterM doesFileExist . map (dir </>) >>= return . map m) wps
+          let all = concat candidates
+          index <- randomRIO (0, length all - 1)
+          return $ all !! index
 
 lock :: MonadIO m => m ()
 lock = safeSpawn "xdg-screensaver" ["lock"]
@@ -151,9 +157,7 @@ myStartupHook LocalConfig { homeDir = home
   safeSpawn "setxkbmap" ["-layout", "gb"]
   safeSpawn "xsetroot" ["-cursor_name", "left_ptr"]
   safeSpawn "xrdb" ["-merge", (home </> ".Xresources")]
-  maybe
-    (warn "couldn't set wallpaper!")
-    (\w -> safeSpawn "feh" ["--no-fehbg", "--bg-fill", w]) wp
+  setWallpaper warn wp
   when xScreensaver $ safeSpawn "xscreensaver" ["-no-splash"]
   ifNotRunning "urxvtd" $ safeSpawn "urxvtd" ["-q", "-o"]
   ifNotRunning "trayer" $ safeSpawn "trayer"
@@ -173,6 +177,13 @@ myStartupHook LocalConfig { homeDir = home
     , "--padding", "0"
     ]
   safeSpawn "compton" ["-cCz", "--backend=glx", "--paint-on-overlay"]
+  where
+    setWallpaper warn None =
+      warn "couldn't set wallpaper!"
+    setWallpaper _ (Fill wp) =
+      safeSpawn "feh" ["--no-fehbg", "--bg-fill", wp]
+    setWallpaper _ (Tile wp) =
+      safeSpawn "feh" ["--no-fehbg", "--bg-tile", wp]
 
 ifNotRunning :: MonadIO m => String -> IO () -> m ()
 ifNotRunning prog hook = io $ void $ forkIO $ do
