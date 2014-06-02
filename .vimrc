@@ -61,7 +61,8 @@ if &t_Co > 2 || has("gui_running")
   set background=dark
   colorscheme desert
   if &t_Co >= 88 || has("gui_running")
-    colorscheme Tomorrow-Night
+    let base16colorspace=256  " Access colors present in 256 colorspace
+    colorscheme base16-default
   endif
 endif
 

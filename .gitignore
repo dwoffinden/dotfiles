@@ -10,6 +10,8 @@
 /.config/*
 !/.config/fontconfig/
 !/.config/htop/
+!/.config/base16-shell
+!/.config/base16-xresources
 
 !/.gitconfig
 !/.gitignore
