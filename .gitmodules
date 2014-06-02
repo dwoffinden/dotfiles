@@ -34,3 +34,6 @@
 [submodule ".config/base16-xresources"]
 	path = .config/base16-xresources
 	url = git://github.com/chriskempson/base16-xresources
+[submodule ".local/share/git-remote-hg"]
+	path = .local/share/git-remote-hg
+	url = git://github.com/felipec/git-remote-hg
