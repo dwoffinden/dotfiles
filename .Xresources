@@ -20,7 +20,8 @@ URxvt.fading: 0
 
 ! actual transparency, requires compositor
 URxvt.depth: 32
-URxvt.background: [95]#151515
+URxvt.background: [95]#002b36
 
-#include ~/.config/base16-xresources/base16-default.dark.xresources
+#include ~/.config/base16-xresources/base16-solarized.dark.xresources
+
 
