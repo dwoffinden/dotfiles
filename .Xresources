@@ -22,6 +22,5 @@ URxvt.fading: 0
 URxvt.depth: 32
 URxvt.background: [95]#002b36
 
-#include ~/.config/base16-xresources/base16-solarized.dark.xresources
-
+#include ".config/base16-xresources/base16-solarized.dark.xresources"
 
