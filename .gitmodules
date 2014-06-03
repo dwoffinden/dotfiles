@@ -22,9 +22,6 @@
 [submodule ".vim/bundle/vim-fugitive"]
 	path = .vim/bundle/vim-fugitive
 	url = git://github.com/tpope/vim-fugitive
-[submodule ".vim/bundle/vim-tomorrow-theme"]
-	path = .vim/bundle/vim-tomorrow-theme
-	url = git://github.com/chriskempson/vim-tomorrow-theme
 [submodule ".vim/bundle/vim-base16"]
 	path = .vim/bundle/vim-base16
 	url = git://github.com/chriskempson/base16-vim
