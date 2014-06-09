@@ -7,7 +7,7 @@
   editor = vim
   fileMode = false
   whitespace = tab-in-indent
-  pager = less -F -X
+  pager = less -FRX
 [color]
   ui = auto
 [diff]
