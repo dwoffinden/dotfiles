@@ -84,7 +84,9 @@ bindkey ' ' magic-space # history expansion on space
 #####[ ALIASES ]############################################################
 
 ### UNIVERSAL ALIASES ###
-alias ls='ls -Fhv --color=auto --group-directories-first'
+ls () {
+  command ls -Fhv --color=always --group-directories-first "$@" | less -FRX
+}
 alias l='ls -l'
 alias ll='ls -la'
 alias lg='ls -gG'
