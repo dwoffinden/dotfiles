@@ -49,6 +49,8 @@ esac
 export EDITOR=vim
 export VISUAL=$EDITOR
 
+export MAKEFLAGS=-j`nproc`
+
 if [[ $_IS_LABS = true ]]; then
   source ~/.profile
   #location of the dropbox lock file
