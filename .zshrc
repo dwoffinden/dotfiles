@@ -243,12 +243,12 @@ else
     gladys)
       alias hdmi-test='aplay -D plughw:1,3 \
                        /usr/share/sounds/alsa/Front_Center.wav'
-      alias mplayer-hdmi='mplayer -ao alsa:device=hw1.3'
+      alias mplayer-hdmi='mplayer -ao alsa:device=hw=1.3'
       ;;
     winona)
       alias hdmi-test='aplay -D plughw:0,1 \
                        /usr/share/sounds/alsa/Front_Center.wav'
-      alias mplayer-hdmi='mplayer -ao alsa:device=hw0.1'
+      alias mplayer-hdmi='mplayer -ao alsa:device=hw=0.1'
       ;;
   esac
 fi
