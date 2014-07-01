@@ -1,11 +1,11 @@
 # XScreenSaver Preferences File
-# Written by xscreensaver-demo 5.26 for woof on Sat Mar  1 19:08:46 2014.
+# Written by xscreensaver-demo 5.29 for woof on Tue Jul  1 10:08:53 2014.
 # http://www.jwz.org/xscreensaver/
 
-timeout:	0:10:00
+timeout:	0:15:00
 cycle:		0:05:00
 lock:		True
-lockTimeout:	0:05:00
+lockTimeout:	0:15:00
 passwdTimeout:	0:00:30
 visualID:	default
 installColormap:    True
@@ -225,7 +225,7 @@ programs:								      \
   GL: 				fliptext -root				    \n\
   GL: 				glhanoi -root				    \n\
   GL: 				tangram -root				    \n\
-  GL: 				timetunnel -root			    \n\
+  GL: 				timetunnel -root -no-logo		    \n\
   GL: 				glschool -root				    \n\
   GL: 				topblock -root				    \n\
   GL: 				cubicgrid -root				    \n\
@@ -250,6 +250,8 @@ programs:								      \
   GL: 				quasicrystal -root			    \n\
   GL: 				unknownpleasures -root			    \n\
   GL: 				geodesic -root				    \n\
+  GL: 				projectiveplane -root			    \n\
+-				tessellimage -root			    \n\
 
 
 pointerPollTime:    0:00:05
