@@ -57,5 +57,7 @@ if [[ $_IS_LABS = true ]]; then
   DLOCKDIR=~/.dropboxLock
 fi
 
+ZSH_COMPDUMP="/tmp/$USER/zcompdump-$ZSH_VERSION"
+
 ############################################################################
 
