@@ -117,8 +117,7 @@ getConfiguration = do
                      , ("vera",   1920)
                      ])
     suspend h
-      | isLaptop h = safeSpawn "systemctl" ["hibernate"] -- Stupid radeon drivers
-      | isVera h   = safeSpawn "systemctl" ["suspend"]
+      | isHomeMachine h   = safeSpawn "systemctl" ["suspend"]
       | otherwise  = screenOff
     chromium h
       | isLabs h  = "chromium-browser"
