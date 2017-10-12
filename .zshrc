@@ -101,12 +101,12 @@ alias grc='git rebase --continue'
 alias grs='git rebase --skip'
 alias gst='git status'
 
-alias gitkaaa="gitk --argscmd='git for-each-ref --format=\"%(refname)\" refs/heads refs/stash'"
-alias gitkaa="gitk --argscmd='git for-each-ref --format=\"%(refname)\" refs/heads refs/stash refs/tags'"
-alias gitka="gitk --argscmd='git for-each-ref --format=\"%(refname)\" refs/heads refs/remotes refs/stash refs/tags'"
-alias tigaaa='tig $(git for-each-ref --format="%(refname)" refs/heads refs/stash)'
-alias tigaa='tig $(git for-each-ref --format="%(refname)" refs/heads refs/stash refs/tags)'
-alias tiga='tig $(git for-each-ref --format="%(refname)" refs/heads refs/remotes refs/stash refs/tags)'
+alias gitkaaa="gitk HEAD --argscmd='git for-each-ref --format=\"%(refname)\" refs/heads refs/stash'"
+alias gitkaa="gitk HEAD --argscmd='git for-each-ref --format=\"%(refname)\" refs/heads refs/stash refs/tags'"
+alias gitka="gitk HEAD --argscmd='git for-each-ref --format=\"%(refname)\" refs/heads refs/remotes refs/stash refs/tags'"
+alias tigaaa='tig HEAD $(git for-each-ref --format="%(refname)" refs/heads refs/stash)'
+alias tigaa='tig HEAD $(git for-each-ref --format="%(refname)" refs/heads refs/stash refs/tags)'
+alias tiga='tig HEAD $(git for-each-ref --format="%(refname)" refs/heads refs/remotes refs/stash refs/tags)'
 
 function bckground {
   nohup $@ </dev/null &>/dev/null &
