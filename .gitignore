@@ -12,6 +12,7 @@
 !/.config/htop/
 !/.config/base16-shell
 !/.config/base16-xresources
+!/.config/taffybar/
 
 !/.gitconfig
 !/.gitignore

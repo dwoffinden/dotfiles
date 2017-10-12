@@ -5,7 +5,7 @@ import           Control.Concurrent (forkIO,threadDelay)
 import           Control.Exception (tryJust)
 import           Control.Monad (filterM,guard,void,when)
 import           Data.Map (Map)
-import           Data.Maybe (fromMaybe,isNothing,mapMaybe)
+import           Data.Maybe (catMaybes, fromMaybe, isNothing, listToMaybe, mapMaybe)
 import qualified Network.MPD as MPD (withMPD, pause, previous, next, stop)
 import qualified Network.MPD.Commands.Extensions as MPD (toggle)
 import           System.Directory (doesDirectoryExist,doesFileExist,findExecutable,getDirectoryContents,getHomeDirectory)
@@ -16,13 +16,14 @@ import           System.IO.Error (isDoesNotExistError)
 import           System.Posix.Types (ProcessID)
 import           System.Posix.Unistd (getSystemID,nodeName)
 import           System.Random (randomRIO)
+import           System.Taffybar.Hooks.PagerHints (pagerHints)
 import           Text.Read (readMaybe)
 import           XMonad
 import           XMonad.Actions.CopyWindow (copyToAll,killAllOtherCopies)
 import           XMonad.Actions.WindowGo (runOrRaise)
-import           XMonad.Hooks.DynamicLog (PP,ppCurrent,statusBar,wrap,xmobarColor,xmobarPP)
-import           XMonad.Hooks.EwmhDesktops (fullscreenEventHook)
-import           XMonad.Hooks.ManageDocks (avoidStruts)
+import           XMonad.Hooks.DynamicLog (defaultPP)
+import           XMonad.Hooks.EwmhDesktops (ewmh, fullscreenEventHook)
+import           XMonad.Hooks.ManageDocks --(avoidStruts, manageDocks, docksEventHook, ToggleStruts)
 import           XMonad.Hooks.ManageHelpers (doFullFloat,isFullscreen)
 import           XMonad.Hooks.SetWMName (setWMName)
 import           XMonad.Layout.Grid
@@ -36,17 +37,11 @@ import qualified XMonad.StackSet as W
 import           XMonad.Util.EZConfig (mkKeymap)
 import           XMonad.Util.Run (safeSpawn,safeSpawnProg,seconds)
 
-{-
-http://hackage.haskell.org/packages/archive/xmonad-contrib/0.8/doc/html/XMonad-Hooks-DynamicLog.html
-TODO: xmobar options on the command line? no?
--}
-
-data LocalConfig m i =
-  (MonadIO m, Integral i, Num i, Show i) => LocalConfig
+data LocalConfig m =
+  (MonadIO m) => LocalConfig
     { hasMpd :: Bool
     , hasWifi :: Bool
     , needsXScreensaver :: Bool
-    , trayerWidth :: i
     , suspendAction :: m ()
     , warnAction :: String -> m ()
     , homeDir :: FilePath
@@ -55,15 +50,6 @@ data LocalConfig m i =
     }
 
 data Wallpaper = Fill FilePath | Tile FilePath | None
-
-myBar :: String
-myBar = "exec " ++ "~" </> ".cabal" </> "bin" </> "xmobar"
-
-myPP :: PP
-myPP = xmobarPP { ppCurrent = xmobarColor "#429942" "" . wrap "<" ">" }
-
-toggleStrutsKey :: XConfig l -> (KeyMask, KeySym)
-toggleStrutsKey XConfig { XMonad.modMask = myMask } = (myMask, xK_b)
 
 myNormalColour :: String
 myNormalColour = "#202020"
@@ -74,11 +60,12 @@ myFocusedColour = "#ff0000"
 myModMask :: KeyMask
 myModMask = mod4Mask
 
-{- If urxvt is not installed, use xterm. -}
+{- If gnome-terminal nor urxvt are not installed, use xterm. -}
 myTerminal :: IO FilePath
-myTerminal = fromMaybe "xterm" <$> findExecutable "urxvtc"
+myTerminal =
+  (fromMaybe "xterm") . listToMaybe . catMaybes <$> (mapM findExecutable ["gnome-terminal", "urxvtc"])
 
-getConfiguration :: IO (LocalConfig X Int)
+getConfiguration :: IO (LocalConfig X)
 getConfiguration = do
   home <- getHomeDirectory
   host <- nodeName <$> getSystemID
@@ -91,7 +78,6 @@ getConfiguration = do
     { hasMpd  = isVera host
     , hasWifi = isLaptop host
     , needsXScreensaver = isHomeMachine host
-    , trayerWidth = tw host
     , suspendAction = suspend host
     , warnAction = warn
     , homeDir = home
@@ -107,19 +93,23 @@ getConfiguration = do
       isVera h || isLaptop h
     isLabs =
       (== "doc.ic.ac.uk") . getDomain
+    isWork =
+      (== "com") . getTld
+    getTld =
+      reverse . takeWhile (/= '.') . reverse
     getDomain =
       dropWhile (== '.') . dropWhile (/= '.')
-    tw =
-      (\w -> w - (w * 95 `div` 100) ) -- width, minus a 95% xmobar
-      . (fromMaybe 1680) -- sane default for labs
-      . (`lookup` [ ("winona", 1024)
-                     , ("gladys", 1366)
-                     , ("vera",   1920)
-                     ])
     suspend h
-      | isHomeMachine h   = safeSpawn "systemctl" ["suspend"]
+      | isWork h = safeSpawn "dbus-send" ["--system"
+                                         , "--print-reply"
+                                         , "--dest=org.freedesktop.UPower"
+                                         , "/org/freedesktop/UPower"
+                                         , "org.freedesktop.UPower.Suspend"
+                                         ]
+      | isHomeMachine h = safeSpawn "systemctl" ["suspend"]
       | otherwise  = screenOff
     chromium h
+      | isWork h  = "google-chrome"
       | isLabs h  = "chromium-browser"
       | otherwise = "chromium"
     pickRandomWallpaper home = do
@@ -145,10 +135,9 @@ screenOff = safeSpawn "xset" ["dpms", "force", "off"]
 sleep :: MonadIO m => Rational -> m ()
 sleep = io . threadDelay . seconds
 
-myStartupHook :: LocalConfig X t -> X ()
+myStartupHook :: LocalConfig X -> X ()
 myStartupHook LocalConfig { homeDir = home
                           , wallpaper = wp
-                          , trayerWidth = tw
                           , warnAction = warn
                           , needsXScreensaver = xScreensaver
                           } = do
@@ -159,22 +148,7 @@ myStartupHook LocalConfig { homeDir = home
   setWallpaper warn wp
   when xScreensaver $ safeSpawn "xscreensaver" ["-no-splash"]
   ifNotRunning "urxvtd" $ safeSpawn "urxvtd" ["-q", "-o"]
-  ifNotRunning "trayer" $ safeSpawn "trayer"
-    [ "--edge", "top"
-    , "--align", "right"
-    , "--margin", "0"
-    , "--SetDockType", "true"
-    , "--SetPartialStrut", "true"
-    , "--heighttype", "pixel"
-    , "--height", "19"
-    , "--widthtype", "pixel"
-    , "--width", show tw
-    , "--transparent", "true"
-    , "--tint", "0"
-    , "--alpha", "0"
-    , "--expand", "true"
-    , "--padding", "0"
-    ]
+  ifNotRunning "taffybar" $ safeSpawnProg "taffybar"
   safeSpawn "compton" ["-cCz", "--backend=glx", "--paint-on-overlay"]
   where
     setWallpaper warn None =
@@ -223,12 +197,9 @@ myManageHook = composeAll
   , resource  =? "kdesktop"       --> doIgnore
 --, isFullscreen                  --> (doF W.focusDown <+> doFullFloat)
   , isFullscreen                  --> doFullFloat
-  ]
+  ] <+> manageDocks
 
-myHandleEventHook = fullscreenEventHook
-
-myLogHook :: X ()
-myLogHook = return ()
+myHandleEventHook = fullscreenEventHook <+> docksEventHook
 
 myLayout = smartBorders $ avoidStruts $
 --layoutHintsToCenter $
@@ -244,7 +215,7 @@ myLayout = smartBorders $ avoidStruts $
 myWorkspaces :: [String]
 myWorkspaces = map pure "`1234567890-="
 
-myKeys :: LocalConfig X t -> XConfig Layout -> Map (KeyMask, KeySym) (X())
+myKeys :: LocalConfig X -> XConfig Layout -> Map (KeyMask, KeySym) (X())
 myKeys LocalConfig { warnAction = warn
                    , hasMpd = mpd
 --                   , hasWifi = wifi
@@ -252,39 +223,46 @@ myKeys LocalConfig { warnAction = warn
                    , chromiumName = chromium
                    } c =
   mkKeymap c $
-    [ ("M-S-<Return>",     safeSpawnProg $ XMonad.terminal c)
-    , ("M-p",              safeSpawnProg "dmenu_run")
---  , ("M-S-p",            spawn "gmrun")
-    , ("M-S-c",            kill)
-    , ("M-<Space>",        sendMessage NextLayout)
-    , ("M-S-<Space>",      setLayout $ XMonad.layoutHook c)
-    , ("M-n",              refresh)
-    , ("M-<Tab>",          windows W.focusDown)
-    , ("M-j",              windows W.focusDown)
-    , ("M-S-<Tab>",        windows W.focusUp)
-    , ("M-k",              windows W.focusUp)
-    , ("M-m",              windows W.focusMaster)
-    , ("M-<Return>",       windows W.swapMaster)
-    , ("M-S-j",            windows W.swapDown)
-    , ("M-S-k",            windows W.swapUp)
-    , ("M-h",              sendMessage Shrink)
-    , ("M-l",              sendMessage Expand)
-    , ("M-t",              withFocused $ windows . W.sink)
-    , ("M-,",              sendMessage (IncMasterN 1))
-    , ("M-.",              sendMessage (IncMasterN (-1)))
-    , ("M-S-q",            io exitSuccess)
-    , ("M-q",              recompile False >>= (`when` (safeSpawn "xmonad" ["--restart"])))
-    , ("M-v",              windows copyToAll)
-    , ("M-S-v",            killAllOtherCopies)
-    , ("M-a",              safeRunInTerm "alsamixer" [])
+    [ ("M-S-<Return>",           safeSpawnProg $ XMonad.terminal c)
+    , ("M-p",                    safeSpawnProg "dmenu_run")
+--  , ("M-S-p",                  spawn "gmrun")
+    , ("M-S-c",                  kill)
+    , ("M-<Space>",              sendMessage NextLayout)
+    , ("M-S-<Space>",            setLayout $ XMonad.layoutHook c)
+    , ("M-n",                    refresh)
+    , ("M-<Tab>",                windows W.focusDown)
+    , ("M-j",                    windows W.focusDown)
+    , ("M-S-<Tab>",              windows W.focusUp)
+    , ("M-k",                    windows W.focusUp)
+    , ("M-m",                    windows W.focusMaster)
+    , ("M-<Return>",             windows W.swapMaster)
+    , ("M-S-j",                  windows W.swapDown)
+    , ("M-S-k",                  windows W.swapUp)
+    , ("M-h",                    sendMessage Shrink)
+    , ("M-l",                    sendMessage Expand)
+    , ("M-t",                    withFocused $ windows . W.sink)
+    , ("M-,",                    sendMessage (IncMasterN 1))
+    , ("M-.",                    sendMessage (IncMasterN (-1)))
+    , ("M-S-q",                  io exitSuccess)
+    , ("M-q",                    recompile False >>=
+                                   (`when` (safeSpawn "xmonad" ["--restart"])))
+    , ("M-b",                    sendMessage ToggleStruts)
+    , ("M-v",                    windows copyToAll)
+    , ("M-S-v",                  killAllOtherCopies)
+    , ("M-a",                    safeRunInTerm "alsamixer" [])
     {- Take a screenshot, save as 'screenshot.png' -}
-    , ("<Print>",          safeSpawn "import" [ "-window", "root", "screenshot.png" ])
-    , ("<XF86Eject>",      safeSpawn "eject" ["-T"])
-    , ("<XF86Calculator>", safeSpawnProg "speedcrunch")
-    , ("<XF86Search>",     warn "search")
-    , ("<XF86Mail>",       warn "mail")
-    , ("<XF86WebCam>",     warn "smile")
-    , ("<XF86Eject>",      safeSpawnProg "eject")
+    -- TODO notify-send screenshot saved
+    , ("<Print>",                safeSpawn "import" [ "-window", "root"
+                                                    , "screenshot.png" ])
+    , ("<XF86Eject>",            safeSpawn "eject" ["-T"])
+    , ("<XF86Calculator>",       safeSpawnProg "speedcrunch")
+    , ("<XF86Search>",           warn "search")
+    , ("<XF86Mail>",             warn "mail")
+    , ("<XF86WebCam>",           warn "smile")
+    , ("<XF86Eject>",            safeSpawnProg "eject")
+    -- TODO >> notify-send `xbacklight`
+    , ("<XF86MonBrightnessUp",   safeSpawn "xbacklight" ["-inc", "10"])
+    , ("<XF86MonBrightnessDown", safeSpawn "xbacklight" ["-dec", "10"])
     ]
     {- Workspace Switching -}
     ++ [ (m ++ k, windows $ f k)
@@ -348,7 +326,7 @@ myKeys LocalConfig { warnAction = warn
 myConfig = do
   conf <- getConfiguration
   term <- myTerminal
-  return defaultConfig
+  return $ ewmh $ pagerHints $ defaultConfig
     { normalBorderColor  = myNormalColour
     , focusedBorderColor = myFocusedColour
     , modMask            = myModMask
@@ -356,12 +334,11 @@ myConfig = do
     , startupHook        = myStartupHook conf
     , manageHook         = myManageHook
     , handleEventHook    = myHandleEventHook
-    , logHook            = myLogHook
     , layoutHook         = myLayout
     , workspaces         = myWorkspaces
     , keys               = myKeys conf
     }
 
 main :: IO ()
-main = myConfig >>= statusBar myBar myPP toggleStrutsKey >>= xmonad
+main = myConfig >>= xmonad
 
