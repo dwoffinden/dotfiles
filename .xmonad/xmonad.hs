@@ -6,8 +6,8 @@ import           Control.Concurrent (forkIO,threadDelay)
 import           Control.Exception (tryJust)
 import           Control.Monad (filterM,guard,void,when)
 import           Data.Map (Map)
-import           Data.Maybe (catMaybes, fromMaybe, isJust, isNothing, listToMaybe, mapMaybe)
-import           Data.List (stripPrefix)
+import           Data.Maybe (catMaybes, fromMaybe, isNothing, listToMaybe, mapMaybe)
+import           Data.List.Split (splitOn)
 import qualified Network.MPD as MPD (withMPD, pause, previous, next, stop)
 import qualified Network.MPD.Commands.Extensions as MPD (toggle)
 import           System.Directory (doesDirectoryExist,doesFileExist,findExecutable,getDirectoryContents,getHomeDirectory)
@@ -93,16 +93,23 @@ getConfiguration = do
 isVera :: String -> Bool
 isVera = (== "vera")
 
-isHomeMachine :: String -> Bool
-isHomeMachine h = isVera h || h `elem` ["gladys", "winona"]
+isHomeLaptop :: String -> Bool
+isHomeLaptop = (`elem` ["gladys", "winona"])
 
--- TODO: isLaptop that works for home and work
+isHomeMachine :: String -> Bool
+isHomeMachine h = isVera h || isHomeLaptop h
+
+isLaptop :: String -> Bool
+isLaptop h = isHomeLaptop h || isWorkLaptop h
 
 isWork :: String -> Bool
-isWork = (== "com") . getTld
+isWork = (== "com") . last . splitHostName
 
-getTld :: String -> String
-getTld = reverse . takeWhile (/= '.') . reverse
+isWorkLaptop :: String -> Bool
+isWorkLaptop h = isWork h && ((== "roam") . (!! 3) . reverse . splitHostName) h
+
+splitHostName :: String -> [String]
+splitHostName = splitOn "."
 
 suspend :: MonadIO m => String -> m ()
 suspend h
@@ -151,8 +158,8 @@ myStartupHook LocalConfig { homeDir = home
   ifNotRunning "taffybar-linux-x86_64" $ safeSpawnProg "taffybar"
   ifNotRunning "compton" $ safeSpawn "compton" [ "--backend=glx"
                                                , "--paint-on-overlay"]
-  -- TODO: spawn this iff isWork, spawn connman-ui-gtk when on a *home* laptop
-  ifNotRunning "nm-applet" $ safeSpawnProg "nm-applet"
+  when (isWorkLaptop host) $ ifNotRunning "nm-applet" $ safeSpawnProg "nm-applet"
+  when (isHomeLaptop host) $ ifNotRunning "connman-ui-gtk" $ safeSpawnProg "nm-applet"
   where
     setWallpaper None =
       warn "couldn't set wallpaper!"
