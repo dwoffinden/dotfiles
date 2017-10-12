@@ -123,6 +123,8 @@ myStartupHook LocalConfig { homeDir = home
   safeSpawn "xsetroot" ["-cursor_name", "left_ptr"]
   safeSpawn "xrdb" ["-merge", (home </> ".Xresources")]
   setWallpaper wp
+  progs <- getRunningProcesses
+  let ifNotRunning prog hook = io $ void $ when (not $ S.member prog progs) hook
   when (needsXScreensaver host) $ safeSpawn "xscreensaver" ["-no-splash"]
   ifNotRunning "urxvtd" $ safeSpawn "urxvtd" ["-q", "-o"]
   ifNotRunning "taffybar-linux-x86_64" $ safeSpawnProg "taffybar"
@@ -138,42 +140,25 @@ myStartupHook LocalConfig { homeDir = home
     setWallpaper (Tile fp) =
       safeSpawn "feh" ["--no-fehbg", "--bg-tile", fp]
 
-ifNotRunning :: MonadIO m => String -> IO () -> m ()
-ifNotRunning prog hook = io $ void $ forkIO $ do
-  notRunning <- isNothing <$> findPid prog
-  when notRunning hook
-
--- | Find the first PID of the first process with given comm, if one exists.
--- We could find all of them by replacing `findM' with `filterM'...
--- TODO: this ignores processes with no cmdline, like kernel threads. We could
---       fallback to comm, but I don't really care for those cases.
-findPid :: String -> IO (Maybe ProcessID)
-findPid comm =
-  getDirectoryContents "/proc" >>= findM matchesComm . mapMaybe readMaybe
-  where
-    matchesComm :: ProcessID -> IO Bool
-    matchesComm pid =
-      either (const False) matchLine <$> tryReadLine ("/proc" </> show pid </> "cmdline")
-    matchLine =
-      any (== comm) . map takeFileName . take 2 . splitOn "\0"
-
-tryReadLine :: FilePath -> IO (Either () String)
-tryReadLine f =
-  tryJust (guard . (\e -> isDoesNotExistError e || isEOFError e)) (readFirstLine f)
-readFirstLine :: FilePath -> IO String
-readFirstLine f = do
-  h <- openFile f ReadMode
-  str <- hGetLine h
-  hClose h
-  return str
-
-getRunningProcesses :: IO (S.Set String)
-getRunningProcesses = do
+-- | Get a set containing the file name and first argument (if it has one, in case it's a script)
+-- | of every running process.
+-- Pretty hacky.
+getRunningProcesses :: MonadIO m => m (S.Set String)
+getRunningProcesses = io $ do
   dirs <- getDirectoryContents "/proc"
   let pids :: [ProcessID] = Data.Maybe.mapMaybe readMaybe dirs
-  foldM (\set pid -> either (const set) (\str -> foldl (\s n -> S.insert n s) set (take 2 $ splitz "\0" str)) <$> tryReadLine ("/proc" </> show pid </> "cmdline")) S.empty pids
+  foldM (\set pid -> either (const set) (\str -> foldl (\s n -> S.insert n s) set (map takeFileName $ take 2 $ splitz "\0" str)) <$> tryReadLine ("/proc" </> show pid </> "cmdline")) S.empty pids
   where
     splitz = split . dropFinalBlank . dropDelims . onSublist
+    tryReadLine :: FilePath -> IO (Either () String)
+    tryReadLine f =
+      tryJust (guard . (\e -> isDoesNotExistError e || isEOFError e)) (readFirstLine f)
+    readFirstLine :: FilePath -> IO String
+    readFirstLine f = do
+      h <- openFile f ReadMode
+      str <- hGetLine h
+      hClose h
+      return str
 
 -- | This generalizes the list-based 'find' function.
 findM :: Monad m => (a -> m Bool) -> [a] -> m (Maybe a)
