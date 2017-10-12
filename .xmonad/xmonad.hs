@@ -8,6 +8,7 @@ import           Control.Monad (filterM,guard,void,when)
 import           Data.Map (Map)
 import           Data.Maybe (catMaybes, fromMaybe, isNothing, listToMaybe, mapMaybe)
 import           Data.List.Split (splitOn)
+import           Daw.Hosts
 import qualified Network.MPD as MPD (withMPD, pause, previous, next, stop)
 import qualified Network.MPD.Commands.Extensions as MPD (toggle)
 import           System.Directory (doesDirectoryExist,doesFileExist,findExecutable,getDirectoryContents,getHomeDirectory)
@@ -90,27 +91,6 @@ getConfiguration = do
           index <- randomRIO (0, length candidates - 1)
           return $ candidates !! index
 
-isVera :: String -> Bool
-isVera = (== "vera")
-
-isHomeLaptop :: String -> Bool
-isHomeLaptop = (`elem` ["gladys", "winona"])
-
-isHomeMachine :: String -> Bool
-isHomeMachine h = isVera h || isHomeLaptop h
-
-isLaptop :: String -> Bool
-isLaptop h = isHomeLaptop h || isWorkLaptop h
-
-isWork :: String -> Bool
-isWork = (== "com") . last . splitHostName
-
-isWorkLaptop :: String -> Bool
-isWorkLaptop h = isWork h && ((== "roam") . (!! 3) . reverse . splitHostName) h
-
-splitHostName :: String -> [String]
-splitHostName = splitOn "."
-
 suspend :: MonadIO m => String -> m ()
 suspend h
   | isWork h = safeSpawn "dbus-send" [ "--system"
@@ -121,17 +101,6 @@ suspend h
                                      ]
   | isHomeMachine h = safeSpawn "systemctl" ["suspend"]
   | otherwise  = screenOff
-
-chromeName :: String -> String
-chromeName h
-  | isWork h  = "google-chrome"
-  | otherwise = "chromium"
-
-hasMpd :: String -> Bool
-hasMpd = isVera
-
-needsXScreensaver :: String -> Bool
-needsXScreensaver = isHomeMachine
 
 lock :: MonadIO m => m ()
 lock = safeSpawn "xdg-screensaver" ["lock"]
@@ -216,7 +185,6 @@ myManageHook = composeAll
   ] <+> manageDocks
   where
     doCopyToAll = ask >>= doF . \w -> (\ws -> foldr($) ws (map (copyWindow w) myWorkspaces))
-
 
 myHandleEventHook = fullscreenEventHook <+> docksEventHook
 

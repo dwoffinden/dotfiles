@@ -1,3 +1,6 @@
+*.hi
+*.o
+
 /.gitconfig.local
 /.hgrc.local
 
@@ -47,6 +50,7 @@
 
 !/.xmonad
 /.xmonad/*
+!/.xmonad/lib/
 !/.xmonad/xmonad.hs
 
 !/.xscreensaver
