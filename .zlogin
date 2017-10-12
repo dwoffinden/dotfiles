@@ -1,1 +1,1 @@
-/home/woof/.zprezto/runcoms/zlogin
+.zprezto/runcoms/zlogin

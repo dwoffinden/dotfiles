@@ -48,4 +48,6 @@
 !/.xmonad/xmonad.hs
 !/.xscreensaver
 !/.z*
+/.zcompcache
 /.zcompdump
+/.zhistory
