@@ -79,8 +79,10 @@ alias dwstat='watch -n 1 dropbox status'
 
 alias git-repack-aggressive='git repack -Adf --depth=300 --window=300'
 
+alias gca='git commit -a'
 alias gf='git fetch'
 alias gfa='git fetch --all'
+alias gd='git diff'
 alias gdc='git diff --cached'
 alias gds='git diff --stat'
 alias gdcs='git diff --cached --stat'
@@ -224,6 +226,11 @@ else
       ;;
   esac
 fi
+
+alias dbus-halt='dbus-send --system --print-reply --dest="org.freedesktop.ConsoleKit" /org/freedesktop/ConsoleKit/Manager org.freedesktop.ConsoleKit.Manager.Stop'
+alias dbus-reboot='dbus-send --system --print-reply --dest="org.freedesktop.ConsoleKit" /org/freedesktop/ConsoleKit/Manager org.freedesktop.ConsoleKit.Manager.Restart'
+alias dbus-suspend='dbus-send --system --print-reply --dest="org.freedesktop.UPower" /org/freedesktop/UPower org.freedesktop.UPower.Suspend'
+alias dbus-hibernate='dbus-send --system --print-reply --dest="org.freedesktop.UPower" /org/freedesktop/UPower org.freedesktop.UPower.Hibernate'
 
 #####[ GREETING ]###########################################################
 
