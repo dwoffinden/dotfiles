@@ -146,6 +146,7 @@ myStartupHook LocalConfig { homeDir = home
   ifNotRunning "urxvtd" $ safeSpawn "urxvtd" ["-q", "-o"]
   ifNotRunning "taffybar" $ safeSpawnProg "taffybar"
   safeSpawn "compton" ["-cCz", "--backend=glx", "--paint-on-overlay"]
+  ifNotRunning "nm-applet" $ safeSpawnProg "nm-applet"
   where
     setWallpaper warn None =
       warn "couldn't set wallpaper!"
@@ -246,7 +247,7 @@ myKeys LocalConfig { warnAction = warn
     , ("M-b",                    sendMessage ToggleStruts)
     , ("M-v",                    windows copyToAll)
     , ("M-S-v",                  killAllOtherCopies)
-    , ("M-a",                    safeRunInTerm "alsamixer" [])
+    , ("M-a",                    safeRunProgInTerm "alsamixer")
     {- Take a screenshot, save as 'screenshot.png' -}
     -- TODO notify-send screenshot saved
     , ("<Print>",                safeSpawn "import" [ "-window", "root"
