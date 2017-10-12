@@ -17,24 +17,18 @@ fi
 _HAS_OPTICAL_DRIVE=false
 _HAS_YAOURT=false
 _IS_ARCH=false
-_IS_LABS=false
 _IS_LAPTOP=false
 _IS_SUDOER=false
 
 # Lowercase $HOST, and split by '.' into an array
 _HOST=("${(Ls/./)HOST}")
 
-if [[ "${(j/./)_HOST[-2,-1]}" = 'ac.uk' ]]; then
-  echo "You're in labs!"
-  _IS_LABS=true
-fi
-
 if [[ "${_HOST[-1]}" = 'com' ]]; then
   echo "You're at work!"
 fi
 
 case ${_HOST[1]} in
-  gladys | winona)
+  gladys | winona | daw-glaptop)
     _IS_LAPTOP=true
     ;| # break but continue scanning
   gladys | vera)
@@ -46,7 +40,7 @@ case ${_HOST[1]} in
   watchtower)
     _IS_ARCH=true
     ;& # fall through
-  buzzard)
+  buzzard | daw | daw-glaptop)
     _IS_SUDOER=true
     ;| # break but continue scanning
 esac

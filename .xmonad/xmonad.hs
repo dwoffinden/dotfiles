@@ -91,8 +91,6 @@ getConfiguration = do
       (`elem` ["gladys", "winona"])
     isHomeMachine h =
       isVera h || isLaptop h
-    isLabs =
-      (== "doc.ic.ac.uk") . getDomain
     isWork =
       (== "com") . getTld
     getTld =
@@ -110,7 +108,6 @@ getConfiguration = do
       | otherwise  = screenOff
     chromium h
       | isWork h  = "google-chrome"
-      | isLabs h  = "chromium-browser"
       | otherwise = "chromium"
     pickRandomWallpaper home = do
       wps <- filterM (doesDirectoryExist . snd)

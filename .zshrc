@@ -79,7 +79,7 @@ alias dwstat='watch -n 1 dropbox status'
 
 alias git-repack-aggressive='git repack -Adf --depth=300 --window=300'
 
-alias gca='git commit -a'
+alias gca='git commit -av'
 alias gf='git fetch'
 alias gfa='git fetch --all'
 alias gd='git diff'
@@ -88,6 +88,7 @@ alias gds='git diff --stat'
 alias gdcs='git diff --cached --stat'
 alias gra='git rebase --abort'
 alias grc='git rebase --continue'
+alias gst='git status'
 
 alias gitkaaa="gitk --argscmd='git for-each-ref --format=\"%(refname)\" refs/heads refs/stash'"
 alias gitkaa="gitk --argscmd='git for-each-ref --format=\"%(refname)\" refs/heads refs/stash refs/tags'"
@@ -127,105 +128,62 @@ function sbt-clean {
   return 0
 }
 
-if [[ $_IS_LABS = true ]]; then
-  ### Labs aliases ###
-  alias lp-staple='lp -d ICTMono -o "OutputBin=UStapler HPStaplerOptions=1diagonal"'
-  alias quota='quota -sQ'
-  alias locked='startx -display :1 -- :1 vt9'
-  function dstat {
-    if [[ -e "$DLOCKDIR" ]]; then
-      echo -n "dropbox running on "
-      cat "$DLOCKDIR"
+### ALL NON-LABS ###
+alias dstat='dropbox status'
+if [[ $_IS_SUDOER = true ]]; then
+  alias s='sudo'
+  alias sv='sudo vim'
+  alias svd='sudo vimdiff'
+  if [[ $_IS_ARCH = true ]]; then
+    function dstart {
+      sudo systemctl start dropbox@$USER
+    }
+    function dstop {
+      sudo systemctl stop dropbox@$USER
+    }
+    function drestart {
+      sudo systemctl restart dropbox@$USER
+    }
+    alias sp='sudo pacman'
+    alias update-grub='sudo grub-mkconfig -o /boot/grub/grub.cfg'
+    alias mkinitcpio-all='sudo sh -c "mkinitcpio -p linux & \
+                                      mkinitcpio -p linux-ck & \
+                                      mkinitcpio -p linux-lts &"'
+    if [[ $_HAS_YAOURT = true ]]; then
+      alias y='yaourt'
+      alias ysc='yaourt -Sc --noconfirm'
     else
-      echo "no dropbox lock detected"
-    fi
-    dropbox status
-  }
-  function dstart {
-    if [[ -e "$DLOCKDIR" ]]; then
-      echo -n "Dropbox is already running on "
-      cat "$DLOCKDIR"
-      return 1
-    else
-      echo "Creating $DLOCKDIR..."
-      uname -n > "$DLOCKDIR"
-      dropbox start
-    fi
-  }
-  function dstop {
-    if [[ ! -e "$DLOCKDIR" ]]; then
-      echo "Dropbox *shouldn't* be running..."
-      # dropbox stop
-      return 1
-    fi
-    if [[ `uname -n` != `cat $DLOCKDIR` ]]; then
-      echo -n "dropbox is running on "
-      cat $DLOCKDIR
-      return 1
-    fi
-    dropbox stop && rm -v $DLOCKDIR
-  }
-  function drestart {
-    dstop && sleep 1 && dstart
-  }
-else
-  ### ALL NON-LABS ###
-  alias dstat='dropbox status'
-  if [[ $_IS_SUDOER = true ]]; then
-    alias s='sudo'
-    alias sv='sudo vim'
-    alias svd='sudo vimdiff'
-    if [[ $_IS_ARCH = true ]]; then
-      function dstart {
-        sudo systemctl start dropbox@$USER
-      }
-      function dstop {
-        sudo systemctl stop dropbox@$USER
-      }
-      function drestart {
-        sudo systemctl restart dropbox@$USER
-      }
-      alias sp='sudo pacman'
-      alias update-grub='sudo grub-mkconfig -o /boot/grub/grub.cfg'
-      alias mkinitcpio-all='sudo sh -c "mkinitcpio -p linux & \
-                                        mkinitcpio -p linux-ck & \
-                                        mkinitcpio -p linux-lts &"'
-      if [[ $_HAS_YAOURT = true ]]; then
-        alias y='yaourt'
-        alias ysc='yaourt -Sc --noconfirm'
-      else
-        alias p='pacman'
-      fi
+      alias p='pacman'
     fi
   fi
-  if [[ $_HAS_OPTICAL_DRIVE = true ]]; then
-    alias abcde-mp3-high='abcde -o mp3'
-    alias abcde-flac='abcde -o flac'
-  fi
-  if [[ $_IS_LAPTOP = true ]]; then
-    alias hdmi-off='xrandr --output HDMI-0 --off'
-    alias hdmi-on='xrandr --output HDMI-0 --mode 1920x1080 --rate 60 \
-                          --set underscan off --right-of LVDS'
-    alias crt-off='xrandr --output CRT1 --off'
-    alias crt-on='xrandr --output CRT1 --mode 1920x1080 --rate 60 \
-                          --right-of LVDS'
-    alias vga-off='xrandr --output VGA-0 --off'
-    alias vga-on='xrandr --output VGA-0 --mode 1920x1080 --rate 60 \
-                          --right-of LVDS'
-  fi
-  case ${_HOST[1]} in
-    gladys)
-      alias hdmi-test='aplay -D plughw:1,3 \
-                       /usr/share/sounds/alsa/Front_Center.wav'
-      alias mplayer-hdmi='mplayer -ao alsa:device=hw=1.3'
-      ;;
-    winona)
-      alias hdmi-test='aplay -D plughw:0,1 \
-                       /usr/share/sounds/alsa/Front_Center.wav'
-      alias mplayer-hdmi='mplayer -ao alsa:device=hw=0.1'
-      ;;
-  esac
 fi
+if [[ $_HAS_OPTICAL_DRIVE = true ]]; then
+  alias abcde-mp3-high='abcde -o mp3'
+  alias abcde-flac='abcde -o flac'
+fi
+if [[ $_IS_LAPTOP = true ]]; then
+  alias hdmi-off='xrandr --output HDMI-0 --off'
+  alias hdmi-on='xrandr --output HDMI-0 --mode 1920x1080 --rate 60 \
+                        --set underscan off --right-of LVDS'
+  alias crt-off='xrandr --output CRT1 --off'
+  alias crt-on='xrandr --output CRT1 --mode 1920x1080 --rate 60 \
+                        --right-of LVDS'
+  alias vga-off='xrandr --output VGA-0 --off'
+  alias vga-on='xrandr --output VGA-0 --mode 1920x1080 --rate 60 \
+                        --right-of LVDS'
+fi
+case ${_HOST[1]} in
+  gladys)
+    alias hdmi-test='aplay -D plughw:1,3 \
+                     /usr/share/sounds/alsa/Front_Center.wav'
+    alias mplayer-hdmi='mplayer -ao alsa:device=hw=1.3'
+    ;;
+  winona)
+    alias hdmi-test='aplay -D plughw:0,1 \
+                     /usr/share/sounds/alsa/Front_Center.wav'
+    alias mplayer-hdmi='mplayer -ao alsa:device=hw=0.1'
+    ;;
+esac
 
 alias dbus-halt='dbus-send --system --print-reply --dest="org.freedesktop.ConsoleKit" /org/freedesktop/ConsoleKit/Manager org.freedesktop.ConsoleKit.Manager.Stop'
 alias dbus-reboot='dbus-send --system --print-reply --dest="org.freedesktop.ConsoleKit" /org/freedesktop/ConsoleKit/Manager org.freedesktop.ConsoleKit.Manager.Restart'
