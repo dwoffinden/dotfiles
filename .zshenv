@@ -5,10 +5,6 @@ if [[ "$SHLVL" -eq 1 && ! -o LOGIN && -s "${ZDOTDIR:-$HOME}/.zprofile" ]]; then
   source "${ZDOTDIR:-$HOME}/.zprofile"
 fi
 
-#####[ PRELIMINARIES ]######################################################
-
-[[ -d /tmp/$USER ]] || mkdir /tmp/$USER && chmod 700 /tmp/$USER
-
 #####[ CONFIG SELECTION ]###################################################
 
 _HAS_OPTICAL_DRIVE=false
