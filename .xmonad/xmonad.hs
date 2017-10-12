@@ -1,13 +1,14 @@
 {-# OPTIONS_GHC -O2 -tmpdir /tmp -optc -O2 #-}
-{-# LANGUAGE GADTs, OverloadedStrings #-}
+{-# LANGUAGE GADTs, OverloadedStrings, ScopedTypeVariables #-}
 
 import           Control.Applicative ((<$>),pure)
 import           Control.Concurrent (forkIO,threadDelay)
 import           Control.Exception (tryJust)
 import           Control.Monad (filterM,foldM,guard,void,when)
-import           Data.Map.Strict as Map (Map,empty,insert,lookup)
+import           Data.Map (Map)
 import           Data.Maybe (catMaybes, fromMaybe, isNothing, listToMaybe, mapMaybe)
 import           Data.List.Split (splitOn,split,dropFinalBlank,dropDelims,onSublist)
+import           Data.Set as S (Set, empty, insert, member)
 import           Daw.Hosts
 import qualified Network.MPD as MPD (withMPD, pause, previous, next, stop)
 import qualified Network.MPD.Commands.Extensions as MPD (toggle)
@@ -166,12 +167,11 @@ readFirstLine f = do
   hClose h
   return str
 
--- TODO make this a set
-getAllPids :: IO (Map.Map String ProcessID)
-getAllPids = do
+getRunningProcesses :: IO (S.Set String)
+getRunningProcesses = do
   dirs <- getDirectoryContents "/proc"
-  let pids = Data.Maybe.mapMaybe readMaybe dirs
-  foldM (\map pid -> either (const map) (\str -> foldl (\m s -> Map.insert s pid m) map (take 2 $ splitz "\0" str)) <$> tryReadLine ("/proc" </> show pid </> "cmdline")) Map.empty pids
+  let pids :: [ProcessID] = Data.Maybe.mapMaybe readMaybe dirs
+  foldM (\set pid -> either (const set) (\str -> foldl (\s n -> S.insert n s) set (take 2 $ splitz "\0" str)) <$> tryReadLine ("/proc" </> show pid </> "cmdline")) S.empty pids
   where
     splitz = split . dropFinalBlank . dropDelims . onSublist
 
@@ -211,7 +211,7 @@ myLayout = smartBorders $ avoidStruts $
 myWorkspaces :: [String]
 myWorkspaces = map pure "`1234567890-="
 
-myKeys :: LocalConfig X -> XConfig Layout -> Map.Map (KeyMask, KeySym) (X())
+myKeys :: LocalConfig X -> XConfig Layout -> Map (KeyMask, KeySym) (X())
 myKeys LocalConfig { warnAction = warn
                    , hostName = host
                    } c =
