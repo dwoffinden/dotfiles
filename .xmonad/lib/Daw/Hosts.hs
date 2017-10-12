@@ -5,8 +5,11 @@ import Data.List.Split (splitOn)
 isVera :: String -> Bool
 isVera = (== "vera")
 
+isGladys :: String -> Bool
+isGladys = (== "gladys")
+
 isHomeLaptop :: String -> Bool
-isHomeLaptop = (`elem` ["gladys", "winona"])
+isHomeLaptop h = isGladys h || h == "winona"
 
 isHomeMachine :: String -> Bool
 isHomeMachine h = isVera h || isHomeLaptop h

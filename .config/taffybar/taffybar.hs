@@ -3,6 +3,8 @@
 import Control.Applicative ((<$>))
 import Control.Monad (guard)
 
+import Daw.Hosts
+
 import System.Information.CPU
 import System.Information.Memory
 
@@ -35,11 +37,6 @@ cpuCallback = do
 main :: IO ()
 main = do
   host <- nodeName <$> getSystemID
-  -- TODO: share this with XMonad.hs?
-  let getTld = reverse . takeWhile (/= '.') . reverse
-      isWork = getTld host == "com" || host == "daw-glaptop"
-      isLaptop = host `elem` ["gladys", "winona", "daw-glaptop"]
-      notGladys = host /= "gladys"
   let memCfg = defaultGraphConfig { graphDataColors = [(1, 0, 0, 1)]
                                   , graphLabel = Just "mem"
                                   }
@@ -60,12 +57,12 @@ main = do
       tray = systrayNew
       dropbox = commandRunnerNew 5 "dstatline" [] "error calling dstatline" "blue"
       cputemp = commandRunnerNew 5 "cputemp" [] "error calling cputemp" "red"
-      batt = textBatteryNew ("$percentage$%" ++ (guard notGladys >> " ($time$)")) 10
+      batt = textBatteryNew ("$percentage$%" ++ (guard (not $ isGladys host) >> " ($time$)")) 10
   defaultTaffybar defaultTaffybarConfig
       { startWidgets =
-          (guard isLaptop >> [batt])
+          (guard (isLaptop host) >> [batt])
           ++ [pager]
-          ++ (guard (not isWork) >> [dropbox])
+          ++ (guard (not $ isWork host) >> [dropbox])
           ++ [note]
       , endWidgets = [ tray, wea, clock, mem, cputemp, cpu, mpris ]
       }
