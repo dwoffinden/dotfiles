@@ -5,7 +5,8 @@ import           Control.Concurrent (forkIO,threadDelay)
 import           Control.Exception (tryJust)
 import           Control.Monad (filterM,guard,void,when)
 import           Data.Map (Map)
-import           Data.Maybe (catMaybes, fromMaybe, isNothing, listToMaybe, mapMaybe)
+import           Data.Maybe (catMaybes, fromMaybe, isJust, isNothing, listToMaybe, mapMaybe)
+import           Data.List (stripPrefix)
 import qualified Network.MPD as MPD (withMPD, pause, previous, next, stop)
 import qualified Network.MPD.Commands.Extensions as MPD (toggle)
 import           System.Directory (doesDirectoryExist,doesFileExist,findExecutable,getDirectoryContents,getHomeDirectory)
@@ -158,15 +159,16 @@ ifNotRunning prog hook = io $ void $ forkIO $ do
   notRunning <- isNothing <$> findPid prog
   when notRunning hook
 
--- | Find the first PID of the first process with given `comm', if one exists.
--- We could find all of them by replacing `findM' with `filterM'...
+-- | Find the first PID of the first process with comm prefix 'comm', if one
+-- exists. We could find all of them by replacing `findM' with `filterM'...
+-- TODO: only do prefix match if it's actually truncated
 findPid :: String -> IO (Maybe ProcessID)
 findPid comm =
   getDirectoryContents "/proc" >>= findM matchesComm . mapMaybe readMaybe
   where
     matchesComm :: ProcessID -> IO Bool
     matchesComm pid =
-      either (const False) (== comm) <$> tryReadLine ("/proc" </> show pid </> "comm")
+      either (const False) (\c -> isJust $ stripPrefix comm c) <$> tryReadLine ("/proc" </> show pid </> "comm")
     tryReadLine :: FilePath -> IO (Either () String)
     tryReadLine f =
       tryJust (guard . isDoesNotExistError) (readFirstLine f)
