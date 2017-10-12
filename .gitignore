@@ -50,8 +50,7 @@
 
 !/.xmonad
 /.xmonad/*
-!/.xmonad/lib/
-!/.xmonad/xmonad.hs
+!/.xmonad/**/*.hs
 
 !/.xscreensaver
 
