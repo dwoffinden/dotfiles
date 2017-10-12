@@ -28,7 +28,6 @@ fi
 _HOST=("${(Ls/./)HOST}")
 
 if [[ $_HOST[-1] = com ]]; then
-  echo "You're at work!"
   _IS_WORK=true
   if [[ $_HOST[-5] = daw ]]; then
     _IS_SUDOER=true
