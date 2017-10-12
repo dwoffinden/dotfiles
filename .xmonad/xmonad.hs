@@ -4,10 +4,10 @@
 import           Control.Applicative ((<$>),pure)
 import           Control.Concurrent (forkIO,threadDelay)
 import           Control.Exception (tryJust)
-import           Control.Monad (filterM,guard,void,when)
-import           Data.Map (Map)
+import           Control.Monad (filterM,foldM,guard,void,when)
+import           Data.Map.Strict as Map (Map,empty,insert,lookup)
 import           Data.Maybe (catMaybes, fromMaybe, isNothing, listToMaybe, mapMaybe)
-import           Data.List.Split (splitOn)
+import           Data.List.Split (splitOn,split,dropFinalBlank,dropDelims,onSublist)
 import           Daw.Hosts
 import qualified Network.MPD as MPD (withMPD, pause, previous, next, stop)
 import qualified Network.MPD.Commands.Extensions as MPD (toggle)
@@ -146,7 +146,6 @@ ifNotRunning prog hook = io $ void $ forkIO $ do
 -- We could find all of them by replacing `findM' with `filterM'...
 -- TODO: this ignores processes with no cmdline, like kernel threads. We could
 --       fallback to comm, but I don't really care for those cases.
--- TODO: seperate this into computing a name => pid map, then consulting it
 findPid :: String -> IO (Maybe ProcessID)
 findPid comm =
   getDirectoryContents "/proc" >>= findM matchesComm . mapMaybe readMaybe
@@ -156,15 +155,25 @@ findPid comm =
       either (const False) matchLine <$> tryReadLine ("/proc" </> show pid </> "cmdline")
     matchLine =
       any (== comm) . map takeFileName . take 2 . splitOn "\0"
-    tryReadLine :: FilePath -> IO (Either () String)
-    tryReadLine f =
-      tryJust (guard . (\e -> isDoesNotExistError e || isEOFError e)) (readFirstLine f)
-    readFirstLine :: FilePath -> IO String
-    readFirstLine f = do
-      h <- openFile f ReadMode
-      str <- hGetLine h
-      hClose h
-      return str
+
+tryReadLine :: FilePath -> IO (Either () String)
+tryReadLine f =
+  tryJust (guard . (\e -> isDoesNotExistError e || isEOFError e)) (readFirstLine f)
+readFirstLine :: FilePath -> IO String
+readFirstLine f = do
+  h <- openFile f ReadMode
+  str <- hGetLine h
+  hClose h
+  return str
+
+-- TODO make this a set
+getAllPids :: IO (Map.Map String ProcessID)
+getAllPids = do
+  dirs <- getDirectoryContents "/proc"
+  let pids = Data.Maybe.mapMaybe readMaybe dirs
+  foldM (\map pid -> either (const map) (\str -> foldl (\m s -> Map.insert s pid m) map (take 2 $ splitz "\0" str)) <$> tryReadLine ("/proc" </> show pid </> "cmdline")) Map.empty pids
+  where
+    splitz = split . dropFinalBlank . dropDelims . onSublist
 
 -- | This generalizes the list-based 'find' function.
 findM :: Monad m => (a -> m Bool) -> [a] -> m (Maybe a)
@@ -202,7 +211,7 @@ myLayout = smartBorders $ avoidStruts $
 myWorkspaces :: [String]
 myWorkspaces = map pure "`1234567890-="
 
-myKeys :: LocalConfig X -> XConfig Layout -> Map (KeyMask, KeySym) (X())
+myKeys :: LocalConfig X -> XConfig Layout -> Map.Map (KeyMask, KeySym) (X())
 myKeys LocalConfig { warnAction = warn
                    , hostName = host
                    } c =
