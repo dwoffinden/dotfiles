@@ -55,6 +55,9 @@ bindkey ' ' magic-space # history expansion on space
 
 #####[ ALIASES ]############################################################
 
+# silly prezto
+unalias ls
+
 ### UNIVERSAL ALIASES ###
 ls () {
   command ls -Fhv --color=always --group-directories-first "$@" | less -FRX
