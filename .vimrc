@@ -1,6 +1,7 @@
 runtime bundle/vim-pathogen/autoload/pathogen.vim
 
 let g:airline#extensions#tabline#enabled=1
+let g:base16_shell_path='~/.config/base16-shell/'
 set laststatus=2
 
 execute pathogen#infect()
