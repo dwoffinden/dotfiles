@@ -177,7 +177,6 @@ ifNotRunning prog hook = io $ void $ forkIO $ do
 -- We could find all of them by replacing `findM' with `filterM'...
 -- TODO: this ignores processes with no cmdline, like kernel threads. We could
 --       fallback to comm, but I don't really care for those cases.
--- TODO: handle scripts, where the script name is the second field
 -- TODO: seperate this into computing a name => pid map, then consulting it
 findPid :: String -> IO (Maybe ProcessID)
 findPid comm =
@@ -185,7 +184,9 @@ findPid comm =
   where
     matchesComm :: ProcessID -> IO Bool
     matchesComm pid =
-      either (const False) ((== comm) . takeFileName . takeWhile (/= '\0')) <$> tryReadLine ("/proc" </> show pid </> "cmdline")
+      either (const False) matchLine <$> tryReadLine ("/proc" </> show pid </> "cmdline")
+    matchLine =
+      any (== comm) . map takeFileName . take 2 . splitOn "\0"
     tryReadLine :: FilePath -> IO (Either () String)
     tryReadLine f =
       tryJust (guard . (\e -> isDoesNotExistError e || isEOFError e)) (readFirstLine f)
