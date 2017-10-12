@@ -145,9 +145,22 @@ myStartupHook LocalConfig { homeDir = home
 -- Pretty hacky.
 getRunningProcesses :: MonadIO m => m (S.Set String)
 getRunningProcesses = io $ do
+  -- get all of the files/dirs in /proc
   dirs <- getDirectoryContents "/proc"
-  let pids :: [ProcessID] = Data.Maybe.mapMaybe readMaybe dirs
-  foldM (\set pid -> either (const set) (\str -> foldl (\s n -> S.insert n s) set (map takeFileName $ take 2 $ splitz "\0" str)) <$> tryReadLine ("/proc" </> show pid </> "cmdline")) S.empty pids
+  -- read those that we can as numbers
+  let pids :: [ProcessID] = mapMaybe readMaybe dirs
+  foldM
+    (\set pid ->
+      -- for each process, try and get the command line
+      tryReadLine ("/proc" </> show pid </> "cmdline") >>= \errorOrCmdline ->
+        return $ either
+          -- if reading failed (e.g. the process is already dead), leave the set as-is
+          (const set)
+          -- else take the set and add to it the filename components of up to the first 2 args
+          (\str -> foldl (flip S.insert) set (map takeFileName $ take 2 $ splitz "\0" str))
+          errorOrCmdline)
+    S.empty
+    pids
   where
     splitz = split . dropFinalBlank . dropDelims . onSublist
     tryReadLine :: FilePath -> IO (Either () String)
