@@ -20,8 +20,8 @@ setopt autopushd
 setopt autocd
 setopt auto_param_slash
 
-HISTSIZE=1000
-SAVEHIST=1000
+HISTSIZE=100000
+SAVEHIST=100000
 setopt append_history
 setopt inc_append_history
 setopt extended_history
