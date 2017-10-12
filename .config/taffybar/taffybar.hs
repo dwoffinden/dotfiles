@@ -1,18 +1,19 @@
+import System.Information.CPU
+import System.Information.Memory
+
 import System.Taffybar
 
+import System.Taffybar.Battery
 import System.Taffybar.CommandRunner
+import System.Taffybar.FreedesktopNotifications
+import System.Taffybar.MPRIS
+import System.Taffybar.SimpleClock
 import System.Taffybar.Systray
 import System.Taffybar.TaffyPager
-import System.Taffybar.SimpleClock
-import System.Taffybar.FreedesktopNotifications
 import System.Taffybar.Weather
-import System.Taffybar.MPRIS
 
 import System.Taffybar.Widgets.PollingBar
 import System.Taffybar.Widgets.PollingGraph
-
-import System.Information.Memory
-import System.Information.CPU
 
 memCallback = do
   mi <- parseMeminfo
@@ -42,7 +43,8 @@ main = do
       tray = systrayNew
       dropbox = commandRunnerNew 2 "dstatline" [] "error calling dstatline" "blue"
       cputemp = commandRunnerNew 5 "cputemp" [] "error calling cputemp" "red"
+      batt = textBatteryNew "$percentage$% ($time$)" 2
   defaultTaffybar defaultTaffybarConfig
-      { startWidgets = [ log, dropbox, note ]
+      { startWidgets = [ batt, log, dropbox, note ]
       , endWidgets = [ tray, wea, clock, mem, cputemp, cpu, mpris ]
       }
