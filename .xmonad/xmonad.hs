@@ -22,6 +22,7 @@ import           System.Taffybar.Hooks.PagerHints (pagerHints)
 import           Text.Read (readMaybe)
 import           XMonad
 import           XMonad.Actions.CopyWindow (copyToAll,copyWindow,killAllOtherCopies)
+import           XMonad.Actions.PhysicalScreens (viewScreen, sendToScreen)
 import           XMonad.Actions.WindowGo (runOrRaise)
 import           XMonad.Hooks.EwmhDesktops (ewmh, fullscreenEventHook)
 import           XMonad.Hooks.ManageDocks (avoidStruts, manageDocks, docksEventHook, ToggleStruts(..))
@@ -257,8 +258,9 @@ myKeys LocalConfig { warnAction = warn
        | k <- XMonad.workspaces c, (f, m) <- [(W.greedyView, "M-"), (W.shift, "M-S-")]
     ]
     {- Screen Switching -}
-    ++ [ (m ++ key, screenWorkspace sc >>= (`whenJust` (windows . f)))
-       | (key, sc) <- zip ["w", "e", "r"] [0..], (m, f) <- [("M-", W.view), ("M-S-", W.shift)]
+    ++ [ (m ++ key, f sc)
+       | (key, sc) <- zip ["w", "e", "r"] [0..]
+       , (m, f) <- [("M-", viewScreen), ("M-S-", sendToScreen)]
     ]
     {- Volume Controls -}
     ++ [ (k, safeSpawn "amixer" ["set", "Master", a])
