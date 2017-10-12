@@ -30,6 +30,7 @@ cpuCallback = do
 
 main = do
   host <- nodeName <$> getSystemID
+  -- TODO: share this with XMonad.hs?
   let getTld = reverse . takeWhile (/= '.') . reverse
       isWork h = getTld h == "com" || h == "daw-glaptop"
       notWork = not $ isWork host
