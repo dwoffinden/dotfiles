@@ -21,7 +21,7 @@ import           System.Random (randomRIO)
 import           System.Taffybar.Hooks.PagerHints (pagerHints)
 import           Text.Read (readMaybe)
 import           XMonad
-import           XMonad.Actions.CopyWindow (copyToAll,killAllOtherCopies)
+import           XMonad.Actions.CopyWindow (copyToAll,copyWindow,killAllOtherCopies)
 import           XMonad.Actions.WindowGo (runOrRaise)
 import           XMonad.Hooks.EwmhDesktops (ewmh, fullscreenEventHook)
 import           XMonad.Hooks.ManageDocks (avoidStruts, manageDocks, docksEventHook)
@@ -212,9 +212,11 @@ myManageHook = composeAll
   , resource  =? "kdesktop"       --> doIgnore
 --, isFullscreen                  --> (doF W.focusDown <+> doFullFloat)
   , isFullscreen                  --> doFullFloat
-  , stringProperty "WM_WINDOW_ROLE" =? "pop-up" --> doFloat
-  , stringProperty "WM_WINDOW_ROLE" =? "app" --> doFloat
+  , stringProperty "WM_WINDOW_ROLE" =? "pop-up" --> doFloat <+> doCopyToAll
+  , stringProperty "WM_WINDOW_ROLE" =? "app" --> doFloat <+> doCopyToAll
   ] <+> manageDocks
+  where
+    doCopyToAll = ask >>= doF . \w -> (\ws -> foldr($) ws (map (copyWindow w) myWorkspaces))
 
 
 myHandleEventHook = fullscreenEventHook <+> docksEventHook
