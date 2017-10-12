@@ -1,5 +1,6 @@
 {-# OPTIONS_GHC -O2 -tmpdir /tmp -optc -O2 #-}
 {-# LANGUAGE GADTs, OverloadedStrings #-}
+
 import           Control.Applicative ((<$>),pure)
 import           Control.Concurrent (forkIO,threadDelay)
 import           Control.Exception (tryJust)
@@ -22,9 +23,8 @@ import           Text.Read (readMaybe)
 import           XMonad
 import           XMonad.Actions.CopyWindow (copyToAll,killAllOtherCopies)
 import           XMonad.Actions.WindowGo (runOrRaise)
-import           XMonad.Hooks.DynamicLog (defaultPP)
 import           XMonad.Hooks.EwmhDesktops (ewmh, fullscreenEventHook)
-import           XMonad.Hooks.ManageDocks --(avoidStruts, manageDocks, docksEventHook, ToggleStruts)
+import           XMonad.Hooks.ManageDocks (avoidStruts, manageDocks, docksEventHook)
 import           XMonad.Hooks.ManageHelpers (doFullFloat,isFullscreen)
 import           XMonad.Hooks.SetWMName (setWMName)
 import           XMonad.Layout.Grid
@@ -95,8 +95,6 @@ getConfiguration = do
       getTld h == "com" || h == "daw-glaptop"
     getTld =
       reverse . takeWhile (/= '.') . reverse
-    getDomain =
-      dropWhile (== '.') . dropWhile (/= '.')
     suspend h
       | isWork h = safeSpawn "dbus-send" ["--system"
                                          , "--print-reply"
@@ -119,10 +117,9 @@ getConfiguration = do
       if null wps
         then return None
         else do
-          candidates <- mapM (\(m, dir) -> getDirectoryContents dir >>= filterM doesFileExist . map (dir </>) >>= return . map m) wps
-          let all = concat candidates
-          index <- randomRIO (0, length all - 1)
-          return $ all !! index
+          candidates <- concat <$> mapM (\(m, dir) -> getDirectoryContents dir >>= filterM doesFileExist . map (dir </>) >>= return . map m) wps
+          index <- randomRIO (0, length candidates - 1)
+          return $ candidates !! index
 
 lock :: MonadIO m => m ()
 lock = safeSpawn "xdg-screensaver" ["lock"]
@@ -143,19 +140,19 @@ myStartupHook LocalConfig { homeDir = home
   safeSpawn "setxkbmap" ["-layout", "gb"]
   safeSpawn "xsetroot" ["-cursor_name", "left_ptr"]
   safeSpawn "xrdb" ["-merge", (home </> ".Xresources")]
-  setWallpaper warn wp
+  setWallpaper wp
   when xScreensaver $ safeSpawn "xscreensaver" ["-no-splash"]
   ifNotRunning "urxvtd" $ safeSpawn "urxvtd" ["-q", "-o"]
   ifNotRunning "taffybar" $ safeSpawnProg "taffybar"
   safeSpawn "compton" ["-cCz", "--backend=glx", "--paint-on-overlay"]
   ifNotRunning "nm-applet" $ safeSpawnProg "nm-applet"
   where
-    setWallpaper warn None =
+    setWallpaper None =
       warn "couldn't set wallpaper!"
-    setWallpaper _ (Fill wp) =
-      safeSpawn "feh" ["--no-fehbg", "--bg-fill", wp]
-    setWallpaper _ (Tile wp) =
-      safeSpawn "feh" ["--no-fehbg", "--bg-tile", wp]
+    setWallpaper (Fill fp) =
+      safeSpawn "feh" ["--no-fehbg", "--bg-fill", fp]
+    setWallpaper (Tile fp) =
+      safeSpawn "feh" ["--no-fehbg", "--bg-tile", fp]
 
 ifNotRunning :: MonadIO m => String -> IO () -> m ()
 ifNotRunning prog hook = io $ void $ forkIO $ do
@@ -199,6 +196,7 @@ myManageHook = composeAll
   , isFullscreen                  --> doFullFloat
   , stringProperty "WM_WINDOW_ROLE" =? "pop-up" --> doFloat
   ] <+> manageDocks
+
 
 myHandleEventHook = fullscreenEventHook <+> docksEventHook
 
@@ -246,7 +244,6 @@ myKeys LocalConfig { warnAction = warn
     , ("M-S-q",                   io exitSuccess)
     , ("M-q",                     recompile False >>=
                                     (`when` (safeSpawn "xmonad" ["--restart"])))
-    , ("M-b",                     sendMessage ToggleStruts)
     , ("M-v",                     windows copyToAll)
     , ("M-S-v",                   killAllOtherCopies)
     , ("M-a",                     safeRunProgInTerm "alsamixer")

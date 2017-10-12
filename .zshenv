@@ -15,10 +15,11 @@ fi
 
 _HAS_OPTICAL_DRIVE=false
 _HAS_YAOURT=false
-_IS_ARCH=false
 _IS_LAPTOP=false
 _IS_SUDOER=false
 _IS_WORK=false
+
+_DISTRO=`lsb_release -si`
 
 # Lowercase $HOST, and split by '.' into an array
 _HOST=("${(Ls/./)HOST}")
@@ -46,10 +47,6 @@ case ${_HOST[1]} in
     ;| # break but continue scanning
 esac
 
-if [[ `lsb_release -si` = 'Arch' ]]; then
-  _IS_ARCH=true
-fi
-
 #####[ ENVIRONMENTAL VARIABLES ]############################################
 
 export EDITOR=vim
@@ -59,7 +56,7 @@ export MAKEFLAGS=-j`nproc`
 
 ZSH_COMPDUMP="/tmp/$USER/zcompdump-$ZSH_VERSION"
 
-if [[ $_IS_WORK = true ]] && [[ -d /usr/games ]]; then
+if [[ -d /usr/games ]]; then
   path=($path /usr/games)
 fi
 

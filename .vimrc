@@ -53,6 +53,10 @@ set spelllang=en_gb
 
 set directory=/tmp/$USER,/tmp,$TEMP
 
+if $COLORTERM == 'gnome-terminal'
+  set t_Co=256
+endif
+
 if &t_Co > 2 || has("gui_running")
   syntax on
   set hlsearch

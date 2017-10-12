@@ -132,12 +132,11 @@ function sbt-clean {
   return 0
 }
 
-### ALL NON-LABS ###
 if [[ $_IS_SUDOER = true ]]; then
   alias s='sudo'
   alias sv='sudo vim'
   alias svd='sudo vimdiff'
-  if [[ $_IS_ARCH = true ]]; then
+  if [[ $_DISTRO = Arch ]]; then
     function dstart {
       sudo systemctl start dropbox@$USER
     }
@@ -188,8 +187,11 @@ case ${_HOST[1]} in
     ;;
 esac
 
-alias dbus-halt='dbus-send --system --print-reply --dest="org.freedesktop.ConsoleKit" /org/freedesktop/ConsoleKit/Manager org.freedesktop.ConsoleKit.Manager.Stop'
-alias dbus-reboot='dbus-send --system --print-reply --dest="org.freedesktop.ConsoleKit" /org/freedesktop/ConsoleKit/Manager org.freedesktop.ConsoleKit.Manager.Restart'
+if [[ _DISTRO = Ubuntu ]]; then
+  alias dbus-halt='dbus-send --system --print-reply --dest=org.freedesktop.ConsoleKit /org/freedesktop/ConsoleKit/Manager org.freedesktop.ConsoleKit.Manager.Stop'
+  alias dbus-reboot='dbus-send --system --print-reply --dest=org.freedesktop.ConsoleKit /org/freedesktop/ConsoleKit/Manager org.freedesktop.ConsoleKit.Manager.Restart'
+fi
+
 alias dbus-suspend='dbus-send --system --print-reply --dest="org.freedesktop.UPower" /org/freedesktop/UPower org.freedesktop.UPower.Suspend'
 alias dbus-hibernate='dbus-send --system --print-reply --dest="org.freedesktop.UPower" /org/freedesktop/UPower org.freedesktop.UPower.Hibernate'
 

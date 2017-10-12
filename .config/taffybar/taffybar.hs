@@ -1,9 +1,11 @@
 {-# OPTIONS_GHC -O2 -tmpdir /tmp -optc -O2 #-}
-import Control.Applicative
-import Control.Monad
+
+import Control.Applicative ((<$>))
+import Control.Monad (guard)
 
 import System.Information.CPU
 import System.Information.Memory
+
 import System.Posix.Unistd (getSystemID, nodeName)
 
 import System.Taffybar
@@ -12,28 +14,32 @@ import System.Taffybar.Battery
 import System.Taffybar.CommandRunner
 import System.Taffybar.FreedesktopNotifications
 import System.Taffybar.MPRIS
+import System.Taffybar.Pager (colorize, escape)
 import System.Taffybar.SimpleClock
 import System.Taffybar.Systray
 import System.Taffybar.TaffyPager
 import System.Taffybar.Weather
 
-import System.Taffybar.Widgets.PollingBar
 import System.Taffybar.Widgets.PollingGraph
 
+memCallback :: IO [Double]
 memCallback = do
   mi <- parseMeminfo
   return [memoryUsedRatio mi]
 
+cpuCallback :: IO [Double]
 cpuCallback = do
-  (userLoad, systemLoad, totalLoad) <- cpuLoad
+  (_, systemLoad, totalLoad) <- cpuLoad
   return [totalLoad, systemLoad]
 
+main :: IO ()
 main = do
   host <- nodeName <$> getSystemID
   -- TODO: share this with XMonad.hs?
   let getTld = reverse . takeWhile (/= '.') . reverse
-      isWork h = getTld h == "com" || h == "daw-glaptop"
-      notWork = not $ isWork host
+      isWork = getTld host == "com" || host == "daw-glaptop"
+      isLaptop = host `elem` ["gladys", "winona", "daw-glaptop"]
+      notGladys = host /= "gladys"
   let memCfg = defaultGraphConfig { graphDataColors = [(1, 0, 0, 1)]
                                   , graphLabel = Just "mem"
                                   }
@@ -43,18 +49,23 @@ main = do
                                   , graphLabel = Just "cpu"
                                   }
       weatherCfg = (defaultWeatherConfig "EGLC") { weatherTemplate = "$tempC$ °C" }
+      pagerCfg = defaultPagerConfig { emptyWorkspace = colorize "grey" "" . escape }
   let clock = textClockNew Nothing "<span fgcolor='orange'>%a %b %_d %H:%M:%S</span>" 1
-      log = taffyPagerNew defaultPagerConfig
+      pager = taffyPagerNew pagerCfg
       note = notifyAreaNew defaultNotificationConfig
-      wea = weatherNew weatherCfg 10
+      wea = weatherNew weatherCfg 60
       mpris = mprisNew
-      mem = pollingGraphNew memCfg 1 memCallback
-      cpu = pollingGraphNew cpuCfg 0.5 cpuCallback
+      mem = pollingGraphNew memCfg 2 memCallback
+      cpu = pollingGraphNew cpuCfg 1 cpuCallback
       tray = systrayNew
-      dropbox = commandRunnerNew 2 "dstatline" [] "error calling dstatline" "blue"
+      dropbox = commandRunnerNew 5 "dstatline" [] "error calling dstatline" "blue"
       cputemp = commandRunnerNew 5 "cputemp" [] "error calling cputemp" "red"
-      batt = textBatteryNew "$percentage$% ($time$)" 2
+      batt = textBatteryNew ("$percentage$%" ++ (guard notGladys >> " ($time$)")) 10
   defaultTaffybar defaultTaffybarConfig
-      { startWidgets = [ batt, log] ++ (guard notWork >> [ dropbox ]) ++ [ note ]
+      { startWidgets =
+          (guard isLaptop >> [batt])
+          ++ [pager]
+          ++ (guard (not isWork) >> [dropbox])
+          ++ [note]
       , endWidgets = [ tray, wea, clock, mem, cputemp, cpu, mpris ]
       }
