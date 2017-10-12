@@ -55,6 +55,8 @@
 /.xmonad/*
 !/.xmonad/**/*.hs
 
+!/.xinitrc
+!/.xsession
 !/.xscreensaver
 
 /.zlogin
