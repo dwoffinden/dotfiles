@@ -43,7 +43,7 @@ case $_HOST[1] in
   tombstone | winona)
     _HAS_YAOURT=true
     ;& # fall through
-  watchtower | buzzard)
+  watchtower | buzzard | edgar)
     _IS_SUDOER=true
     ;| # break but continue scanning
 esac
