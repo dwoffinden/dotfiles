@@ -10,8 +10,6 @@ import           Data.Maybe (catMaybes, fromMaybe, isNothing, listToMaybe, mapMa
 import           Data.List.Split (splitOn,split,dropFinalBlank,dropDelims,onSublist)
 import           Data.Set as Set (Set, empty, insert, member)
 import           Daw.Hosts
-import qualified Network.MPD as MPD (withMPD, pause, previous, next, stop)
-import qualified Network.MPD.Commands.Extensions as MPD (toggle)
 import           System.Directory (doesDirectoryExist,doesFileExist,findExecutable,getDirectoryContents,getHomeDirectory)
 import           System.Exit (exitSuccess)
 import           System.FilePath ((</>), takeFileName)
@@ -132,13 +130,13 @@ myStartupHook LocalConfig { homeDir = home
   setWallpaper wp
   progs <- getRunningProcesses
   let ifNotRunning prog hook = io $ void $ when (not $ Set.member prog progs) hook
-  when (needsXScreensaver host) $ safeSpawn "xscreensaver" ["-no-splash"]
+  safeSpawn "xscreensaver" ["-no-splash"]
   ifNotRunning "urxvtd" $ safeSpawn "urxvtd" ["-q", "-o"]
   ifNotRunning "taffybar-linux-x86_64" $ safeSpawn "stack" ["exec", "taffybar"]
   ifNotRunning "compton" $ safeSpawn "compton" [ "--backend=glx"
                                                , "--paint-on-overlay"]
-  when (isWorkLaptop host) $ ifNotRunning "nm-applet" $ safeSpawnProg "nm-applet"
-  when (isHomeLaptop host) $ ifNotRunning "connman-ui-gtk" $ safeSpawnProg "connman-ui-gtk"
+  when (isWork host) $ ifNotRunning "nm-applet" $ safeSpawnProg "nm-applet"
+  when (isLaptop host) $ ifNotRunning "connman-ui-gtk" $ safeSpawnProg "connman-ui-gtk"
   where
     setWallpaper None =
       warn "couldn't set wallpaper!"
@@ -276,7 +274,7 @@ myKeys LocalConfig { warnAction = warn
        | k <- ["M-c", "<XF86HomePage>"]
     ]
     {- Screen Locking -}
-    ++ [ (k , (when mpd $ doMpd $ MPD.pause True) >> lock >> sleep 4 >> screenOff)
+    ++ [ (k , (safeSpawn "mpc" ["pause"]) >> lock >> sleep 4 >> screenOff)
        | k <- ["M-s", "<XF86ScreenSaver>"]
     ]
     ++ [ (k , lock >> sleep 4 >> screenOff)
@@ -286,28 +284,23 @@ myKeys LocalConfig { warnAction = warn
        | k <- ["M-C-S-s", "<XF86Sleep>"]
     ]
     {- MPC keys, media player UI -}
-    ++ ( guard mpd >>
-      [ (k, doMpd comm)
-      | (k, comm) <- [ ("<XF86AudioPlay>", MPD.toggle)
-                     , ("<XF86AudioPrev>", MPD.previous)
-                     , ("<XF86AudioNext>", MPD.next)
-                     , ("<XF86AudioStop>", MPD.stop)
-                     ]
-      ] ++
-      [ (k, safeRunProgInTerm "ncmpcpp")
-      | k <- ["M-S-m", "<XF86AudioMedia>"]
-      ]
-    )
+    ++ [ (k, safeSpawn "mpc" [comm])
+       | (k, comm) <- [ ("<XF86AudioPlay>", "toggle")
+                      , ("<XF86AudioPrev>", "prev")
+                      , ("<XF86AudioNext>", "next")
+                      , ("<XF86AudioStop>", "stop")
+                      ]
+       ] ++
+       [ (k, safeRunProgInTerm "ncmpcpp")
+       | k <- ["M-S-m", "<XF86AudioMedia>"]
+       ]
   where
-    doMpd =
-      io . void . MPD.withMPD
     safeRunInTerm :: String -> [String] -> X()
     safeRunInTerm comm args =
       asks (terminal . config) >>= (`safeSpawn` (["-e", comm] ++ args))
     safeRunProgInTerm =
       (`safeRunInTerm` [])
     chrome = chromeName host
-    mpd = hasMpd host
 
 myConfig = do
   conf <- getConfiguration

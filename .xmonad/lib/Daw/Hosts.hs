@@ -8,24 +8,14 @@ isVera = (== "vera")
 isGladys :: String -> Bool
 isGladys = (== "gladys")
 
-isHomeLaptop :: String -> Bool
-isHomeLaptop h = isGladys h || h == "winona"
+isLaptop :: String -> Bool
+isLaptop h = isGladys h || h == "winona"
 
 isHomeMachine :: String -> Bool
-isHomeMachine h = isVera h || isHomeLaptop h
-
-isLaptop :: String -> Bool
-isLaptop h = isHomeLaptop h || isWorkLaptop h
+isHomeMachine h = isVera h || isLaptop h
 
 isWork :: String -> Bool
 isWork = (== "com") . last . splitHostName
-
--- TODO this by pattern matching?
-isWorkLaptop :: String -> Bool
-isWorkLaptop h = isWork h && ((== "roam") . (!! 3) . reverse . splitHostName) h
-
-isWorkDesktop :: String -> Bool
-isWorkDesktop h = isWork h && not (isWorkLaptop h)
 
 splitHostName :: String -> [String]
 splitHostName = splitOn "."
@@ -34,10 +24,4 @@ chromeName :: String -> String
 chromeName h
   | isWork h  = "google-chrome"
   | otherwise = "chromium"
-
-hasMpd :: String -> Bool
-hasMpd = isVera
-
-needsXScreensaver :: String -> Bool
-needsXScreensaver = isHomeMachine
 
