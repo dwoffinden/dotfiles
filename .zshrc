@@ -101,7 +101,7 @@ function bckground {
   nohup $@ </dev/null &>/dev/null &
 }
 
-alias cabal-install-taffybar='cabal update && cabal install -j alex happy && cabal install -j gtk2hs-buildtoold && cabal install -j taffybar'
+alias cabal-install-everything='cabal update && cabal install -j alex happy && cabal install -j gtk2hs-buildtools && cabal install -j taffybar libmpd'
 
 function find-loose-git-objects {
   find ./ -wholename "*/.git/*objects/*" -type d \! \( -name info -o -name pack \) "$@"
