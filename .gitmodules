@@ -1,36 +1,36 @@
 [submodule ".vim/bundle/vim-pathogen"]
 	path = .vim/bundle/vim-pathogen
-	url = git://github.com/tpope/vim-pathogen
+	url = https://github.com/tpope/vim-pathogen
 [submodule ".vim/bundle/vim-coffee-script"]
 	path = .vim/bundle/vim-coffee-script
-	url = git://github.com/kchmck/vim-coffee-script
+	url = https://github.com/kchmck/vim-coffee-script
 [submodule ".vim/bundle/vim-scala"]
 	path = .vim/bundle/vim-scala
-	url = git://github.com/derekwyatt/vim-scala
+	url = https://github.com/derekwyatt/vim-scala
 [submodule ".vim/bundle/vim-glsl"]
 	path = .vim/bundle/vim-glsl
-	url = git://github.com/tikhomirov/vim-glsl
+	url = https://github.com/tikhomirov/vim-glsl
 [submodule ".vim/bundle/vim-opencl"]
 	path = .vim/bundle/vim-opencl
-	url = git://github.com/petRUShka/vim-opencl
+	url = https://github.com/petRUShka/vim-opencl
 [submodule ".vim/bundle/vim-airline"]
 	path = .vim/bundle/vim-airline
 	url = https://github.com/bling/vim-airline
 [submodule ".vim/bundle/vim-fugitive"]
 	path = .vim/bundle/vim-fugitive
-	url = git://github.com/tpope/vim-fugitive
+	url = https://github.com/tpope/vim-fugitive
 [submodule ".vim/bundle/vim-base16"]
 	path = .vim/bundle/vim-base16
-	url = git://github.com/chriskempson/base16-vim
+	url = https://github.com/chriskempson/base16-vim
 [submodule ".config/base16-shell"]
 	path = .config/base16-shell
-	url = git://github.com/chriskempson/base16-shell
+	url = https://github.com/chriskempson/base16-shell
 [submodule ".config/base16-xresources"]
 	path = .config/base16-xresources
-	url = git://github.com/chriskempson/base16-xresources
+	url = https://github.com/chriskempson/base16-xresources
 [submodule ".local/share/git-remote-hg"]
 	path = .local/share/git-remote-hg
-	url = git://github.com/felipec/git-remote-hg
+	url = https://github.com/felipec/git-remote-hg
 [submodule ".zprezto"]
 	path = .zprezto
 	url = https://github.com/sorin-ionescu/prezto.git
