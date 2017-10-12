@@ -101,9 +101,9 @@ alias grc='git rebase --continue'
 alias grs='git rebase --skip'
 alias gst='git status'
 
-alias gitkaaa="gitk HEAD --argscmd='git for-each-ref --format=\"%(refname)\" refs/heads refs/stash'"
-alias gitkaa="gitk HEAD --argscmd='git for-each-ref --format=\"%(refname)\" refs/heads refs/stash refs/tags'"
-alias gitka="gitk HEAD --argscmd='git for-each-ref --format=\"%(refname)\" refs/heads refs/remotes refs/stash refs/tags'"
+alias gitkaaa="gitk HEAD --argscmd='git rev-list --no-walk --branches --glob=refs/stash* --glob=refs/exported'"
+alias gitkaa="gitk HEAD --argscmd='git rev-list --no-walk --branches --glob=refs/stash* --glob=refs/exported --tags'"
+alias gitka="gitk HEAD --argscmd='git rev-list --no-walk --branches --glob=refs/stash* --glob=refs/exported --tags --remotes'"
 alias tigaaa='tig HEAD $(git for-each-ref --format="%(refname)" refs/heads refs/stash)'
 alias tigaa='tig HEAD $(git for-each-ref --format="%(refname)" refs/heads refs/stash refs/tags)'
 alias tiga='tig HEAD $(git for-each-ref --format="%(refname)" refs/heads refs/remotes refs/stash refs/tags)'
