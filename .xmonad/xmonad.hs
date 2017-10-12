@@ -210,10 +210,9 @@ myManageHook = composeAll
   , className =? "Xmessage"       --> doFloat
   , resource  =? "desktop_window" --> doIgnore
   , resource  =? "kdesktop"       --> doIgnore
---, isFullscreen                  --> (doF W.focusDown <+> doFullFloat)
-  , isFullscreen                  --> doFullFloat
-  , stringProperty "WM_WINDOW_ROLE" =? "pop-up" --> doFloat <+> doCopyToAll
-  , stringProperty "WM_WINDOW_ROLE" =? "app" --> doFloat <+> doCopyToAll
+  , isFullscreen                  --> (doF W.focusDown <+> doFullFloat)
+  , stringProperty "WM_WINDOW_ROLE" =? "pop-up"
+    <||> stringProperty "WM_WINDOW_ROLE" =? "app" --> doFloat <+> doCopyToAll
   ] <+> manageDocks
   where
     doCopyToAll = ask >>= doF . \w -> (\ws -> foldr($) ws (map (copyWindow w) myWorkspaces))
