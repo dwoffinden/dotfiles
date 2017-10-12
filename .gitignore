@@ -9,6 +9,8 @@
 !/.Xresources
 !/.abcde.conf
 
+!/.base16_theme
+
 !/.config/
 /.config/*
 !/.config/fontconfig/
@@ -50,6 +52,7 @@
 /.vim/.netrwhist
 
 !/.vimrc
+!/.vimrc_background
 
 !/.xmonad
 /.xmonad/*

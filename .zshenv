@@ -57,7 +57,7 @@ if (( $+commands[nproc] )); then
   export MAKEFLAGS=-j`nproc`
 fi
 
-ZSH_COMPDUMP="/tmp/$USER/zcompdump-$ZSH_VERSION"
+ZSH_COMPDUMP="/tmp/$USER-zcompdump-$ZSH_VERSION"
 
 if [[ -d /usr/games ]]; then
   path=($path /usr/games)
