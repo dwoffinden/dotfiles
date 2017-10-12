@@ -12,9 +12,9 @@ import qualified Network.MPD as MPD (withMPD, pause, previous, next, stop)
 import qualified Network.MPD.Commands.Extensions as MPD (toggle)
 import           System.Directory (doesDirectoryExist,doesFileExist,findExecutable,getDirectoryContents,getHomeDirectory)
 import           System.Exit (exitSuccess)
-import           System.FilePath ((</>))
+import           System.FilePath ((</>), takeFileName)
 import           System.IO (hClose,hGetLine,IOMode(ReadMode),openFile)
-import           System.IO.Error (isDoesNotExistError)
+import           System.IO.Error (isDoesNotExistError, isEOFError)
 import           System.Posix.Types (ProcessID)
 import           System.Posix.Unistd (getSystemID,nodeName)
 import           System.Random (randomRIO)
@@ -140,7 +140,7 @@ myStartupHook LocalConfig { homeDir = home
   setWallpaper wp
   when xScreensaver $ safeSpawn "xscreensaver" ["-no-splash"]
   ifNotRunning "urxvtd" $ safeSpawn "urxvtd" ["-q", "-o"]
-  ifNotRunning "taffybar" $ safeSpawnProg "taffybar"
+  ifNotRunning "taffybar-linux-x86_64" $ safeSpawnProg "taffybar"
   ifNotRunning "compton" $ safeSpawn "compton" [ "--backend=glx"
                                                , "--paint-on-overlay"]
   ifNotRunning "nm-applet" $ safeSpawnProg "nm-applet"
@@ -157,19 +157,20 @@ ifNotRunning prog hook = io $ void $ forkIO $ do
   notRunning <- isNothing <$> findPid prog
   when notRunning hook
 
--- | Find the first PID of the first process with comm prefix 'comm', if one
--- exists. We could find all of them by replacing `findM' with `filterM'...
--- TODO: only do prefix match if it's actually truncated
+-- | Find the first PID of the first process with given comm, if one exists.
+-- We could find all of them by replacing `findM' with `filterM'...
+-- TODO: this ignores processes with no cmdline, like kernel threads. We could
+--       fallback to comm, but I don't really care for those cases.
 findPid :: String -> IO (Maybe ProcessID)
 findPid comm =
   getDirectoryContents "/proc" >>= findM matchesComm . mapMaybe readMaybe
   where
     matchesComm :: ProcessID -> IO Bool
     matchesComm pid =
-      either (const False) (\c -> isJust $ stripPrefix comm c) <$> tryReadLine ("/proc" </> show pid </> "comm")
+      either (const False) ((== comm) . takeFileName . takeWhile (/= '\0')) <$> tryReadLine ("/proc" </> show pid </> "cmdline")
     tryReadLine :: FilePath -> IO (Either () String)
     tryReadLine f =
-      tryJust (guard . isDoesNotExistError) (readFirstLine f)
+      tryJust (guard . (\e -> isDoesNotExistError e || isEOFError e)) (readFirstLine f)
     readFirstLine :: FilePath -> IO String
     readFirstLine f = do
       h <- openFile f ReadMode
