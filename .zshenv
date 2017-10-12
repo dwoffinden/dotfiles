@@ -10,8 +10,6 @@ fi
 [[ -d /tmp/$USER ]] || mkdir /tmp/$USER && chmod 700 /tmp/$USER
 
 #####[ CONFIG SELECTION ]###################################################
-#
-#   TODO tolerate the case that I set a machine's hostname to "ac.uk" or "com"?
 
 _HAS_OPTICAL_DRIVE=false
 _HAS_YAOURT=false
@@ -29,12 +27,19 @@ fi
 # Lowercase $HOST, and split by '.' into an array
 _HOST=("${(Ls/./)HOST}")
 
-if [[ "${_HOST[-1]}" = 'com' ]]; then
+if [[ $_HOST[-1] = com ]]; then
   echo "You're at work!"
+  _IS_WORK=true
+  if [[ $_HOST[-5] = daw ]]; then
+    _IS_SUDOER=true
+  fi
+  if [[ $_HOST[-4] = roam ]]; then
+    _IS_LAPTOP=true
+  fi
 fi
 
-case ${_HOST[1]} in
-  gladys | winona | daw-glaptop)
+case $_HOST[1] in
+  gladys | winona)
     _IS_LAPTOP=true
     ;| # break but continue scanning
   gladys | vera)
@@ -44,10 +49,6 @@ case ${_HOST[1]} in
     _HAS_YAOURT=true
     ;& # fall through
   watchtower | buzzard)
-    _IS_SUDOER=true
-    ;| # break but continue scanning
-  daw | daw-glaptop)
-    _IS_WORK=true
     _IS_SUDOER=true
     ;| # break but continue scanning
 esac
