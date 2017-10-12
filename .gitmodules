@@ -1,6 +1,3 @@
-[submodule ".oh-my-zsh"]
-	path = .oh-my-zsh
-	url = git://github.com/dwoffinden/oh-my-zsh.git
 [submodule ".vim/bundle/vim-pathogen"]
 	path = .vim/bundle/vim-pathogen
 	url = git://github.com/tpope/vim-pathogen
@@ -34,3 +31,6 @@
 [submodule ".local/share/git-remote-hg"]
 	path = .local/share/git-remote-hg
 	url = git://github.com/felipec/git-remote-hg
+[submodule ".zprezto"]
+	path = .zprezto
+	url = https://github.com/sorin-ionescu/prezto.git

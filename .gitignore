@@ -43,4 +43,5 @@
 !/.xmobarrc
 !/.xmonad/xmonad.hs
 !/.xscreensaver
-!/.zsh*
+!/.z*
+/.zcompdump
