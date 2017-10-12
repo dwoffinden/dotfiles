@@ -29,6 +29,7 @@
 !/.local/
 /.local/*
 !/.local/bin/
+/.local/bin/stack
 /.local/bin/taffybar
 /.local/bin/xmonad
 !/.local/share/
