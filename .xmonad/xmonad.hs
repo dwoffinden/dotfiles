@@ -40,7 +40,6 @@ import           XMonad.Util.Run (safeSpawn,safeSpawnProg,seconds)
 data LocalConfig m =
   (MonadIO m) => LocalConfig
     { hasMpd :: Bool
-    , hasWifi :: Bool
     , needsXScreensaver :: Bool
     , suspendAction :: m ()
     , warnAction :: String -> m ()
@@ -76,7 +75,6 @@ getConfiguration = do
   wp <- pickRandomWallpaper home
   return LocalConfig
     { hasMpd  = isVera host
-    , hasWifi = isLaptop host
     , needsXScreensaver = isHomeMachine host
     , suspendAction = suspend host
     , warnAction = warn
@@ -215,7 +213,6 @@ myWorkspaces = map pure "`1234567890-="
 myKeys :: LocalConfig X -> XConfig Layout -> Map (KeyMask, KeySym) (X())
 myKeys LocalConfig { warnAction = warn
                    , hasMpd = mpd
---                   , hasWifi = wifi
                    , suspendAction = suspend
                    , chromiumName = chromium
                    } c =
@@ -293,12 +290,6 @@ myKeys LocalConfig { warnAction = warn
     ++ [ (k , lock >> sleep 4 >> suspend)
        | k <- ["M-C-S-s", "<XF86Sleep>"]
     ]
-{-
-    {- WiFi manager -}
-    ++ ( guard wifi >>
-      [ ("M-S-n", safeRunProgInTerm "wicd-curses") ]
-    )
--}
     {- MPC keys, media player UI -}
     ++ ( guard mpd >>
       [ (k, doMpd comm)
