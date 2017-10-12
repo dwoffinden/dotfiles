@@ -19,7 +19,12 @@ _IS_LAPTOP=false
 _IS_SUDOER=false
 _IS_WORK=false
 
-_DISTRO=`lsb_release -si`
+if (( $+commands[lsb_release] )); then
+  _DISTRO=`lsb_release -si`
+else
+  # probably windows
+  _DISTRO=Unknown
+fi
 
 # Lowercase $HOST, and split by '.' into an array
 _HOST=("${(Ls/./)HOST}")
@@ -52,7 +57,9 @@ esac
 export EDITOR=vim
 export VISUAL=$EDITOR
 
-export MAKEFLAGS=-j`nproc`
+if (( $+commands[nproc] )); then
+  export MAKEFLAGS=-j`nproc`
+fi
 
 ZSH_COMPDUMP="/tmp/$USER/zcompdump-$ZSH_VERSION"
 
