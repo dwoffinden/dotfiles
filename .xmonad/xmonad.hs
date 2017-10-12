@@ -85,10 +85,17 @@ getConfiguration = do
         , (Fill, home </> "Dropbox" </> "wallpaper")
         , (Fill, "/usr/share/backgrounds")
         ]
-      if null wps
-        then return None
-        else do
-          candidates <- concat <$> mapM (\(m, dir) -> getDirectoryContents dir >>= filterM doesFileExist . map (dir </>) >>= return . map m) wps
+      case wps of
+        [] -> return None
+        _  -> do
+          candidates <-
+            concat <$>
+               mapM
+                (\(m, dir) ->
+                  getDirectoryContents dir
+                    >>= filterM doesFileExist . map (dir </>)
+                    >>= return . map m)
+                wps
           index <- randomRIO (0, length candidates - 1)
           return $ candidates !! index
 
