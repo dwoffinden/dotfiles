@@ -1,5 +1,9 @@
+import Control.Applicative
+import Control.Monad
+
 import System.Information.CPU
 import System.Information.Memory
+import System.Posix.Unistd (getSystemID, nodeName)
 
 import System.Taffybar
 
@@ -24,6 +28,10 @@ cpuCallback = do
   return [totalLoad, systemLoad]
 
 main = do
+  host <- nodeName <$> getSystemID
+  let getTld = reverse . takeWhile (/= '.') . reverse
+      isWork h = getTld h == "com" || h == "daw-glaptop"
+      notWork = not $ isWork host
   let memCfg = defaultGraphConfig { graphDataColors = [(1, 0, 0, 1)]
                                   , graphLabel = Just "mem"
                                   }
@@ -45,6 +53,6 @@ main = do
       cputemp = commandRunnerNew 5 "cputemp" [] "error calling cputemp" "red"
       batt = textBatteryNew "$percentage$% ($time$)" 2
   defaultTaffybar defaultTaffybarConfig
-      { startWidgets = [ batt, log, dropbox, note ]
+      { startWidgets = [ batt, log] ++ (guard notWork >> [ dropbox ]) ++ [ note ]
       , endWidgets = [ tray, wea, clock, mem, cputemp, cpu, mpris ]
       }

@@ -73,9 +73,16 @@ alias grep='grep --color=auto'
 alias hd='hexdump -C'
 alias du='du -h'
 
-### DROPBOX ###
-alias dls='dropbox filestatus -l'
-alias dwstat='watch -n 1 dropbox status'
+if [[ _IS_WORK = false ]]; then
+  ### DROPBOX ###
+  alias dstat='dropbox status'
+  alias dls='dropbox filestatus -l'
+  alias dwstat='watch -n 1 dropbox status'
+
+  function find-dropbox-conflicts {
+    find ~/Dropbox/ \( -name "*'s conflicted copy *" -o -name "*(Case Conflict)*" \) "$@"
+  }
+fi
 
 alias git-repack-aggressive='git repack -Adf --depth=300 --window=300'
 
@@ -108,10 +115,6 @@ function find-loose-git-objects {
   find ./ -wholename "*/.git/*objects/*" -type d \! \( -name info -o -name pack \) "$@"
 }
 
-function find-dropbox-conflicts {
-  find ~/Dropbox/ \( -name "*'s conflicted copy *" -o -name "*(Case Conflict)*" \) "$@"
-}
-
 function fliptable {
   echo "（╯°□°）╯︵ ┻━┻"
 }
@@ -130,7 +133,6 @@ function sbt-clean {
 }
 
 ### ALL NON-LABS ###
-alias dstat='dropbox status'
 if [[ $_IS_SUDOER = true ]]; then
   alias s='sudo'
   alias sv='sudo vim'

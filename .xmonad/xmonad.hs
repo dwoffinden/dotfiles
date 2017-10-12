@@ -91,8 +91,8 @@ getConfiguration = do
       (`elem` ["gladys", "winona"])
     isHomeMachine h =
       isVera h || isLaptop h
-    isWork =
-      (== "com") . getTld
+    isWork h =
+      getTld h == "com" || h == "daw-glaptop"
     getTld =
       reverse . takeWhile (/= '.') . reverse
     getDomain =
