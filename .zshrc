@@ -72,7 +72,7 @@ alias grep='grep --color=auto'
 alias hd='hexdump -C'
 alias du='du -h'
 
-if [[ _IS_WORK = false ]]; then
+if [[ $_IS_WORK = false ]]; then
   ### DROPBOX ###
   alias dstat='dropbox status'
   alias dls='dropbox filestatus -l'
@@ -108,7 +108,7 @@ function bckground {
   nohup $@ </dev/null &>/dev/null &
 }
 
-alias cabal-install-everything='cabal update && cabal install -j alex happy && cabal install -j gtk2hs-buildtools && cabal install -j taffybar libmpd'
+alias cabal-install-everything='cabal update && cabal install -j cabal-install alex happy && cabal install -j gtk2hs-buildtools && cabal install -j taffybar libmpd proc'
 
 function find-loose-git-objects {
   find ./ -wholename "*/.git/*objects/*" -type d \! \( -name info -o -name pack \) "$@"
