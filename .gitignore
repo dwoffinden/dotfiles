@@ -44,10 +44,17 @@
 /.vim/.netrwhist
 
 !/.vimrc
-!/.xmobarrc
+
+!/.xmonad
+/.xmonad/*
 !/.xmonad/xmonad.hs
+
 !/.xscreensaver
-!/.z*
-/.zcompcache
-/.zcompdump
-/.zhistory
+
+/.zlogin
+/.zlogout
+/.zpreztorc
+/.zprofile
+/.zshenv
+/.zshrc
+
