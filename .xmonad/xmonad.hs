@@ -160,13 +160,6 @@ getRunningProcesses = io $ do
       hClose h
       return str
 
--- | This generalizes the list-based 'find' function.
-findM :: Monad m => (a -> m Bool) -> [a] -> m (Maybe a)
-findM _ [] = return Nothing
-findM f (x:xs) = do
-  y <- f x
-  if y then return (Just x) else findM f xs
-
 myManageHook = composeAll
   [ className =? "MPlayer"                      --> doFloat
   , className =? "Zenity"                       --> doFloat
