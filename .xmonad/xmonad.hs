@@ -8,7 +8,7 @@ import           Control.Monad (filterM,foldM,guard,void,when)
 import           Data.Map (Map)
 import           Data.Maybe (catMaybes, fromMaybe, isNothing, listToMaybe, mapMaybe)
 import           Data.List.Split (splitOn,split,dropFinalBlank,dropDelims,onSublist)
-import           Data.Set as S (Set, empty, insert, member)
+import           Data.Set as Set (Set, empty, insert, member)
 import           Daw.Hosts
 import qualified Network.MPD as MPD (withMPD, pause, previous, next, stop)
 import qualified Network.MPD.Commands.Extensions as MPD (toggle)
@@ -131,7 +131,7 @@ myStartupHook LocalConfig { homeDir = home
   safeSpawn "xrdb" ["-merge", (home </> ".Xresources")]
   setWallpaper wp
   progs <- getRunningProcesses
-  let ifNotRunning prog hook = io $ void $ when (not $ S.member prog progs) hook
+  let ifNotRunning prog hook = io $ void $ when (not $ Set.member prog progs) hook
   when (needsXScreensaver host) $ safeSpawn "xscreensaver" ["-no-splash"]
   ifNotRunning "urxvtd" $ safeSpawn "urxvtd" ["-q", "-o"]
   ifNotRunning "taffybar-linux-x86_64" $ safeSpawnProg "taffybar"
@@ -150,7 +150,7 @@ myStartupHook LocalConfig { homeDir = home
 -- | Get a set containing the file name and first argument (if it has one, in case it's a script)
 -- | of every running process.
 -- Pretty hacky.
-getRunningProcesses :: MonadIO m => m (S.Set String)
+getRunningProcesses :: MonadIO m => m (Set String)
 getRunningProcesses = io $ do
   -- get all of the files/dirs in /proc
   dirs <- getDirectoryContents "/proc"
@@ -164,9 +164,9 @@ getRunningProcesses = io $ do
           -- if reading failed (e.g. the process is already dead), leave the set as-is
           (const set)
           -- else take the set and add to it the filename components of up to the first 2 args
-          (\str -> foldl (flip S.insert) set (map takeFileName $ take 2 $ splitz "\0" str))
+          (\str -> foldl (flip Set.insert) set (map takeFileName $ take 2 $ splitz "\0" str))
           errorOrCmdline)
-    S.empty
+    Set.empty
     pids
   where
     splitz = split . dropFinalBlank . dropDelims . onSublist
