@@ -1,4 +1,4 @@
-{-# OPTIONS_GHC -O2 -tmpdir /tmp -optc -O2 #-}
+{-# OPTIONS_GHC -O2 -optc -O2 #-}
 {-# LANGUAGE GADTs, OverloadedStrings, ScopedTypeVariables #-}
 
 import           Control.Applicative ((<$>),pure)
@@ -26,7 +26,7 @@ import           XMonad
 import           XMonad.Actions.CopyWindow (copyToAll,copyWindow,killAllOtherCopies)
 import           XMonad.Actions.WindowGo (runOrRaise)
 import           XMonad.Hooks.EwmhDesktops (ewmh, fullscreenEventHook)
-import           XMonad.Hooks.ManageDocks (avoidStruts, manageDocks, docksEventHook)
+import           XMonad.Hooks.ManageDocks (avoidStruts, manageDocks, docksEventHook, ToggleStruts(..))
 import           XMonad.Hooks.ManageHelpers (doFullFloat,isFullscreen)
 import           XMonad.Hooks.SetWMName (setWMName)
 import           XMonad.Layout.Grid
@@ -168,14 +168,13 @@ findM f (x:xs) = do
   if y then return (Just x) else findM f xs
 
 myManageHook = composeAll
-  [ className =? "MPlayer"        --> doFloat
-  , className =? "Zenity"         --> doFloat
-  , className =? "Xmessage"       --> doFloat
-  , resource  =? "desktop_window" --> doIgnore
-  , resource  =? "kdesktop"       --> doIgnore
-  , isFullscreen                  --> (doF W.focusDown <+> doFullFloat)
-  , stringProperty "WM_WINDOW_ROLE" =? "pop-up"
-    <||> stringProperty "WM_WINDOW_ROLE" =? "app" --> doFloat <+> doCopyToAll
+  [ className =? "MPlayer"                      --> doFloat
+  , className =? "Zenity"                       --> doFloat
+  , className =? "Xmessage"                     --> doFloat
+  , resource  =? "desktop_window"               --> doIgnore
+  , resource  =? "kdesktop"                     --> doIgnore
+  , isFullscreen                                --> (doF W.focusDown <+> doFullFloat)
+  , stringProperty "WM_WINDOW_ROLE" =? "pop-up" --> doFloat <+> doCopyToAll
   ] <+> manageDocks
   where
     doCopyToAll = ask >>= doF . \w -> (\ws -> foldr($) ws (map (copyWindow w) myWorkspaces))
@@ -224,6 +223,7 @@ myKeys LocalConfig { warnAction = warn
     , ("M-S-q",                   io exitSuccess)
     , ("M-q",                     recompile False >>=
                                     (`when` (safeSpawn "xmonad" ["--restart"])))
+    , ("M-b",                     sendMessage ToggleStruts)
     , ("M-v",                     windows copyToAll)
     , ("M-S-v",                   killAllOtherCopies)
     , ("M-a",                     safeRunProgInTerm "alsamixer")
@@ -289,6 +289,7 @@ myKeys LocalConfig { warnAction = warn
   where
     doMpd =
       io . void . MPD.withMPD
+    safeRunInTerm :: String -> [String] -> X()
     safeRunInTerm comm args =
       asks (terminal . config) >>= (`safeSpawn` (["-e", comm] ++ args))
     safeRunProgInTerm =
