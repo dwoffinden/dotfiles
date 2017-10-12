@@ -59,7 +59,8 @@ myModMask = mod4Mask
 {- If gnome-terminal nor urxvt are not installed, use xterm. -}
 myTerminal :: IO FilePath
 myTerminal =
-  (fromMaybe "xterm") . listToMaybe . catMaybes <$> (mapM findExecutable ["gnome-terminal", "urxvtc"])
+  (fromMaybe "xterm") . listToMaybe . catMaybes <$>
+      (mapM findExecutable ["urxvtc", "gnome-terminal"])
 
 getConfiguration :: IO (LocalConfig X)
 getConfiguration = do
@@ -133,7 +134,7 @@ myStartupHook LocalConfig { homeDir = home
   let ifNotRunning prog hook = io $ void $ when (not $ Set.member prog progs) hook
   safeSpawn "xscreensaver" ["-no-splash"]
   ifNotRunning "urxvtd" $ safeSpawn "urxvtd" ["-q", "-o"]
-  ifNotRunning "taffybar-linux-x86_64" $ safeSpawn "stack" ["exec", "taffybar"]
+  unsafeSpawn "killall taffybar-linux-x86_64 ; stack exec taffybar"
   ifNotRunning "compton" $ safeSpawn "compton" [ "--backend=glx"
                                                , "--paint-on-overlay"]
   when (isWork host) $ ifNotRunning "nm-applet" $ safeSpawnProg "nm-applet"
