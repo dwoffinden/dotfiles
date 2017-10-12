@@ -131,7 +131,7 @@ myStartupHook LocalConfig { homeDir = home
   ifNotRunning "compton" $ safeSpawn "compton" [ "--backend=glx"
                                                , "--paint-on-overlay"]
   when (isWorkLaptop host) $ ifNotRunning "nm-applet" $ safeSpawnProg "nm-applet"
-  when (isHomeLaptop host) $ ifNotRunning "connman-ui-gtk" $ safeSpawnProg "nm-applet"
+  when (isHomeLaptop host) $ ifNotRunning "connman-ui-gtk" $ safeSpawnProg "connman-ui-gtk"
   where
     setWallpaper None =
       warn "couldn't set wallpaper!"
