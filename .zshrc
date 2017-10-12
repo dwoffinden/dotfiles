@@ -98,6 +98,7 @@ alias gds='git diff --stat'
 alias gdcs='git diff --cached --stat'
 alias gra='git rebase --abort'
 alias grc='git rebase --continue'
+alias grs='git rebase --skip'
 alias gst='git status'
 
 alias gitkaaa="gitk --argscmd='git for-each-ref --format=\"%(refname)\" refs/heads refs/stash'"
