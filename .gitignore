@@ -26,6 +26,8 @@
 !/.local/
 /.local/*
 !/.local/bin/
+/.local/bin/taffybar
+/.local/bin/xmonad
 !/.local/share/
 /.local/share/*
 !/.local/share/git-remote-hg

@@ -35,7 +35,7 @@ import           XMonad.Layout.Renamed
 import           XMonad.Layout.ThreeColumns
 import qualified XMonad.StackSet as W
 import           XMonad.Util.EZConfig (mkKeymap)
-import           XMonad.Util.Run (safeSpawn,safeSpawnProg,seconds)
+import           XMonad.Util.Run (safeSpawn,safeSpawnProg,seconds,unsafeSpawn)
 
 data LocalConfig m =
   (MonadIO m) => LocalConfig
@@ -134,7 +134,7 @@ myStartupHook LocalConfig { homeDir = home
   let ifNotRunning prog hook = io $ void $ when (not $ Set.member prog progs) hook
   when (needsXScreensaver host) $ safeSpawn "xscreensaver" ["-no-splash"]
   ifNotRunning "urxvtd" $ safeSpawn "urxvtd" ["-q", "-o"]
-  ifNotRunning "taffybar-linux-x86_64" $ safeSpawnProg "taffybar"
+  ifNotRunning "taffybar-linux-x86_64" $ safeSpawn "stack" ["exec", "taffybar"]
   ifNotRunning "compton" $ safeSpawn "compton" [ "--backend=glx"
                                                , "--paint-on-overlay"]
   when (isWorkLaptop host) $ ifNotRunning "nm-applet" $ safeSpawnProg "nm-applet"
@@ -234,8 +234,7 @@ myKeys LocalConfig { warnAction = warn
     , ("M-,",                     sendMessage (IncMasterN 1))
     , ("M-.",                     sendMessage (IncMasterN (-1)))
     , ("M-S-q",                   io exitSuccess)
-    , ("M-q",                     recompile False >>=
-                                    (`when` (safeSpawn "xmonad" ["--restart"])))
+    , ("M-q",                     unsafeSpawn "stack exec -- xmonad --recompile; xmonad --restart")
     , ("M-b",                     sendMessage ToggleStruts)
     , ("M-v",                     windows copyToAll)
     , ("M-S-v",                   killAllOtherCopies)
