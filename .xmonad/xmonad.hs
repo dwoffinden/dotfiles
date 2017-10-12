@@ -28,9 +28,6 @@ import           XMonad.Hooks.ManageDocks (avoidStruts, manageDocks, docksEventH
 import           XMonad.Hooks.ManageHelpers (doFullFloat,isFullscreen)
 import           XMonad.Hooks.SetWMName (setWMName)
 import           XMonad.Layout.Grid
-{-
-import           XMonad.Layout.LayoutHints
--}
 import           XMonad.Layout.NoBorders (smartBorders)
 import           XMonad.Layout.Renamed
 import           XMonad.Layout.ThreeColumns
