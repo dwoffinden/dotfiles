@@ -36,6 +36,10 @@
 !/.pentadactylrc
 !/.screenrc
 
+!/.ssh
+/.ssh/*
+!/.ssh/config
+
 !/.vim/
 /.vim/.netrwhist
 

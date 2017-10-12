@@ -79,6 +79,7 @@ alias dwstat='watch -n 1 dropbox status'
 
 alias git-repack-aggressive='git repack -Adf --depth=300 --window=300'
 
+alias ga='git add'
 alias gca='git commit -av'
 alias gf='git fetch'
 alias gfa='git fetch --all'
