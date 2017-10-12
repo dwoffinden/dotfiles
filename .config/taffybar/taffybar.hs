@@ -1,5 +1,6 @@
 import System.Taffybar
 
+import System.Taffybar.CommandRunner
 import System.Taffybar.Systray
 import System.Taffybar.TaffyPager
 import System.Taffybar.SimpleClock
@@ -39,6 +40,7 @@ main = do
       mem = pollingGraphNew memCfg 1 memCallback
       cpu = pollingGraphNew cpuCfg 0.5 cpuCallback
       tray = systrayNew
-  defaultTaffybar defaultTaffybarConfig { startWidgets = [ log, note ]
+      dropbox = commandRunnerNew 1 "dstatline" [] "error calling dstatline" "blue"
+  defaultTaffybar defaultTaffybarConfig { startWidgets = [ log, dropbox, note ]
                                         , endWidgets = [ tray, wea, clock, mem, cpu, mpris ]
                                         }
