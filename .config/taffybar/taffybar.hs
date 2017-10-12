@@ -40,7 +40,9 @@ main = do
       mem = pollingGraphNew memCfg 1 memCallback
       cpu = pollingGraphNew cpuCfg 0.5 cpuCallback
       tray = systrayNew
-      dropbox = commandRunnerNew 1 "dstatline" [] "error calling dstatline" "blue"
-  defaultTaffybar defaultTaffybarConfig { startWidgets = [ log, dropbox, note ]
-                                        , endWidgets = [ tray, wea, clock, mem, cpu, mpris ]
-                                        }
+      dropbox = commandRunnerNew 2 "dstatline" [] "error calling dstatline" "blue"
+      cputemp = commandRunnerNew 5 "cputemp" [] "error calling cputemp" "red"
+  defaultTaffybar defaultTaffybarConfig
+      { startWidgets = [ log, dropbox, note ]
+      , endWidgets = [ tray, wea, clock, mem, cputemp, cpu, mpris ]
+      }
