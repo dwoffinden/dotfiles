@@ -227,7 +227,7 @@ fi
 
 #####[ GREETING ]###########################################################
 
-echo -n $fg[green]
+echo -n $FG[green]
 uname -nrmo
 [[ -f /proc/cpuinfo ]] && grep "^model name" /proc/cpuinfo -m1 | tail -c+14
 date
@@ -243,7 +243,7 @@ if command -v fortune &> /dev/null; then
 else
   echo "No fortunes for you!"
 fi
-echo -n $reset_color
+echo -n $FG[normal]
 
 #####[ CLEAN UP ]###########################################################
 
