@@ -37,13 +37,10 @@ import           XMonad.Util.Run (safeSpawn,safeSpawnProg,seconds)
 
 data LocalConfig m =
   (MonadIO m) => LocalConfig
-    { hasMpd :: Bool
-    , needsXScreensaver :: Bool
-    , suspendAction :: m ()
+    { hostName :: String
     , warnAction :: String -> m ()
     , homeDir :: FilePath
     , wallpaper :: Wallpaper
-    , chromiumName :: String
     }
 
 data Wallpaper = Fill FilePath | Tile FilePath | None
@@ -73,37 +70,12 @@ getConfiguration = do
     <$> findExecutable "notify-send"
   wp <- pickRandomWallpaper home
   return LocalConfig
-    { hasMpd  = isVera host
-    , needsXScreensaver = isHomeMachine host
-    , suspendAction = suspend host
+    { hostName = host
     , warnAction = warn
     , homeDir = home
     , wallpaper = wp
-    , chromiumName = chromium host
     }
   where
-    isVera =
-      (== "vera")
-    isLaptop =
-      (`elem` ["gladys", "winona"])
-    isHomeMachine h =
-      isVera h || isLaptop h
-    isWork h =
-      getTld h == "com" || h == "daw-glaptop"
-    getTld =
-      reverse . takeWhile (/= '.') . reverse
-    suspend h
-      | isWork h = safeSpawn "dbus-send" ["--system"
-                                         , "--print-reply"
-                                         , "--dest=org.freedesktop.UPower"
-                                         , "/org/freedesktop/UPower"
-                                         , "org.freedesktop.UPower.Suspend"
-                                         ]
-      | isHomeMachine h = safeSpawn "systemctl" ["suspend"]
-      | otherwise  = screenOff
-    chromium h
-      | isWork h  = "google-chrome"
-      | otherwise = "chromium"
     pickRandomWallpaper home = do
       wps <- filterM (doesDirectoryExist . snd)
         [ (Tile, home </> "Dropbox" </> "wallpaper" </> "tile")
@@ -118,6 +90,42 @@ getConfiguration = do
           index <- randomRIO (0, length candidates - 1)
           return $ candidates !! index
 
+isVera :: String -> Bool
+isVera = (== "vera")
+
+isHomeMachine :: String -> Bool
+isHomeMachine h = isVera h || h `elem` ["gladys", "winona"]
+
+-- TODO: isLaptop that works for home and work
+
+isWork :: String -> Bool
+isWork = (== "com") . getTld
+
+getTld :: String -> String
+getTld = reverse . takeWhile (/= '.') . reverse
+
+suspend :: MonadIO m => String -> m ()
+suspend h
+  | isWork h = safeSpawn "dbus-send" [ "--system"
+                                     , "--print-reply"
+                                     , "--dest=org.freedesktop.UPower"
+                                     , "/org/freedesktop/UPower"
+                                     , "org.freedesktop.UPower.Suspend"
+                                     ]
+  | isHomeMachine h = safeSpawn "systemctl" ["suspend"]
+  | otherwise  = screenOff
+
+chromeName :: String -> String
+chromeName h
+  | isWork h  = "google-chrome"
+  | otherwise = "chromium"
+
+hasMpd :: String -> Bool
+hasMpd = isVera
+
+needsXScreensaver :: String -> Bool
+needsXScreensaver = isHomeMachine
+
 lock :: MonadIO m => m ()
 lock = safeSpawn "xdg-screensaver" ["lock"]
 
@@ -129,20 +137,21 @@ sleep = io . threadDelay . seconds
 
 myStartupHook :: LocalConfig X -> X ()
 myStartupHook LocalConfig { homeDir = home
+                          , hostName = host
                           , wallpaper = wp
                           , warnAction = warn
-                          , needsXScreensaver = xScreensaver
                           } = do
   setWMName "LG3D" --fuck java
   safeSpawn "setxkbmap" ["-layout", "gb"]
   safeSpawn "xsetroot" ["-cursor_name", "left_ptr"]
   safeSpawn "xrdb" ["-merge", (home </> ".Xresources")]
   setWallpaper wp
-  when xScreensaver $ safeSpawn "xscreensaver" ["-no-splash"]
+  when (needsXScreensaver host) $ safeSpawn "xscreensaver" ["-no-splash"]
   ifNotRunning "urxvtd" $ safeSpawn "urxvtd" ["-q", "-o"]
   ifNotRunning "taffybar-linux-x86_64" $ safeSpawnProg "taffybar"
   ifNotRunning "compton" $ safeSpawn "compton" [ "--backend=glx"
                                                , "--paint-on-overlay"]
+  -- TODO: spawn this iff isWork, spawn connman-ui-gtk when on a *home* laptop
   ifNotRunning "nm-applet" $ safeSpawnProg "nm-applet"
   where
     setWallpaper None =
@@ -161,6 +170,8 @@ ifNotRunning prog hook = io $ void $ forkIO $ do
 -- We could find all of them by replacing `findM' with `filterM'...
 -- TODO: this ignores processes with no cmdline, like kernel threads. We could
 --       fallback to comm, but I don't really care for those cases.
+-- TODO: handle scripts, where the script name is the second field
+-- TODO: seperate this into computing a name => pid map, then consulting it
 findPid :: String -> IO (Maybe ProcessID)
 findPid comm =
   getDirectoryContents "/proc" >>= findM matchesComm . mapMaybe readMaybe
@@ -216,9 +227,7 @@ myWorkspaces = map pure "`1234567890-="
 
 myKeys :: LocalConfig X -> XConfig Layout -> Map (KeyMask, KeySym) (X())
 myKeys LocalConfig { warnAction = warn
-                   , hasMpd = mpd
-                   , suspendAction = suspend
-                   , chromiumName = chromium
+                   , hostName = host
                    } c =
   mkKeymap c $
     [ ("M-S-<Return>",            safeSpawnProg $ XMonad.terminal c)
@@ -280,7 +289,7 @@ myKeys LocalConfig { warnAction = warn
     ++ [ ( k, runOrRaise "firefox" (className =? "Firefox"))
        | k <- ["M-f"]
     ]
-    ++ [ ( k, runOrRaise chromium (className =? chromium))
+    ++ [ ( k, runOrRaise chrome (className =? chrome))
        | k <- ["M-c", "<XF86HomePage>"]
     ]
     {- Screen Locking -}
@@ -290,7 +299,7 @@ myKeys LocalConfig { warnAction = warn
     ++ [ (k , lock >> sleep 4 >> screenOff)
        | k <- ["M-S-s"]
     ]
-    ++ [ (k , lock >> sleep 4 >> suspend)
+    ++ [ (k , lock >> sleep 4 >> (suspend host))
        | k <- ["M-C-S-s", "<XF86Sleep>"]
     ]
     {- MPC keys, media player UI -}
@@ -313,6 +322,8 @@ myKeys LocalConfig { warnAction = warn
       asks (terminal . config) >>= (`safeSpawn` (["-e", comm] ++ args))
     safeRunProgInTerm =
       (`safeRunInTerm` [])
+    chrome = chromeName host
+    mpd = hasMpd host
 
 myConfig = do
   conf <- getConfiguration
