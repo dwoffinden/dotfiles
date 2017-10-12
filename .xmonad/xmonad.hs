@@ -239,6 +239,7 @@ myKeys LocalConfig { warnAction = warn
     , ("M-a",                     safeRunProgInTerm "alsamixer")
     {- Take a screenshot, save as 'screenshot.png' -}
     -- TODO notify-send screenshot saved
+    -- TODO include the timestamp?
     , ("<Print>",                 safeSpawn "import" [ "-window", "root"
                                                      , "/tmp/screenshot.png" ])
     , ("<XF86Eject>",             safeSpawn "eject" ["-T"])
