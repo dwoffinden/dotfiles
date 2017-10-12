@@ -194,6 +194,7 @@ myManageHook = composeAll
   , resource  =? "kdesktop"       --> doIgnore
 --, isFullscreen                  --> (doF W.focusDown <+> doFullFloat)
   , isFullscreen                  --> doFullFloat
+  , stringProperty "WM_WINDOW_ROLE" =? "pop-up" --> doFloat
   ] <+> manageDocks
 
 myHandleEventHook = fullscreenEventHook <+> docksEventHook
