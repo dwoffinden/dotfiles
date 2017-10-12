@@ -1,11 +1,11 @@
 # XScreenSaver Preferences File
-# Written by xscreensaver-demo 5.29 for woof on Tue Jul  1 10:08:53 2014.
+# Written by xscreensaver-demo 5.30 for woof on Sat Oct 11 13:11:07 2014.
 # http://www.jwz.org/xscreensaver/
 
-timeout:	0:15:00
+timeout:	1:00:00
 cycle:		0:05:00
 lock:		True
-lockTimeout:	0:15:00
+lockTimeout:	1:00:00
 passwdTimeout:	0:00:30
 visualID:	default
 installColormap:    True
@@ -27,8 +27,8 @@ font:		*-medium-r-*-140-*-m-*
 dpmsEnabled:	True
 dpmsQuickOff:	False
 dpmsStandby:	0:10:00
-dpmsSuspend:	0:10:00
-dpmsOff:	0:10:00
+dpmsSuspend:	0:20:00
+dpmsOff:	0:30:00
 grabDesktopImages:  False
 grabVideoFrames:    False
 chooseRandomImages: False
@@ -252,6 +252,7 @@ programs:								      \
   GL: 				geodesic -root				    \n\
   GL: 				projectiveplane -root			    \n\
 -				tessellimage -root			    \n\
+  GL: 				winduprobot -root			    \n\
 
 
 pointerPollTime:    0:00:05
@@ -262,4 +263,5 @@ GetViewPortIsFullOfLies:False
 procInterrupts:	True
 xinputExtensionDev: False
 overlayStderr:	True
+authWarningSlack:   20
 

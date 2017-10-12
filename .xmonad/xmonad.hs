@@ -141,7 +141,8 @@ myStartupHook LocalConfig { homeDir = home
   when xScreensaver $ safeSpawn "xscreensaver" ["-no-splash"]
   ifNotRunning "urxvtd" $ safeSpawn "urxvtd" ["-q", "-o"]
   ifNotRunning "taffybar" $ safeSpawnProg "taffybar"
-  safeSpawn "compton" ["-cCz", "--backend=glx", "--paint-on-overlay"]
+  ifNotRunning "compton" $ safeSpawn "compton" [ "--backend=glx"
+                                               , "--paint-on-overlay"]
   ifNotRunning "nm-applet" $ safeSpawnProg "nm-applet"
   where
     setWallpaper None =
@@ -192,6 +193,7 @@ myManageHook = composeAll
 --, isFullscreen                  --> (doF W.focusDown <+> doFullFloat)
   , isFullscreen                  --> doFullFloat
   , stringProperty "WM_WINDOW_ROLE" =? "pop-up" --> doFloat
+  , stringProperty "WM_WINDOW_ROLE" =? "app" --> doFloat
   ] <+> manageDocks
 
 

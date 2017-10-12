@@ -20,7 +20,6 @@ setopt autopushd
 setopt autocd
 setopt auto_param_slash
 
-HISTFILE=/tmp/$USER/zsh-history
 HISTSIZE=1000
 SAVEHIST=1000
 setopt append_history
@@ -187,7 +186,7 @@ case ${_HOST[1]} in
     ;;
 esac
 
-if [[ _DISTRO = Ubuntu ]]; then
+if [[ $_DISTRO = Ubuntu ]]; then
   alias dbus-halt='dbus-send --system --print-reply --dest=org.freedesktop.ConsoleKit /org/freedesktop/ConsoleKit/Manager org.freedesktop.ConsoleKit.Manager.Stop'
   alias dbus-reboot='dbus-send --system --print-reply --dest=org.freedesktop.ConsoleKit /org/freedesktop/ConsoleKit/Manager org.freedesktop.ConsoleKit.Manager.Restart'
 fi
@@ -218,7 +217,6 @@ echo -n $FG[normal]
 #####[ CLEAN UP ]###########################################################
 
 [[ -d ~/Desktop ]] && rmdir ~/Desktop
-[[ -d ~/Downloads ]] && rmdir ~/Downloads
 [[ -f ~/Dropbox/desktop.ini ]] && rm -v ~/Dropbox/desktop.ini
 [[ -d ~/Templates ]] && rmdir ~/Templates
 
