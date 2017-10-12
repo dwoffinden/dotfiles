@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -O2 -tmpdir /tmp -optc -O2 #-}
 import Control.Applicative
 import Control.Monad
 
