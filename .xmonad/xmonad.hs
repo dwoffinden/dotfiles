@@ -243,7 +243,7 @@ myKeys LocalConfig { warnAction = warn
     {- Take a screenshot, save as 'screenshot.png' -}
     -- TODO notify-send screenshot saved
     , ("<Print>",                 safeSpawn "import" [ "-window", "root"
-                                                     , "screenshot.png" ])
+                                                     , "/tmp/screenshot.png" ])
     , ("<XF86Eject>",             safeSpawn "eject" ["-T"])
     , ("<XF86Calculator>",        safeSpawnProg "speedcrunch")
     , ("<XF86Search>",            warn "search")
