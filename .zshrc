@@ -75,9 +75,9 @@ alias cp="${aliases[cp]:-cp} --reflink=auto"
 
 if [[ $_IS_WORK = false ]]; then
   ### DROPBOX ###
-  alias dstat='dropbox status'
-  alias dls='dropbox filestatus -l'
-  alias dwstat='watch -n 1 dropbox status'
+  alias dstat='dropbox-cli status'
+  alias dls='dropbox-cli filestatus -l'
+  alias dwstat='watch -n 1 dropbox-cli status'
 
   function find-dropbox-conflicts {
     find ~/Dropbox/ \( -name "*'s conflicted copy *" -o -name "*(Case Conflict)*" \) "$@"
