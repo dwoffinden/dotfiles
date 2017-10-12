@@ -50,6 +50,7 @@ data LocalConfig m =
     }
 
 data Wallpaper = Fill FilePath | Tile FilePath | None
+  deriving (Eq, Show)
 
 myNormalColour :: String
 myNormalColour = "#202020"
@@ -71,8 +72,8 @@ getConfiguration = do
   host <- nodeName <$> getSystemID
   warn <- maybe
     (\msg -> safeSpawn "xmessage" [msg])
-    (\zty msg -> safeSpawn zty ["--warning", "--text", msg])
-    <$> findExecutable "zenity"
+    (\ntfy msg -> safeSpawn ntfy [msg])
+    <$> findExecutable "notify-send"
   wp <- pickRandomWallpaper home
   return LocalConfig
     { hasMpd  = isVera host
@@ -221,46 +222,46 @@ myKeys LocalConfig { warnAction = warn
                    , chromiumName = chromium
                    } c =
   mkKeymap c $
-    [ ("M-S-<Return>",           safeSpawnProg $ XMonad.terminal c)
-    , ("M-p",                    safeSpawnProg "dmenu_run")
---  , ("M-S-p",                  spawn "gmrun")
-    , ("M-S-c",                  kill)
-    , ("M-<Space>",              sendMessage NextLayout)
-    , ("M-S-<Space>",            setLayout $ XMonad.layoutHook c)
-    , ("M-n",                    refresh)
-    , ("M-<Tab>",                windows W.focusDown)
-    , ("M-j",                    windows W.focusDown)
-    , ("M-S-<Tab>",              windows W.focusUp)
-    , ("M-k",                    windows W.focusUp)
-    , ("M-m",                    windows W.focusMaster)
-    , ("M-<Return>",             windows W.swapMaster)
-    , ("M-S-j",                  windows W.swapDown)
-    , ("M-S-k",                  windows W.swapUp)
-    , ("M-h",                    sendMessage Shrink)
-    , ("M-l",                    sendMessage Expand)
-    , ("M-t",                    withFocused $ windows . W.sink)
-    , ("M-,",                    sendMessage (IncMasterN 1))
-    , ("M-.",                    sendMessage (IncMasterN (-1)))
-    , ("M-S-q",                  io exitSuccess)
-    , ("M-q",                    recompile False >>=
-                                   (`when` (safeSpawn "xmonad" ["--restart"])))
-    , ("M-b",                    sendMessage ToggleStruts)
-    , ("M-v",                    windows copyToAll)
-    , ("M-S-v",                  killAllOtherCopies)
-    , ("M-a",                    safeRunProgInTerm "alsamixer")
+    [ ("M-S-<Return>",            safeSpawnProg $ XMonad.terminal c)
+    , ("M-p",                     safeSpawnProg "dmenu_run")
+--  , ("M-S-p",                   spawn "gmrun")
+    , ("M-S-c",                   kill)
+    , ("M-<Space>",               sendMessage NextLayout)
+    , ("M-S-<Space>",             setLayout $ XMonad.layoutHook c)
+    , ("M-n",                     refresh)
+    , ("M-<Tab>",                 windows W.focusDown)
+    , ("M-j",                     windows W.focusDown)
+    , ("M-S-<Tab>",               windows W.focusUp)
+    , ("M-k",                     windows W.focusUp)
+    , ("M-m",                     windows W.focusMaster)
+    , ("M-<Return>",              windows W.swapMaster)
+    , ("M-S-j",                   windows W.swapDown)
+    , ("M-S-k",                   windows W.swapUp)
+    , ("M-h",                     sendMessage Shrink)
+    , ("M-l",                     sendMessage Expand)
+    , ("M-t",                     withFocused $ windows . W.sink)
+    , ("M-,",                     sendMessage (IncMasterN 1))
+    , ("M-.",                     sendMessage (IncMasterN (-1)))
+    , ("M-S-q",                   io exitSuccess)
+    , ("M-q",                     recompile False >>=
+                                    (`when` (safeSpawn "xmonad" ["--restart"])))
+    , ("M-b",                     sendMessage ToggleStruts)
+    , ("M-v",                     windows copyToAll)
+    , ("M-S-v",                   killAllOtherCopies)
+    , ("M-a",                     safeRunProgInTerm "alsamixer")
     {- Take a screenshot, save as 'screenshot.png' -}
     -- TODO notify-send screenshot saved
-    , ("<Print>",                safeSpawn "import" [ "-window", "root"
-                                                    , "screenshot.png" ])
-    , ("<XF86Eject>",            safeSpawn "eject" ["-T"])
-    , ("<XF86Calculator>",       safeSpawnProg "speedcrunch")
-    , ("<XF86Search>",           warn "search")
-    , ("<XF86Mail>",             warn "mail")
-    , ("<XF86WebCam>",           warn "smile")
-    , ("<XF86Eject>",            safeSpawnProg "eject")
+    , ("<Print>",                 safeSpawn "import" [ "-window", "root"
+                                                     , "screenshot.png" ])
+    , ("<XF86Eject>",             safeSpawn "eject" ["-T"])
+    , ("<XF86Calculator>",        safeSpawnProg "speedcrunch")
+    , ("<XF86Search>",            warn "search")
+    , ("<XF86Mail>",              warn "mail")
+    , ("<XF86WebCam>",            warn "smile")
+    , ("<XF86Eject>",             safeSpawnProg "eject")
     -- TODO >> notify-send `xbacklight`
-    , ("<XF86MonBrightnessUp",   safeSpawn "xbacklight" ["-inc", "10"])
-    , ("<XF86MonBrightnessDown", safeSpawn "xbacklight" ["-dec", "10"])
+    , ("<XF86MonBrightnessUp>",   safeSpawn "xbacklight" ["-inc", "10"])
+    , ("<XF86MonBrightnessDown>", safeSpawn "xbacklight" ["-dec", "10"])
     ]
     {- Workspace Switching -}
     ++ [ (m ++ k, windows $ f k)
