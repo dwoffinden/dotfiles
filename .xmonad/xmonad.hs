@@ -114,6 +114,7 @@ getConfiguration = do
         [ (Tile, home </> "Dropbox" </> "wallpaper" </> "tile")
         , (Fill, home </> "Dropbox" </> "wallpaper" </> "simple")
         , (Fill, home </> "Dropbox" </> "wallpaper")
+        , (Fill, "/usr/share/backgrounds")
         ]
       if null wps
         then return None
