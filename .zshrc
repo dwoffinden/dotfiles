@@ -69,11 +69,9 @@ alias la='ls -a'
 alias lR='ls -lR'
 alias v='vim'
 alias vd='vimdiff'
-alias df='df -h'
 alias mountc='mount | column -t'
-alias grep='grep --color=auto'
 alias hd='hexdump -C'
-alias du='du -h'
+alias cp="${aliases[cp]:-cp} --reflink=auto"
 
 if [[ $_IS_WORK = false ]]; then
   ### DROPBOX ###
