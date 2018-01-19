@@ -215,7 +215,7 @@ myKeys LocalConfig { warnAction = warn
   mkKeymap c $
     [ ("M-S-<Return>",            safeSpawnProg $ XMonad.terminal c)
     , ("M-p",                     safeSpawnProg "dmenu_run")
---  , ("M-S-p",                   spawn "gmrun")
+    , ("M-S-p",                   spawn "gmrun")
     , ("M-S-c",                   kill)
     , ("M-<Space>",               sendMessage NextLayout)
     , ("M-S-<Space>",             setLayout $ XMonad.layoutHook c)
