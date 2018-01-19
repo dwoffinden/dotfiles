@@ -25,7 +25,7 @@ import           XMonad.Actions.CopyWindow (copyToAll,copyWindow,killAllOtherCop
 import           XMonad.Actions.PhysicalScreens (viewScreen, sendToScreen)
 import           XMonad.Actions.WindowGo (runOrRaise)
 import           XMonad.Hooks.EwmhDesktops (ewmh, fullscreenEventHook)
-import           XMonad.Hooks.ManageDocks (avoidStruts, manageDocks, docksEventHook, ToggleStruts(..))
+import           XMonad.Hooks.ManageDocks (avoidStruts, docks, manageDocks, docksEventHook, ToggleStruts(..))
 import           XMonad.Hooks.ManageHelpers (doFullFloat,isFullscreen)
 import           XMonad.Hooks.SetWMName (setWMName)
 import           XMonad.Layout.Grid
@@ -309,7 +309,7 @@ myKeys LocalConfig { warnAction = warn
 myConfig = do
   conf <- getConfiguration
   term <- myTerminal
-  return $ ewmh $ pagerHints $ defaultConfig
+  return $ docks $ ewmh $ pagerHints $ defaultConfig
     { normalBorderColor  = myNormalColour
     , focusedBorderColor = myFocusedColour
     , modMask            = myModMask
