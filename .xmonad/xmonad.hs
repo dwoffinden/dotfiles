@@ -36,14 +36,6 @@ import qualified XMonad.StackSet as W
 import           XMonad.Util.EZConfig (mkKeymap)
 import           XMonad.Util.Run (safeSpawn,safeSpawnProg,seconds,unsafeSpawn)
 
-data LocalConfig m =
-  (MonadIO m) => LocalConfig
-    { hostName :: String
-    , warnAction :: String -> m ()
-    , homeDir :: FilePath
-    , wallpaper :: Wallpaper
-    }
-
 data Wallpaper = Fill FilePath | Tile FilePath | None
   deriving (Eq, Show)
 
@@ -62,42 +54,37 @@ myTerminal =
   (fromMaybe "xterm") . listToMaybe . catMaybes <$>
       (mapM findExecutable ["urxvtc", "gnome-terminal"])
 
-getConfiguration :: IO (LocalConfig X)
-getConfiguration = do
-  home <- getHomeDirectory
-  host <- nodeName <$> getSystemID
-  warn <- maybe
+warnAction :: (MonadIO m, MonadIO n) => m (String -> n ())
+warnAction = maybe
     (\msg -> safeSpawn "xmessage" [msg])
     (\ntfy msg -> safeSpawn ntfy [msg])
-    <$> findExecutable "notify-send"
-  wp <- pickRandomWallpaper home
-  return LocalConfig
-    { hostName = host
-    , warnAction = warn
-    , homeDir = home
-    , wallpaper = wp
-    }
-  where
-    pickRandomWallpaper home = do
-      wps <- filterM (doesDirectoryExist . snd)
-        [ (Tile, home </> "Dropbox" </> "wallpaper" </> "tile")
-        , (Fill, home </> "Dropbox" </> "wallpaper" </> "simple")
-        , (Fill, home </> "Dropbox" </> "wallpaper")
-        , (Fill, "/usr/share/backgrounds")
-        ]
-      case wps of
-        [] -> return None
-        _  -> do
-          candidates <-
-            concat <$>
-               mapM
-                (\(m, dir) ->
-                  getDirectoryContents dir
-                    >>= filterM doesFileExist . map (dir </>)
-                    >>= return . map m)
-                wps
-          index <- randomRIO (0, length candidates - 1)
-          return $ candidates !! index
+    <$> (io . findExecutable) "notify-send"
+
+pickRandomWallpaper :: MonadIO m => String -> m Wallpaper
+pickRandomWallpaper home = do
+  wps <- filterM (io . doesDirectoryExist . snd)
+    [ (Tile, home </> "Dropbox" </> "wallpaper" </> "tile")
+    , (Fill, home </> "Dropbox" </> "wallpaper" </> "simple")
+    , (Fill, home </> "Dropbox" </> "wallpaper")
+    , (Fill, "/usr/share/backgrounds")
+    , (Fill, "/usr/share/backgrounds/gnome")
+    ]
+  case wps of
+    [] -> return None
+    _  -> do
+      candidates <-
+        concat <$>
+           mapM
+            (\(m, dir) ->
+              io $ getDirectoryContents dir
+                >>= filterM doesFileExist . map (dir </>)
+                >>= return . map m)
+            wps
+      index <- io $ randomRIO (0, length candidates - 1)
+      return $ candidates !! index
+
+getHostName :: MonadIO m => m String
+getHostName = io $ nodeName <$> getSystemID
 
 suspend :: MonadIO m => String -> m ()
 suspend h
@@ -119,17 +106,15 @@ screenOff = safeSpawn "xset" ["dpms", "force", "off"]
 sleep :: MonadIO m => Rational -> m ()
 sleep = io . threadDelay . seconds
 
-myStartupHook :: LocalConfig X -> X ()
-myStartupHook LocalConfig { homeDir = home
-                          , hostName = host
-                          , wallpaper = wp
-                          , warnAction = warn
-                          } = do
+myStartupHook :: X ()
+myStartupHook = do
+  home <- io getHomeDirectory
+  host <- io getHostName
   setWMName "LG3D" --fuck java
   safeSpawn "setxkbmap" ["-layout", "gb"]
   safeSpawn "xsetroot" ["-cursor_name", "left_ptr"]
   safeSpawn "xrdb" ["-merge", (home </> ".Xresources")]
-  setWallpaper wp
+  pickRandomWallpaper home >>= setWallpaper
   progs <- getRunningProcesses
   let ifNotRunning prog hook = io $ void $ when (not $ Set.member prog progs) hook
   safeSpawn "xscreensaver" ["-no-splash"]
@@ -139,13 +124,15 @@ myStartupHook LocalConfig { homeDir = home
                                                , "--paint-on-overlay"]
   when (isWork host) $ ifNotRunning "nm-applet" $ safeSpawnProg "nm-applet"
   when (isLaptop host) $ ifNotRunning "connman-ui-gtk" $ safeSpawnProg "connman-ui-gtk"
-  where
-    setWallpaper None =
-      warn "couldn't set wallpaper!"
-    setWallpaper (Fill fp) =
-      safeSpawn "feh" ["--no-fehbg", "--bg-fill", fp]
-    setWallpaper (Tile fp) =
-      safeSpawn "feh" ["--no-fehbg", "--bg-tile", fp]
+
+setWallpaper :: MonadIO m => Wallpaper -> m ()
+setWallpaper None = do
+  warn <- warnAction
+  warn "couldn't set wallpaper!"
+setWallpaper (Fill fp) =
+  safeSpawn "feh" ["--no-fehbg", "--bg-fill", fp]
+setWallpaper (Tile fp) =
+  safeSpawn "feh" ["--no-fehbg", "--bg-tile", fp]
 
 -- | Get a set containing the file name and first argument (if it has one, in case it's a script)
 -- | of every running process.
@@ -208,11 +195,12 @@ myLayout = smartBorders $ avoidStruts $
 myWorkspaces :: [String]
 myWorkspaces = map pure "`1234567890-="
 
-myKeys :: LocalConfig X -> XConfig Layout -> Map (KeyMask, KeySym) (X())
-myKeys LocalConfig { warnAction = warn
-                   , hostName = host
-                   } c =
-  mkKeymap c $
+myKeys :: MonadIO m => m (XConfig Layout -> Map (KeyMask, KeySym) (X ()))
+myKeys = do
+  warn <- warnAction
+  host <- getHostName
+  let chrome = chromeName host
+  return $ \c -> mkKeymap c $
     [ ("M-S-<Return>",            safeSpawnProg $ XMonad.terminal c)
     , ("M-p",                     safeSpawnProg "dmenu_run")
     , ("M-S-p",                   spawn "gmrun")
@@ -304,22 +292,21 @@ myKeys LocalConfig { warnAction = warn
       asks (terminal . config) >>= (`safeSpawn` (["-e", comm] ++ args))
     safeRunProgInTerm =
       (`safeRunInTerm` [])
-    chrome = chromeName host
 
 myConfig = do
-  conf <- getConfiguration
   term <- myTerminal
-  return $ docks $ ewmh $ pagerHints $ defaultConfig
+  myKeys' <- myKeys
+  return $ docks $ ewmh $ pagerHints $ def
     { normalBorderColor  = myNormalColour
     , focusedBorderColor = myFocusedColour
     , modMask            = myModMask
     , terminal           = term
-    , startupHook        = myStartupHook conf
+    , startupHook        = myStartupHook
     , manageHook         = myManageHook
     , handleEventHook    = myHandleEventHook
     , layoutHook         = myLayout
     , workspaces         = myWorkspaces
-    , keys               = myKeys conf
+    , keys               = myKeys'
     }
 
 main :: IO ()
