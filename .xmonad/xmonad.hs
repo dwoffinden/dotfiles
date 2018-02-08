@@ -28,10 +28,10 @@ import           XMonad.Hooks.EwmhDesktops (ewmh, fullscreenEventHook)
 import           XMonad.Hooks.ManageDocks (avoidStruts, docks, manageDocks, docksEventHook, ToggleStruts(..))
 import           XMonad.Hooks.ManageHelpers (doFullFloat,isFullscreen)
 import           XMonad.Hooks.SetWMName (setWMName)
-import           XMonad.Layout.Grid
+import           XMonad.Layout.Grid (Grid(..))
 import           XMonad.Layout.NoBorders (smartBorders)
-import           XMonad.Layout.Renamed
-import           XMonad.Layout.ThreeColumns
+import           XMonad.Layout.PerScreen (ifWider)
+import           XMonad.Layout.Spiral (spiral)
 import qualified XMonad.StackSet as W
 import           XMonad.Util.EZConfig (mkKeymap)
 import           XMonad.Util.Run (safeSpawn,safeSpawnProg,seconds,unsafeSpawn)
@@ -182,14 +182,16 @@ myManageHook = composeAll
 myHandleEventHook = fullscreenEventHook <+> docksEventHook
 
 myLayout = smartBorders $ avoidStruts $
+  ifWider 1280 (spiral (3/4)) Grid
+  where tall = Tall 1 (2/100) (1/2)
 --layoutHintsToCenter $
-      (Tall 1 (2/100) (1/2))
-  ||| (ThreeColMid 1 (2/100) (1/2))
-  ||| (wide 1 (2/100) (1/2))
-  ||| Grid
-  where
-    wide a b c =
-      renamed [Replace "Wide"] $ Mirror $ Tall a b c
+--      (Tall 1 (2/100) (1/2))
+--  ||| (ThreeColMid 1 (2/100) (1/2))
+--  ||| (wide 1 (2/100) (1/2))
+--  ||| Grid
+--  where
+--   wide a b c =
+--      renamed [Replace "Wide"] $ Mirror $ Tall a b c
 
 {- Workspace Identifiers. Must correspond to keys in mkKeyMap format. -}
 myWorkspaces :: [String]
