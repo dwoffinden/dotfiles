@@ -250,7 +250,7 @@ myKeys = do
     ]
     {- Screen Switching -}
     ++ [ (m ++ key, f sc)
-       | (key, sc) <- zip ["w", "e", "r"] [0..]
+       | (key, sc) <- zip ["w", "e", "r", "y"] [0..]
        , (m, f) <- [("M-", viewScreen), ("M-S-", sendToScreen)]
     ]
     {- Volume Controls -}
