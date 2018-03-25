@@ -119,7 +119,7 @@ myStartupHook = do
   let ifNotRunning prog hook = io $ void $ when (not $ Set.member prog progs) hook
   safeSpawn "xscreensaver" ["-no-splash"]
   ifNotRunning "urxvtd" $ safeSpawn "urxvtd" ["-q", "-o"]
-  unsafeSpawn "killall taffybar-linux-x86_64 ; stack exec taffybar"
+  unsafeSpawn "killall taffybar-linux-x86_64 ; exec stack exec taffybar"
   ifNotRunning "compton" $ safeSpawn "compton" [ "--backend=glx"
                                                , "--paint-on-overlay"]
   when (isWork host) $ ifNotRunning "nm-applet" $ safeSpawnProg "nm-applet"
