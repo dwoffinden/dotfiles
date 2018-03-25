@@ -28,7 +28,6 @@ zstyle ':prezto:load' pmodule \
   'terminal' \
   'editor' \
   'git' \
-  'haskell' \
   'history' \
   'directory' \
   'spectrum' \
