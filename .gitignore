@@ -20,6 +20,8 @@
 !/.config/base16-xresources
 !/.config/taffybar/
 
+!/.elvish/
+/.elvish/db
 !/.gitconfig
 !/.gitignore
 !/.gitmodules
