@@ -110,14 +110,8 @@ function bckground {
   nohup $@ </dev/null &>/dev/null &
 }
 
-alias cabal-install-everything='cabal update && cabal install -j cabal-install alex happy && cabal install -j gtk2hs-buildtools && cabal install -j taffybar libmpd'
-
 function find-loose-git-objects {
   find ./ -wholename "*/.git/*objects/*" -type d \! \( -name info -o -name pack \) "$@"
-}
-
-function fliptable {
-  echo "（╯°□°）╯︵ ┻━┻"
 }
 
 #TODO update this
@@ -218,7 +212,6 @@ echo -n $FG[normal]
 
 #####[ CLEAN UP ]###########################################################
 
-[[ -d ~/Desktop ]] && rmdir ~/Desktop
 [[ -f ~/Dropbox/desktop.ini ]] && rm -v ~/Dropbox/desktop.ini
 [[ -d ~/Templates ]] && rmdir ~/Templates
 
