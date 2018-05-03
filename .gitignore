@@ -14,6 +14,7 @@
 !/.config/
 /.config/*
 !/.config/fontconfig/
+!/.config/git/
 !/.config/htop/
 !/.config/base16-shell
 !/.config/base16-gnome-terminal
