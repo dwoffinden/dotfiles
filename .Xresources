@@ -29,5 +29,8 @@ URxvt.fading: 0
 URxvt.depth: 32
 URxvt.background: [95]#002b36
 
+! Bring gitk into the 90s
+*TkTheme: clam
+
 #include ".config/base16-xresources/xresources/base16-solarized-dark-256.Xresources"
 
