@@ -70,6 +70,7 @@
 !/.xmonad/**/*.hs
 
 !/.xinitrc
+!/.xsecurelockrc
 !/.xsession
 !/.xscreensaver
 

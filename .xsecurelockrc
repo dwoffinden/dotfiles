@@ -1,0 +1,14 @@
+# Don't show the password length
+export XSECURELOCK_PARANOID_PASSWORD=1
+
+# Timeout, in seconds, before blanking the screen
+export XSECURELOCK_BLANK_TIMEOUT=30
+
+# DPMS (Energy Star) state to put the screen in when blanking
+export XSECURELOCK_BLANK_DPMS_STATE=off
+
+# Use 12h AM/PM time format instead of 24h format without AM/PM
+# export XSECURELOCK_TIME_FORMAT="%I:%M %p"
+
+# Flying toasters, yo
+export XSECURELOCK_SAVER=saver_xscreensaver
