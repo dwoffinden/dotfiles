@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 
 compton --backend=glx --paint-on-overlay &
-urxvtd -q -o -f
+urxvtd -q -o &
 
-stack exec -- xmonad --recompile && exec xmonad
+stack exec -- xmonad --recompile && xmonad
