@@ -18,7 +18,7 @@ import           System.IO.Error (isDoesNotExistError, isEOFError)
 import           System.Posix.Types (ProcessID)
 import           System.Posix.Unistd (getSystemID,nodeName)
 import           System.Random (randomRIO)
-import           System.Taffybar.Hooks.PagerHints (pagerHints)
+import           System.Taffybar.Support.PagerHints (pagerHints)
 import           Text.Read (readMaybe)
 import           XMonad
 import           XMonad.Actions.CopyWindow (copyToAll,copyWindow,killAllOtherCopies)
