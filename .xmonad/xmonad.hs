@@ -118,7 +118,6 @@ myStartupHook = do
   progs <- getRunningProcesses
   let ifNotRunning prog hook = io $ void $ when (not $ Set.member prog progs) hook
   safeSpawn "xscreensaver" ["-no-splash"]
-  unsafeSpawn "killall taffybar-linux-x86_64 ; exec stack exec taffybar"
   when (isLaptop host) $ ifNotRunning "connman-ui-gtk" $ safeSpawnProg "connman-ui-gtk"
 
 setWallpaper :: MonadIO m => Wallpaper -> m ()

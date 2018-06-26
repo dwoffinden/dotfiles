@@ -33,6 +33,7 @@
 /.local/*
 !/.local/bin/
 /.local/bin/stack
+/.local/bin/status-notifier-watcher
 /.local/bin/taffybar
 /.local/bin/xmonad
 !/.local/share/

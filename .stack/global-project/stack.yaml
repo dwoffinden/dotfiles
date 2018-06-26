@@ -6,7 +6,7 @@
 # For more information about stack's configuration, see
 # http://docs.haskellstack.org/en/stable/yaml_configuration/
 
-# This should do for a `stack install xmonad taffybar && stack exec -- xmonad --recompile`
+# This should do for a `stack install xmonad taffybar status-notifier-item`
 # Make sure to install libxinerama-dev, gobject-introspection, libdbusmenu-gtk3
 # TODO: figure out how to use stack properly and add a real project config file
 # https://github.com/commercialhaskell/stack/issues/710
