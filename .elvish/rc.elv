@@ -2,7 +2,7 @@
 E:BASE16_SHELL=~/.config/base16-shell/
 E:BASE16_THEME=base16-solarized-dark
 try {
-  bash ~/'.config/base16-shell/scripts/'$E:BASE16_THEME'.sh'
+  bash $E:BASE16_SHELL'/scripts/'$E:BASE16_THEME'.sh'
 } except e { put $e }
 
 fn ls [@a]{ e:ls -Fhv --color --group-directories-first $@a | less -FRX }
