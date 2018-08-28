@@ -72,6 +72,7 @@ typeset -gU cdpath fpath mailpath path
 path=(
   /usr/local/{bin,sbin}
   $HOME/.local/bin
+  $HOME/.cargo/bin
   $path
 )
 
