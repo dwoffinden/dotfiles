@@ -7,7 +7,9 @@ import           Control.Exception (tryJust)
 import           Control.Monad (filterM,foldM,guard,void,when)
 import           Data.Map (Map)
 import           Data.Maybe (catMaybes, fromMaybe, isNothing, listToMaybe, mapMaybe)
+import           Data.Monoid (Endo)
 import           Data.List.Split (splitOn,split,dropFinalBlank,dropDelims,onSublist)
+import           Data.Ratio ((%))
 import           Data.Set as Set (Set, empty, insert, member)
 import           Daw.Hosts
 import           System.Directory (doesDirectoryExist,doesFileExist,findExecutable,getDirectoryContents,getHomeDirectory)
@@ -26,7 +28,7 @@ import           XMonad.Actions.PhysicalScreens (viewScreen, sendToScreen)
 import           XMonad.Actions.WindowGo (runOrRaise)
 import           XMonad.Hooks.EwmhDesktops (ewmh, fullscreenEventHook)
 import           XMonad.Hooks.ManageDocks (avoidStruts, docks, manageDocks, docksEventHook, ToggleStruts(..))
-import           XMonad.Hooks.ManageHelpers (doFullFloat,isFullscreen)
+import           XMonad.Hooks.ManageHelpers (doFullFloat,doRectFloat,isFullscreen)
 import           XMonad.Hooks.SetWMName (setWMName)
 import           XMonad.Layout.Grid (Grid(..))
 import           XMonad.Layout.NoBorders (smartBorders)
@@ -35,6 +37,7 @@ import           XMonad.Layout.Spiral (spiral)
 import qualified XMonad.StackSet as W
 import           XMonad.Util.EZConfig (mkKeymap)
 import           XMonad.Util.Run (safeSpawn,safeSpawnProg,seconds,unsafeSpawn)
+import           XMonad.Util.WindowProperties (propertyToQuery,Property(Role))
 
 data Wallpaper = Fill FilePath | Tile FilePath | None
   deriving (Eq, Show)
@@ -162,14 +165,17 @@ getRunningProcesses = io $ do
       hClose h
       return str
 
+myManageHook :: Query (Endo WindowSet)
 myManageHook = composeAll
-  [ className =? "MPlayer"                      --> doFloat
-  , className =? "Zenity"                       --> doFloat
-  , className =? "Xmessage"                     --> doFloat
-  , resource  =? "desktop_window"               --> doIgnore
-  , resource  =? "kdesktop"                     --> doIgnore
-  , isFullscreen                                --> (doF W.focusDown <+> doFullFloat)
-  , stringProperty "WM_WINDOW_ROLE" =? "pop-up" --> doFloat <+> doCopyToAll
+  [ className =? "MPlayer"           --> doFloat
+  , className =? "Zenity"            --> doFloat
+  , className =? "Xmessage"          --> doFloat
+  , appName   =? "desktop_window"    --> doIgnore
+  , appName   =? "kdesktop"          --> doIgnore
+  , propertyToQuery (Role "pop-up")  --> doFloat <+> doCopyToAll
+  , propertyToQuery (Role "GtkFileChooserDialog")
+      --> doRectFloat (W.RationalRect (1 % 4) (1 % 4) (1 % 2) (1 % 2))
+  , isFullscreen                     --> (doF W.focusDown <+> doFullFloat)
   ] <+> manageDocks
   where
     doCopyToAll = ask >>= doF . \w -> (\ws -> foldr($) ws (map (copyWindow w) myWorkspaces))
