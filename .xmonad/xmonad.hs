@@ -1,4 +1,3 @@
-{-# OPTIONS_GHC -O2 -optc -O2 #-}
 {-# LANGUAGE GADTs, OverloadedStrings, ScopedTypeVariables #-}
 
 import           Control.Applicative ((<$>),pure)
@@ -24,7 +23,7 @@ import           System.Taffybar.Support.PagerHints (pagerHints)
 import           Text.Read (readMaybe)
 import           XMonad
 import           XMonad.Actions.CopyWindow (copyToAll,copyWindow,killAllOtherCopies)
-import           XMonad.Actions.PhysicalScreens (viewScreen, sendToScreen)
+import           XMonad.Actions.PhysicalScreens (viewScreen, sendToScreen, ScreenComparator(..))
 import           XMonad.Actions.WindowGo (runOrRaise)
 import           XMonad.Hooks.EwmhDesktops (ewmh, fullscreenEventHook)
 import           XMonad.Hooks.ManageDocks (avoidStruts, docks, manageDocks, docksEventHook, ToggleStruts(..))
@@ -252,7 +251,7 @@ myKeys = do
     {- Screen Switching -}
     ++ [ (m ++ key, f sc)
        | (key, sc) <- zip ["w", "e", "r", "y"] [0..]
-       , (m, f) <- [("M-", viewScreen), ("M-S-", sendToScreen)]
+       , (m, f) <- [("M-", viewScreen def), ("M-S-", sendToScreen def)]
     ]
     {- Volume Controls -}
     ++ [ (k, safeSpawn "amixer" ["set", "Master", a])

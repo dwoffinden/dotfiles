@@ -1,4 +1,4 @@
-{-# OPTIONS_GHC -O2 -tmpdir /tmp -optc -O2 #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 import Control.Applicative ((<$>))
 import Control.Monad (guard)
