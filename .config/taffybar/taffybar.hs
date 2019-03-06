@@ -52,14 +52,12 @@ main = do
       mem = pollingGraphNew memCfg 2 memCallback
       cpu = cpuMonitorNew cpuCfg 1 "cpu"
       tray = sniTrayNew
-      dropbox = commandRunnerNew 5 "dstatline" [] "error calling dstatline"
       cputemp = commandRunnerNew 5 "cputemp" [] "error calling cputemp"
       batt = textBatteryNew ("$percentage$%" ++ (guard (not $ isGladys host) >> " ($time$)"))
       myConfig = defaultSimpleTaffyConfig
         { startWidgets =
           (guard (isLaptop host) >> [batt])
           ++ (workspaces : map (>>= buildContentsBox) [ layout, windows ])
-          ++ (guard (not $ isWork host) >> [dropbox])
           ++ [note]
         , endWidgets = [ tray, wea, clock, mem, cputemp, cpu ]
         }
