@@ -17,10 +17,7 @@ resolver: lts-13.6
 extra-deps:
   - xmonad-0.15
   - xmonad-contrib-0.15
-  # - taffybar-3.1.1
-  # need master to fix gi-gdkpixbuf compat:
-  - git: https://github.com/taffybar/taffybar.git
-    commit: e382599358bb06383ba4b08d469fc093c11f5915
+  - taffybar-3.1.2
   - split-0.2.3.3
   # Transitive:
   - ConfigFile-1.1.4
