@@ -5,6 +5,9 @@ try {
   bash $E:BASE16_SHELL'/scripts/'$E:BASE16_THEME'.sh'
 } except e { put $e }
 
+fn du [@a]{ e:du -h $@a }
+fn df [@a]{ e:df -h $@a }
+
 fn ls [@a]{ e:ls -Fhv --color --group-directories-first $@a | less -FRX }
 fn la [@a]{ ls --all $@a }
 
