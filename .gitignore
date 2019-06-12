@@ -32,7 +32,9 @@
 !/.local/
 /.local/*
 !/.local/bin/
+/.local/bin/sni-cl-tool
 /.local/bin/stack
+/.local/bin/status-notifier-item-static
 /.local/bin/status-notifier-watcher
 /.local/bin/taffybar
 /.local/bin/xmonad
