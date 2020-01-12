@@ -32,6 +32,9 @@
 !/.local/
 /.local/*
 !/.local/bin/
+/.local/bin/hledger
+/.local/bin/hledger-ui
+/.local/bin/hledger-web
 /.local/bin/sni-cl-tool
 /.local/bin/stack
 /.local/bin/status-notifier-item-static
