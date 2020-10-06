@@ -3,7 +3,7 @@
   path = ~/.gitconfig.local
 [core]
   autocrlf = input
-  safecrlf = true
+  safecrlf = false
   editor = vim
   fileMode = false
   whitespace = tab-in-indent
