@@ -65,9 +65,9 @@ warnAction = maybe
 pickRandomWallpaper :: MonadIO m => String -> m Wallpaper
 pickRandomWallpaper home = do
   wps <- filterM (io . doesDirectoryExist . snd)
-    [ (Tile, home </> "Dropbox" </> "wallpaper" </> "tile")
-    , (Fill, home </> "Dropbox" </> "wallpaper" </> "simple")
-    , (Fill, home </> "Dropbox" </> "wallpaper")
+    [ (Tile, home </> "wallpaper" </> "tile")
+    , (Fill, home </> "wallpaper" </> "simple")
+    , (Fill, home </> "wallpaper")
     , (Fill, "/usr/share/backgrounds")
     , (Fill, "/usr/share/backgrounds/gnome")
     ]
