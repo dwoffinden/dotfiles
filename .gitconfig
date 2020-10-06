@@ -21,3 +21,7 @@
   conflictstyle = diff3
 [push]
   default = simple
+[commit]
+	gpgSign = true
+[user]
+	signingkey = F3EA503B360FBD40
