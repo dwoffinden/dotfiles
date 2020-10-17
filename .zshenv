@@ -8,7 +8,6 @@ fi
 #####[ CONFIG SELECTION ]###################################################
 
 _HAS_OPTICAL_DRIVE=false
-_HAS_YAOURT=false
 _IS_LAPTOP=false
 _IS_SUDOER=false
 _IS_WORK=false
@@ -25,9 +24,11 @@ _HOST=("${(Ls/./)HOST}")
 
 if [[ $_HOST[-1] = com ]]; then
   _IS_WORK=true
-  if [[ $_HOST[-5] = daw ]]; then
-    _IS_SUDOER=true
-  fi
+  case $_HOST[-5 in
+    daw | not-invented-here)
+      _IS_SUDOER=true
+      ;; # break
+  esac
   if [[ $_HOST[-4] = roam ]]; then
     _IS_LAPTOP=true
   fi
@@ -37,13 +38,12 @@ case $_HOST[1] in
   gladys | winona)
     _IS_LAPTOP=true
     ;| # break but continue scanning
-  gladys | vera)
+  gladys | contents-may-differ)
     _HAS_OPTICAL_DRIVE=true
     ;& # fall through
   tombstone | winona)
-    _HAS_YAOURT=true
     ;& # fall through
-  watchtower | buzzard | edgar)
+  xenophobe)
     _IS_SUDOER=true
     ;| # break but continue scanning
 esac

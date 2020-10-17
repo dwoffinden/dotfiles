@@ -132,26 +132,11 @@ if [[ $_IS_SUDOER = true ]]; then
   alias sv='sudo vim'
   alias svd='sudo vimdiff'
   if [[ $_DISTRO = Arch ]]; then
-    function dstart {
-      sudo systemctl start dropbox@$USER
-    }
-    function dstop {
-      sudo systemctl stop dropbox@$USER
-    }
-    function drestart {
-      sudo systemctl restart dropbox@$USER
-    }
+    alias p='pacman'
     alias sp='sudo pacman'
     alias update-grub='sudo grub-mkconfig -o /boot/grub/grub.cfg'
     alias mkinitcpio-all='sudo sh -c "mkinitcpio -p linux & \
-                                      mkinitcpio -p linux-ck & \
                                       mkinitcpio -p linux-lts &"'
-    if [[ $_HAS_YAOURT = true ]]; then
-      alias y='yaourt'
-      alias ysc='yaourt -Sc --noconfirm'
-    else
-      alias p='pacman'
-    fi
   fi
 fi
 if [[ $_HAS_OPTICAL_DRIVE = true ]]; then
