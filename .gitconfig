@@ -1,5 +1,5 @@
 [include]
-  # ~/.gitconfig.local should contain user.name, user.email etc.
+  # ~/.gitconfig.local should contain user.email etc.
   path = ~/.gitconfig.local
 [core]
   autocrlf = input
@@ -22,6 +22,7 @@
 [push]
   default = simple
 [commit]
-	gpgSign = true
+  gpgSign = true
 [user]
-	signingkey = F3EA503B360FBD40
+  signingkey = F3EA503B360FBD40
+  name = Daniel Woffinden
