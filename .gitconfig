@@ -26,3 +26,5 @@
 [user]
   signingkey = F3EA503B360FBD40
   name = Daniel Woffinden
+[tag]
+  gpgSign = true
