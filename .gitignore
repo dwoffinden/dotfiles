@@ -43,14 +43,12 @@
 /.local/bin/xmonad
 !/.local/share/
 /.local/share/*
-!/.local/share/git-remote-hg
 
 !/.mplayer/
 
 !/.ncmpcpp/
 /.ncmpcpp/error.log
 
-!/.oh-my-zsh
 !/.pentadactylrc
 !/.screenrc
 
