@@ -40,3 +40,6 @@
 [submodule ".vim/bundle/vim-ledger"]
 	path = .vim/bundle/vim-ledger
 	url = https://github.com/ledger/vim-ledger.git
+[submodule ".stack/global-project/taffybar"]
+	path = .stack/global-project/taffybar
+	url = https://github.com/dwoffinden/taffybar.git
