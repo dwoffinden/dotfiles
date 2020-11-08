@@ -73,7 +73,7 @@ if &t_Co > 2 || has("gui_running")
 endif
 
 if has("gui_running")
-  set guifont=Terminus,Inconsolata-g,Inconsolata,Consolas
+  set guifont=Monospace\ 10
   set lines=50 columns=100
 endif
 
