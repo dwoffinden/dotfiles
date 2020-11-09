@@ -43,3 +43,6 @@
 [submodule ".stack/global-project/taffybar"]
 	path = .stack/global-project/taffybar
 	url = https://github.com/dwoffinden/taffybar.git
+[submodule ".vim/bundle/vim-nix"]
+	path = .vim/bundle/vim-nix
+	url = https://github.com/LnL7/vim-nix.git
