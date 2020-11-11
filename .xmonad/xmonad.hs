@@ -10,7 +10,6 @@ import           Data.Monoid (Endo)
 import           Data.List.Split (splitOn,split,dropFinalBlank,dropDelims,onSublist)
 import           Data.Ratio ((%))
 import           Data.Set as Set (Set, empty, insert, member)
-import           Daw.Hosts
 import           System.Directory (doesDirectoryExist,doesFileExist,findExecutable,getDirectoryContents,getHomeDirectory)
 import           System.Exit (exitSuccess)
 import           System.FilePath ((</>), takeFileName)
@@ -40,6 +39,13 @@ import           XMonad.Util.WindowProperties (propertyToQuery,Property(Role))
 
 data Wallpaper = Fill FilePath | Tile FilePath | None
   deriving (Eq, Show)
+
+isLaptop :: String -> Bool
+isLaptop "gladys" = True
+isLaptop "winona" = True
+isLaptop h = case splitOn "." h of
+    [_, "roam", _, _, "com"] -> True
+    _ -> False
 
 myNormalColour :: String
 myNormalColour = "#202020"
@@ -88,16 +94,8 @@ pickRandomWallpaper home = do
 getHostName :: MonadIO m => m String
 getHostName = io $ nodeName <$> getSystemID
 
-suspend :: MonadIO m => String -> m ()
-suspend h
-  | isWork h = safeSpawn "dbus-send" [ "--system"
-                                     , "--print-reply"
-                                     , "--dest=org.freedesktop.UPower"
-                                     , "/org/freedesktop/UPower"
-                                     , "org.freedesktop.UPower.Suspend"
-                                     ]
-  | isHomeMachine h = safeSpawn "systemctl" ["suspend"]
-  | otherwise  = screenOff
+suspend :: MonadIO m => m ()
+suspend = safeSpawn "systemctl" ["suspend"]
 
 lock :: MonadIO m => m ()
 lock = safeSpawn "xdg-screensaver" ["lock"]
@@ -201,7 +199,7 @@ myKeys :: MonadIO m => m (XConfig Layout -> Map (KeyMask, KeySym) (X ()))
 myKeys = do
   warn <- warnAction
   host <- getHostName
-  let chrome = chromeName host
+  let chrome = "chromium"
   return $ \c -> mkKeymap c $
     [ ("M-S-<Return>",            safeSpawnProg $ XMonad.terminal c)
     , ("M-p",                     safeSpawnProg "dmenu_run")
@@ -224,7 +222,7 @@ myKeys = do
     , ("M-,",                     sendMessage (IncMasterN 1))
     , ("M-.",                     sendMessage (IncMasterN (-1)))
     , ("M-S-q",                   io exitSuccess)
-    , ("M-q",                     unsafeSpawn "stack exec -- xmonad --recompile; xmonad --restart")
+    , ("M-q",                     restart "xmonad-built" True)
     , ("M-b",                     sendMessage ToggleStruts)
     , ("M-v",                     windows copyToAll)
     , ("M-S-v",                   killAllOtherCopies)
@@ -274,7 +272,7 @@ myKeys = do
     ++ [ (k , lock >> sleep 4 >> screenOff)
        | k <- ["M-S-s"]
     ]
-    ++ [ (k , lock >> sleep 4 >> (suspend host))
+    ++ [ (k , lock >> sleep 4 >> suspend)
        | k <- ["M-C-S-s", "<XF86Sleep>"]
     ]
     {- MPC keys, media player UI -}
@@ -312,5 +310,5 @@ myConfig = do
     }
 
 main :: IO ()
-main = myConfig >>= xmonad
+main = myConfig >>= launch
 

@@ -3,7 +3,7 @@
 import Control.Applicative ((<$>))
 import Control.Monad (guard)
 import Control.Monad.IO.Class (liftIO)
-import Daw.Hosts
+import Data.List.Split (splitOn)
 import System.Posix.Unistd (getSystemID, nodeName)
 import System.Taffybar
 import System.Taffybar.Hooks
@@ -19,6 +19,13 @@ import System.Taffybar.Widget.SimpleClock
 import System.Taffybar.Widget.SNITray
 import System.Taffybar.Widget.Weather
 import System.Taffybar.Widget.Workspaces
+
+isLaptop :: String -> Bool
+isLaptop "gladys" = True
+isLaptop "winona" = True
+isLaptop h = case splitOn "." h of
+    [_, "roam", _, _, "com"] -> True
+    _ -> False
 
 memCallback :: IO [Double]
 memCallback = do
@@ -53,7 +60,7 @@ main = do
       cpu = cpuMonitorNew cpuCfg 1 "cpu"
       tray = sniTrayNew
       cputemp = commandRunnerNew 5 "cputemp" [] "error calling cputemp"
-      batt = textBatteryNew ("$percentage$%" ++ (guard (not $ isGladys host) >> " ($time$)"))
+      batt = textBatteryNew "$percentage$% ($time$)"
       myConfig = defaultSimpleTaffyConfig
         { startWidgets =
           (guard (isLaptop host) >> [batt])
@@ -61,5 +68,4 @@ main = do
           ++ [note]
         , endWidgets = [ tray, wea, clock, mem, cputemp, cpu ]
         }
-  dyreTaffybar $ withBatteryRefresh $
-    toTaffyConfig myConfig
+  startTaffybar $ withBatteryRefresh $ toTaffyConfig myConfig

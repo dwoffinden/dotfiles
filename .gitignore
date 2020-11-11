@@ -40,7 +40,9 @@
 /.local/bin/status-notifier-item-static
 /.local/bin/status-notifier-watcher
 /.local/bin/taffybar
+/.local/bin/taffybar-built
 /.local/bin/xmonad
+/.local/bin/xmonad-built
 !/.local/share/
 /.local/share/*
 
