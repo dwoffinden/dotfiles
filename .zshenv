@@ -24,7 +24,7 @@ _HOST=("${(Ls/./)HOST}")
 
 if [[ $_HOST[-1] = com ]]; then
   _IS_WORK=true
-  case $_HOST[-5 in
+  case $_HOST[-5] in
     daw | not-invented-here)
       _IS_SUDOER=true
       ;; # break
