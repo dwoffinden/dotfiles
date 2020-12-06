@@ -19,10 +19,10 @@
 # hledger instructions use:
 # stack install --resolver=lts hledger-lib-1.16.1 hledger-1.16.1 hledger-ui-1.16.1 hledger-web-1.16.1
 # which is probably saner and I should use for xmonad too...
-packages:
-  - './taffybar'
+packages: []
 resolver: lts-16.20
 extra-deps:
+  - taffybar-3.2.3
   - xmonad-contrib-0.16
 # https://github.com/haskell-gi/haskell-gi/issues/318
   - gi-atk-2.0.22
