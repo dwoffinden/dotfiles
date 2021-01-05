@@ -1,3 +1,5 @@
+use str
+
 # base16-shell is super complicated and not ported to elvish, but this seems to be the jist:
 E:BASE16_SHELL=~/.config/base16-shell/
 E:BASE16_THEME=base16-solarized-dark
@@ -51,7 +53,7 @@ fn tiga {
 }
 
 fn random-cowfile {
-  cows = [(cowsay -l | drop 1 | each [s]{splits ' ' $s})]
+  cows = [(cowsay -l | drop 1 | each [s]{str:split ' ' $s})]
   put $cows[(randint 0 (count $cows))]
 }
 
