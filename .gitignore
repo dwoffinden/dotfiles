@@ -19,6 +19,8 @@
 !/.config/base16-shell
 !/.config/base16-gnome-terminal
 !/.config/base16-xresources
+!/.config/sway/
+!/.config/swaylock/
 !/.config/taffybar/
 
 !/.elvish/
