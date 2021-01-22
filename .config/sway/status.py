@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
 from datetime import datetime
+from numpy import clip
 from psutil._common import bytes2human
-from time import sleep
+from time import perf_counter, sleep
 
 import psutil
 
@@ -21,6 +22,7 @@ net_stats = psutil.net_io_counters(nowrap=True)
 
 print('{"version":1}\n[', end='')
 while True:
+    start_time = perf_counter()
     # TODO: Lil' history graphs? Click to expand?
 
     # TODO: AC/not 🔌⚡, charge/discharge time
@@ -47,4 +49,7 @@ while True:
             sep=',',
             end='],',
             flush=True)
-    sleep(1)
+
+    elapsed = perf_counter() - start_time
+
+    sleep(1 - clip(elapsed, 0, 1))
