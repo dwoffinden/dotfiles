@@ -13,12 +13,14 @@ def net_diff(old):
 def bps(n):
     return bytes2human(n) + '/s'
 
+def block(full_text):
+    # TODO: optional colours, etc (see https://man.archlinux.org/man/swaybar-protocol.7.en)
+    return f'{{"full_text":"{full_text}"}}'
+
 net_stats = psutil.net_io_counters(nowrap=True)
 
 print('{"version":1}\n[', end='')
 while True:
-    # TODO: less awful code, inefficiency is probs fine
-    # TODO: colours? https://man.archlinux.org/man/swaybar-protocol.7.en
     # TODO: Lil' history graphs? Click to expand?
 
     # TODO: AC/not 🔌⚡, charge/discharge time
@@ -35,6 +37,14 @@ while True:
 
     time = datetime.now().strftime('%Y-%m-%d %k:%M:%S')
 
-    line = f'[{{"full_text":"⬆️{bps(netup)}⬇️{bps(netdn)}"}},{{"full_text":"🔋{bat:.0f}%"}},{{"full_text":"CPU {cpu:.0f}%"}},{{"full_text":"🌡️{temp:.0f}°C"}},{{"full_text":"{time}"}}],'
-    print(line, end='', flush=True)
+    print('[', end='', flush=False)
+    print(
+            block(f'⬆️{bps(netup)}⬇️{bps(netdn)}'),
+            block(f'🔋{bat:.0f}%'),
+            block(f'CPU {cpu:.0f}%'),
+            block(f'🌡️{temp:.0f}°C'),
+            block(time),
+            sep=',',
+            end='],',
+            flush=True)
     sleep(1)
