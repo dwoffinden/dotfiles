@@ -28,13 +28,13 @@ while True:
     net_stats, netup, netdn = net_diff(net_stats)
 
     # TODO: load avg? frequency? pegged cores?
-    cpu = str(psutil.cpu_percent(interval=None))
+    cpu = psutil.cpu_percent(interval=None)
 
     # TODO: be more dynamic? include more sensors?
     temp = psutil.sensors_temperatures()['coretemp'][0].current
 
     time = datetime.now().strftime('%Y-%m-%d %k:%M:%S')
 
-    line = f'[{{"full_text":"⬆️{bps(netup)}⬇️{bps(netdn)}"}},{{"full_text":"🔋{bat:.0f}%"}},{{"full_text":"CPU {cpu}%"}},{{"full_text":"🌡️{temp:.0f}°C"}},{{"full_text":"{time}"}}],'
+    line = f'[{{"full_text":"⬆️{bps(netup)}⬇️{bps(netdn)}"}},{{"full_text":"🔋{bat:.0f}%"}},{{"full_text":"CPU {cpu:.0f}%"}},{{"full_text":"🌡️{temp:.0f}°C"}},{{"full_text":"{time}"}}],'
     print(line, end='', flush=True)
     sleep(1)
