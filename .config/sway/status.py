@@ -37,7 +37,7 @@ while True:
     # TODO: be more dynamic? include more sensors?
     temp = psutil.sensors_temperatures()['coretemp'][0].current
 
-    time = datetime.now().strftime('%Y-%m-%d %k:%M:%S')
+    time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     print('[', end='', flush=False)
     print(
