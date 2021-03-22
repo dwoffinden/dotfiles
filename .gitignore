@@ -26,6 +26,11 @@
 
 !/.elvish/
 /.elvish/db
+
+!/.emacs.d/
+/.emacs.d/*
+!/.emacs.d/*.el
+
 !/.gitconfig
 !/.gitignore
 !/.gitmodules
