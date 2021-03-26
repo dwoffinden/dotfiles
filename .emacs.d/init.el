@@ -8,5 +8,6 @@
 (setq use-package-always-ensure t)
 
 (use-package solarized-theme)
-
 (load-theme 'solarized-dark t)
+
+(setq org-agenda-files '("~/org/"))
