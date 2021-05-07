@@ -26,7 +26,7 @@ while True:
     # TODO: Lil' history graphs? Click to expand?
 
     # TODO: AC/not 🔌⚡, charge/discharge time
-    bat = psutil.sensors_battery().percent
+    bat = psutil.sensors_battery()
 
     # TODO: eth vs wifi SSID? latency? strength? errors/drops?
     net_stats, netup, netdn = net_diff(net_stats)
@@ -42,7 +42,7 @@ while True:
     print('[', end='', flush=False)
     print(
             block(f'⬆️{bps(netup)}⬇️{bps(netdn)}'),
-            block(f'🔋{bat:.0f}%'),
+            block(f'🔋{bat.percent:.0f}%' if bat else 'no battery'),
             block(f'CPU {cpu:.0f}%'),
             block(f'🌡️{temp:.0f}°C'),
             block(time),
