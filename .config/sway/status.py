@@ -34,7 +34,7 @@ while True:
     # TODO: load avg? frequency? pegged cores?
     cpu = psutil.cpu_percent(interval=None)
 
-    # TODO: be more dynamic? include more sensors?
+    # TODO: be more dynamic? include more sensors? include fans?
     temp = psutil.sensors_temperatures()['coretemp'][0].current
 
     time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
