@@ -39,10 +39,13 @@ while True:
 
     time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
+    # TODO: refactor this to, e.g, a list of generator functions?
+    #     allow each to return None?
     print('[', end='', flush=False)
+    print(block(f'⬆️{bps(netup)}⬇️{bps(netdn)}'), end=',', flush=False)
+    if bat:
+        print(block(f'🔋{bat.percent:.0f}%' if bat else 'no battery'), end=',', flush=False)
     print(
-            block(f'⬆️{bps(netup)}⬇️{bps(netdn)}'),
-            block(f'🔋{bat.percent:.0f}%' if bat else 'no battery'),
             block(f'CPU {cpu:.0f}%'),
             block(f'🌡️{temp:.0f}°C'),
             block(time),
