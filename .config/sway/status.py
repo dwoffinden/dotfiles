@@ -13,13 +13,6 @@ def net_diff(old):
 # nicked from psutil._common bytes2human:
 # https://github.com/giampaolo/psutil/blob/95db8bb96caf5540c45b9eff2229c0401b578c31/psutil/_common.py#L728-L745
 def bytes2human(n):
-    """Used by various scripts. See:
-    http://goo.gl/zeJZl
-    >>> bytes2human(10000)
-    '9.8K'
-    >>> bytes2human(100001221)
-    '95.4M'
-    """
     symbols = ('B', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y')
     prefix = {}
     for i, s in enumerate(symbols[1:]):
