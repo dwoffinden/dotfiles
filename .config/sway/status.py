@@ -2,7 +2,6 @@
 
 from datetime import datetime
 from numpy import clip
-from psutil._common import bytes2human
 from time import perf_counter, sleep
 
 import psutil
@@ -11,8 +10,29 @@ def net_diff(old):
     stats = psutil.net_io_counters(nowrap=True)
     return stats, stats.bytes_sent - old.bytes_sent, stats.bytes_recv - old.bytes_recv
 
+# nicked from psutil._common bytes2human:
+# https://github.com/giampaolo/psutil/blob/95db8bb96caf5540c45b9eff2229c0401b578c31/psutil/_common.py#L728-L745
+def bytes2human(n):
+    """Used by various scripts. See:
+    http://goo.gl/zeJZl
+    >>> bytes2human(10000)
+    '9.8K'
+    >>> bytes2human(100001221)
+    '95.4M'
+    """
+    symbols = ('B', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y')
+    prefix = {}
+    for i, s in enumerate(symbols[1:]):
+        prefix[s] = 1 << (i + 1) * 10
+    for symbol in reversed(symbols[1:]):
+        if n >= prefix[symbol]:
+            value = float(n) / prefix[symbol]
+            return f'{value: >5.1f}{symbol}s/s'
+    return f'{n: >5.1f}{symbols[0]}s/s'
+
+
 def bps(n):
-    return bytes2human(n) + '/s'
+    return bytes2human(n)
 
 def block(full_text):
     # TODO: optional colours, etc (see https://man.archlinux.org/man/swaybar-protocol.7.en)
