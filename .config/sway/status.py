@@ -59,7 +59,7 @@ while True:
     if bat:
         print(block(f'🔋{bat.percent:.0f}%' if bat else 'no battery'), end=',', flush=False)
     print(
-            block(f'CPU {cpu:.0f}%'),
+            block(f'CPU {cpu: >2.0f}%'),
             block(f'🌡️{temp:.0f}°C'),
             block(time),
             sep=',',
