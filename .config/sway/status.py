@@ -55,7 +55,12 @@ while True:
     # TODO: refactor this to, e.g, a list of generator functions?
     #     allow each to return None?
     print('[', end='', flush=False)
-    print(block(f'⬆️{bps(netup)}⬇️{bps(netdn)}'), end=',', flush=False)
+    print(
+            block(f'⬆️{bps(netup)}'),
+            block(f'⬇️{bps(netdn)}'),
+            sep=',',
+            end=',',
+            flush=False)
     if bat:
         print(block(f'🔋{bat.percent:.0f}%' if bat else 'no battery'), end=',', flush=False)
     print(
