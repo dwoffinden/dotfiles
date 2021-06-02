@@ -20,8 +20,8 @@ def bytes2human(n):
     for symbol in reversed(symbols[1:]):
         if n >= prefix[symbol]:
             value = float(n) / prefix[symbol]
-            return f'{value: >5.1f}{symbol}s/s'
-    return f'{n: >5.1f}{symbols[0]}s/s'
+            return f'{value: >5.1f}{symbol}/s'
+    return f'{n: >5.1f}{symbols[0]}/s'
 
 
 def bps(n):
