@@ -10,6 +10,13 @@ def net_diff(old):
     stats = psutil.net_io_counters(nowrap=True)
     return stats, stats.bytes_sent - old.bytes_sent, stats.bytes_recv - old.bytes_recv
 
+def find_temp():
+    temps = psutil.sensors_temperatures()
+    if 'coretemp' in temps:
+        return temps['coretemp'][0].current
+    if 'k10temp' in temps:
+        return temps['k10temp'][0].current
+
 # nicked from psutil._common bytes2human:
 # https://github.com/giampaolo/psutil/blob/95db8bb96caf5540c45b9eff2229c0401b578c31/psutil/_common.py#L728-L745
 def bytes2human(n):
@@ -48,7 +55,7 @@ while True:
     cpu = psutil.cpu_percent(interval=None)
 
     # TODO: be more dynamic? include more sensors? include fans?
-    temp = psutil.sensors_temperatures()['coretemp'][0].current
+    temp = find_temp()
 
     time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
