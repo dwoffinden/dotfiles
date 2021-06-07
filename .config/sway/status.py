@@ -65,8 +65,8 @@ while True:
     #     allow each to return None?
     print('[', end='', flush=False)
     print(
-            block(f'⬆️{bps(netup)}'),
             block(f'⬇️{bps(netdn)}'),
+            block(f'⬆️{bps(netup)}'),
             sep=',',
             end=',',
             flush=False)
