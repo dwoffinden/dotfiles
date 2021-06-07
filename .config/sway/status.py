@@ -54,6 +54,8 @@ while True:
     # TODO: load avg? frequency? pegged cores?
     cpu = psutil.cpu_percent(interval=None)
 
+    ram = psutil.virtual_memory().percent
+
     # TODO: be more dynamic? include more sensors? include fans?
     temp = find_temp()
 
@@ -72,6 +74,7 @@ while True:
         print(block(f'🔋{bat.percent:.0f}%' if bat else 'no battery'), end=',', flush=False)
     print(
             block(f'CPU {cpu: >2.0f}%'),
+            block(f'RAM {ram: >2.0f}%'),
             block(f'🌡️{temp:.0f}°C'),
             block(time),
             sep=',',
