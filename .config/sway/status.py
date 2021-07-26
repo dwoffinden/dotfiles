@@ -17,6 +17,12 @@ def find_temp():
     if 'k10temp' in temps:
         return temps['k10temp'][0].current
 
+# TODO: multiple/no fans? more compact formatting? krpm for some?
+def find_fan():
+    fans = psutil.sensors_fans()
+    if 'thinkpad' in fans:
+        return fans['thinkpad'][0].current
+
 # nicked from psutil._common bytes2human:
 # https://github.com/giampaolo/psutil/blob/95db8bb96caf5540c45b9eff2229c0401b578c31/psutil/_common.py#L728-L745
 def bytes2human(n):
@@ -56,8 +62,10 @@ while True:
 
     ram = psutil.virtual_memory().percent
 
-    # TODO: be more dynamic? include more sensors? include fans?
+    # TODO: be more dynamic? include more sensors?
     temp = find_temp()
+
+    fan = find_fan()
 
     time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
@@ -76,6 +84,7 @@ while True:
             block(f'CPU {cpu: >2.0f}%'),
             block(f'RAM {ram: >2.0f}%'),
             block(f'🌡️{temp:.0f}°C'),
+            block(f'🌀 {fan: >4.0f} RPM'),
             block(time),
             sep=',',
             end='],',
