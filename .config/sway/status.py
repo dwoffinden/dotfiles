@@ -10,18 +10,15 @@ def net_diff(old):
     stats = psutil.net_io_counters(nowrap=True)
     return stats, stats.bytes_sent - old.bytes_sent, stats.bytes_recv - old.bytes_recv
 
+def find_first(dict, keys):
+    return next((dict[key] for key in keys if key in dict), None)
+
 def find_temp():
-    temps = psutil.sensors_temperatures()
-    if 'coretemp' in temps:
-        return temps['coretemp'][0].current
-    if 'k10temp' in temps:
-        return temps['k10temp'][0].current
+    return find_first(psutil.sensors_temperatures(), ['coretemp', 'k10temp'])[0].current
 
 # TODO: multiple/no fans? more compact formatting? krpm for some?
 def find_fan():
-    fans = psutil.sensors_fans()
-    if 'thinkpad' in fans:
-        return fans['thinkpad'][0].current
+    return find_first(psutil.sensors_fans(), ['thinkpad', 'nouveau'])[0].current
 
 # nicked from psutil._common bytes2human:
 # https://github.com/giampaolo/psutil/blob/95db8bb96caf5540c45b9eff2229c0401b578c31/psutil/_common.py#L728-L745
