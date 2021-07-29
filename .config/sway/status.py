@@ -34,6 +34,7 @@ def bytes2human(n):
         prefix[s] = 1 << (i + 1) * 10
     for symbol in reversed(symbols[1:]):
         if n >= prefix[symbol]:
+
             value = float(n) / prefix[symbol]
             return f"{value: >5.1f}{symbol}/s"
     return f"{n: >5.1f}{symbols[0]}/s"
