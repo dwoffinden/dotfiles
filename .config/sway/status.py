@@ -86,9 +86,7 @@ while True:
     )
 
     if bat:
-        print(
-            block(f"🔋{bat.percent:.0f}%" if bat else "no battery"), end=",", flush=False
-        )
+        print(block(f"🔋{bat.percent:.0f}%" if bat else "no battery"), end=",", flush=False)
 
     print(
         block(f"CPU {cpu: >2.0f}%"),
