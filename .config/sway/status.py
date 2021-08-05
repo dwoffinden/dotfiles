@@ -13,7 +13,11 @@ def net_diff(old):
 
 
 def find_first(dict, keys):
-    return next((dict[key] for key in keys if key in dict), None)
+    first = next((dict[key] for key in keys if key in dict), None)
+    if first:
+        return first
+    else:
+        raise Exception(f"No recognised keys in {dict.keys()}, expected one of {keys}")
 
 
 def find_temp():
