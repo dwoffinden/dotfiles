@@ -227,6 +227,8 @@ bindsym XF86Search exec $menu
 bindsym --locked XF86MonBrightnessUp exec light -A 8
 bindsym --locked XF86MonBrightnessDown exec light -U 8
 
+bindsym $mod+Shift+s exec swaylock
+
 #
 # Status Bar:
 #
