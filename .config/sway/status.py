@@ -53,56 +53,61 @@ def block(full_text):
     return f'{{"full_text":"{full_text}"}}'
 
 
-net_stats = psutil.net_io_counters(nowrap=True)
+def main():
+    net_stats = psutil.net_io_counters(nowrap=True)
 
-print('{"version":1}\n[', end="")
-while True:
-    start_time = perf_counter()
-    # TODO: Lil' history graphs? Click to expand?
+    print('{"version":1}\n[', end="")
+    while True:
+        start_time = perf_counter()
+        # TODO: Lil' history graphs? Click to expand?
 
-    # TODO: AC/not 🔌⚡, charge/discharge time
-    bat = psutil.sensors_battery()
+        # TODO: AC/not 🔌⚡, charge/discharge time
+        bat = psutil.sensors_battery()
 
-    # TODO: eth vs wifi SSID? latency? strength? errors/drops?
-    net_stats, netup, netdn = net_diff(net_stats)
+        # TODO: eth vs wifi SSID? latency? strength? errors/drops?
+        net_stats, netup, netdn = net_diff(net_stats)
 
-    # TODO: load avg? frequency? pegged cores?
-    cpu = psutil.cpu_percent(interval=None)
+        # TODO: load avg? frequency? pegged cores?
+        cpu = psutil.cpu_percent(interval=None)
 
-    ram = psutil.virtual_memory().percent
+        ram = psutil.virtual_memory().percent
 
-    # TODO: be more dynamic? include more sensors?
-    temp = find_temp()
+        # TODO: be more dynamic? include more sensors?
+        temp = find_temp()
 
-    fan = find_fan()
+        fan = find_fan()
 
-    time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    # TODO: refactor this to, e.g, a list of generator functions?
-    #     allow each to return None?
-    print("[", end="", flush=False)
-    print(
-        block(f"⬇️{bps(netdn)}"),
-        block(f"⬆️{bps(netup)}"),
-        sep=",",
-        end=",",
-        flush=False,
-    )
+        # TODO: refactor this to, e.g, a list of generator functions?
+        #     allow each to return None?
+        print("[", end="", flush=False)
+        print(
+            block(f"⬇️{bps(netdn)}"),
+            block(f"⬆️{bps(netup)}"),
+            sep=",",
+            end=",",
+            flush=False,
+        )
 
-    if bat:
-        print(block(f"🔋{bat.percent:.0f}%" if bat else "no battery"), end=",", flush=False)
+        if bat:
+            print(block(f"🔋{bat.percent:.0f}%" if bat else "no battery"), end=",", flush=False)
 
-    print(
-        block(f"CPU {cpu: >2.0f}%"),
-        block(f"RAM {ram: >2.0f}%"),
-        block(f"🌡️{temp:.0f}°C"),
-        block(f"🌀{fan: >4.0f} RPM"),
-        block(time),
-        sep=",",
-        end="],",
-        flush=True,
-    )
+        print(
+            block(f"CPU {cpu: >2.0f}%"),
+            block(f"RAM {ram: >2.0f}%"),
+            block(f"🌡️{temp:.0f}°C"),
+            block(f"🌀{fan: >4.0f} RPM"),
+            block(time),
+            sep=",",
+            end="],",
+            flush=True,
+        )
 
-    elapsed = perf_counter() - start_time
+        elapsed = perf_counter() - start_time
 
-    sleep(1 - clip(elapsed, 0, 1))
+        sleep(1 - clip(elapsed, 0, 1))
+
+
+if __name__ == "__main__":
+    main()
