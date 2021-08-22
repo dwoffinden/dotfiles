@@ -2,6 +2,7 @@
 
 import json
 
+from colour import Color
 from datetime import datetime
 from numpy import clip
 from time import perf_counter, sleep
@@ -55,7 +56,7 @@ def block(full_text, colour=None, urgent=None):
     # TODO: bubble the whole thing up as a single json array
     d = {"full_text": full_text}
     if colour:
-        d["color"] = colour
+        d["color"] = colour.hex_l
     if urgent is not None:
         d["urgent"] = urgent
     return json.dumps(d, separators=(",", ":"))
@@ -69,7 +70,7 @@ def print_battery():
         return
 
     pc = bat.percent
-    colour = "#00FF00" if pc > 75 else "#FFA500" if pc > 40 else "#FF0000"
+    colour = Color("green") if pc > 75 else Color("orange") if pc > 40 else Color("red")
     urgent = True if pc < 20 else None
 
     print(block(f"🔋{pc:.0f}%", urgent=urgent, colour=colour), end=",", flush=False)
