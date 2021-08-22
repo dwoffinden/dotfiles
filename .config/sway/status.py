@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import json
+
 from datetime import datetime
 from numpy import clip
 from time import perf_counter, sleep
@@ -48,9 +50,29 @@ def bps(n):
     return bytes2human(n)
 
 
-def block(full_text):
-    # TODO: optional colours, etc (see https://man.archlinux.org/man/swaybar-protocol.7.en)
-    return f'{{"full_text":"{full_text}"}}'
+def block(full_text, colour=None, urgent=None):
+    # see https://man.archlinux.org/man/swaybar-protocol.7.en
+    # TODO: bubble the whole thing up as a single json array
+    d = {"full_text": full_text}
+    if colour:
+        d["color"] = colour
+    if urgent is not None:
+        d["urgent"] = urgent
+    return json.dumps(d, separators=(",", ":"))
+
+
+def print_battery():
+    # TODO: AC/not 🔌⚡, charge/discharge time
+    bat = psutil.sensors_battery()
+
+    if not bat:
+        return
+
+    pc = bat.percent
+    colour = "#00FF00" if pc > 75 else "#FFA500" if pc > 40 else "#FF0000"
+    urgent = True if pc < 20 else None
+
+    print(block(f"🔋{pc:.0f}%", urgent=urgent, colour=colour), end=",", flush=False)
 
 
 def main():
@@ -60,9 +82,6 @@ def main():
     while True:
         start_time = perf_counter()
         # TODO: Lil' history graphs? Click to expand?
-
-        # TODO: AC/not 🔌⚡, charge/discharge time
-        bat = psutil.sensors_battery()
 
         # TODO: eth vs wifi SSID? latency? strength? errors/drops?
         net_stats, netup, netdn = net_diff(net_stats)
@@ -90,8 +109,7 @@ def main():
             flush=False,
         )
 
-        if bat:
-            print(block(f"🔋{bat.percent:.0f}%" if bat else "no battery"), end=",", flush=False)
+        print_battery()
 
         print(
             block(f"CPU {cpu: >2.0f}%"),
