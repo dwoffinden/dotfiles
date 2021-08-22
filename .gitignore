@@ -1,3 +1,5 @@
+__pycache__
+
 *.hi
 *.o
 
@@ -40,9 +42,11 @@
 !/.local/
 /.local/*
 !/.local/bin/
+/.local/bin/*.py
 /.local/bin/hledger
 /.local/bin/hledger-ui
 /.local/bin/hledger-web
+/.local/bin/py*
 /.local/bin/sni-cl-tool
 /.local/bin/stack
 /.local/bin/status-notifier-item-static
