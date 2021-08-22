@@ -36,6 +36,9 @@ __pycache__
 !/.gitconfig
 !/.gitignore
 !/.gitmodules
+!/.gnupg/
+/.gnupg/*
+!/.gnupg/gpg-agent.conf
 !/.hgrc
 !/.inputrc
 
