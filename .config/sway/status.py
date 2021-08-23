@@ -52,13 +52,12 @@ def bps(n):
 
 def block(full_text, colour=None, urgent=None):
     # see https://man.archlinux.org/man/swaybar-protocol.7.en
-    # TODO: bubble the whole thing up as a single json array
     d = {"full_text": full_text}
     if colour:
         d["color"] = colour.hex_l
     if urgent is not None:
         d["urgent"] = urgent
-    return json.dumps(d, separators=(",", ":"))
+    return d
 
 
 def clip(a, a_min, a_max):
@@ -73,14 +72,14 @@ def print_battery():
     bat = psutil.sensors_battery()
 
     if not bat:
-        return
+        return None
 
     pc = bat.percent
     # 20% is full red, 80% is full lime
     colour = BATTERY_COLOURS[clip(int(pc) - 20, 0, 59)]
     urgent = True if pc < 20 else None
 
-    print(block(f"🔋{pc:.0f}%", urgent=urgent, colour=colour), end=",", flush=False)
+    return block(f"🔋{pc:.0f}%", urgent=urgent, colour=colour)
 
 
 def main():
@@ -108,27 +107,22 @@ def main():
 
         # TODO: refactor this to, e.g, a list of generator functions?
         #     allow each to return None?
-        print("[", end="", flush=False)
-        print(
+
+        d = [
             block(f"⬇️{bps(netdn)}"),
             block(f"⬆️{bps(netup)}"),
-            sep=",",
-            end=",",
-            flush=False,
-        )
+        ]
+        b = print_battery()
+        if b:
+            d.append(b)
 
-        print_battery()
+        d.append(block(f"CPU {cpu: >2.0f}%"))
+        d.append(block(f"RAM {ram: >2.0f}%"))
+        d.append(block(f"🌡️{temp:.0f}°C"))
+        d.append(block(f"🌀{fan: >4.0f} RPM"))
+        d.append(block(time))
 
-        print(
-            block(f"CPU {cpu: >2.0f}%"),
-            block(f"RAM {ram: >2.0f}%"),
-            block(f"🌡️{temp:.0f}°C"),
-            block(f"🌀{fan: >4.0f} RPM"),
-            block(time),
-            sep=",",
-            end="],",
-            flush=True,
-        )
+        print(json.dumps(d, separators=(",", ":")), end=",", flush=True)
 
         elapsed = perf_counter() - start_time
 
