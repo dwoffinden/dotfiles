@@ -4,6 +4,7 @@ import json
 
 from colour import Color
 from datetime import datetime
+from sys import stdout
 from time import perf_counter, sleep
 
 import psutil
@@ -124,7 +125,9 @@ def main():
         d.append(block(f"🌀{fan: >4.0f} RPM"))
         d.append(block(time))
 
-        print(json.dumps(d, separators=(",", ":")), end=",", flush=True)
+        json.dump(d, stdout, ensure_ascii=False, separators=(",", ":"))
+        stdout.write(",")
+        stdout.flush()
 
         elapsed = perf_counter() - start_time
 
