@@ -106,7 +106,9 @@ def main():
         time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         # TODO: refactor this to, e.g, a list of generator functions?
-        #     allow each to return None?
+        #     Some could capture necessary state, most could be
+        #     iter(lambda: block(...), None)
+        #     allow each to return None to be skipped (e.g. no fans/battery)?
 
         d = [
             block(f"⬇️{bps(netdn)}"),
