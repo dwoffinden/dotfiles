@@ -62,6 +62,9 @@ def block(full_text, colour=None, urgent=None):
     return json.dumps(d, separators=(",", ":"))
 
 
+BATTERY_COLOURS = list(Color("red").range_to(Color("lime"), 60))
+
+
 def print_battery():
     # TODO: AC/not 🔌⚡, charge/discharge time
     bat = psutil.sensors_battery()
@@ -70,7 +73,8 @@ def print_battery():
         return
 
     pc = bat.percent
-    colour = Color("green") if pc > 75 else Color("orange") if pc > 40 else Color("red")
+    # 20% is full red, 80% is full lime
+    colour = BATTERY_COLOURS[max(0, min(59, int(pc) - 20))]
     urgent = True if pc < 20 else None
 
     print(block(f"🔋{pc:.0f}%", urgent=urgent, colour=colour), end=",", flush=False)
