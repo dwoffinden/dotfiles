@@ -4,7 +4,6 @@ import json
 
 from colour import Color
 from datetime import datetime
-from numpy import clip
 from time import perf_counter, sleep
 
 import psutil
@@ -62,6 +61,10 @@ def block(full_text, colour=None, urgent=None):
     return json.dumps(d, separators=(",", ":"))
 
 
+def clip(a, a_min, a_max):
+    return max(a_min, min(a, a_max))
+
+
 BATTERY_COLOURS = list(Color("red").range_to(Color("lime"), 60))
 
 
@@ -74,7 +77,7 @@ def print_battery():
 
     pc = bat.percent
     # 20% is full red, 80% is full lime
-    colour = BATTERY_COLOURS[max(0, min(59, int(pc) - 20))]
+    colour = BATTERY_COLOURS[clip(int(pc) - 20, 0, 59)]
     urgent = True if pc < 20 else None
 
     print(block(f"🔋{pc:.0f}%", urgent=urgent, colour=colour), end=",", flush=False)
