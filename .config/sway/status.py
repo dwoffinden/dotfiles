@@ -79,8 +79,9 @@ def print_battery():
     # 20% is full red, 80% is full lime
     colour = BATTERY_COLOURS[clip(int(pc) - 20, 0, 59)]
     urgent = True if pc < 20 else None
+    icon = "🔌" if pc >= 80 else "⚡" if bat.power_plugged else "🔋"
 
-    return block(f"🔋{pc:.0f}%", urgent=urgent, colour=colour)
+    return block(f"{icon}{pc:.0f}%", urgent=urgent, colour=colour)
 
 
 def main():
