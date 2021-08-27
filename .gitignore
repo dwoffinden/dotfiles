@@ -33,8 +33,6 @@ __pycache__
 !/.emacs
 !/.emacs.el
 !/.emacs.d/
-/.emacs.d/*
-!/.emacs.d/*.el
 
 !/.gitconfig
 !/.gitignore
