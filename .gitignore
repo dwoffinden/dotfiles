@@ -15,14 +15,15 @@ __pycache__
 
 !/.config/
 /.config/*
+!/.config/base16-gnome-terminal
+!/.config/base16-shell
+!/.config/base16-xresources
 !/.config/emacs/
 !/.config/fontconfig/
+!/.config/foot
 !/.config/git/
 !/.config/htop/
-!/.config/base16-shell
-!/.config/base16-gnome-terminal
-!/.config/base16-xresources
-!/.config/foot
+!/.config/kitty/
 !/.config/sway/
 !/.config/swaylock/
 !/.config/taffybar/

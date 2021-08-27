@@ -43,3 +43,6 @@
 [submodule ".vim/bundle/vim-nix"]
 	path = .vim/bundle/vim-nix
 	url = https://github.com/LnL7/vim-nix.git
+[submodule ".config/kitty/base16-kitty"]
+	path = .config/kitty/base16-kitty
+	url = https://github.com/kdrag0n/base16-kitty.git
