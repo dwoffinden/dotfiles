@@ -10,7 +10,7 @@ set $down j
 set $up k
 set $right l
 # Your preferred terminal emulator
-set $term footclient
+set $term kitty
 # Your preferred application launcher
 # Note: pass the final command to swaymsg so that the resulting window can be opened
 # on the original workspace that the command was run on.
@@ -249,6 +249,5 @@ bar {
 
 include /etc/sway/config.d/*
 
-exec foot --server
 exec mako
 
