@@ -60,6 +60,7 @@ myModMask = mod4Mask
 myTerminal :: IO FilePath
 myTerminal =
   (fromMaybe "xterm") . listToMaybe . catMaybes <$>
+  -- TODO: if kitty, use `kitty -1`
       (mapM findExecutable ["kitty", "alacritty", "urxvtc", "gnome-terminal"])
 
 warnAction :: (MonadIO m, MonadIO n) => m (String -> n ())
