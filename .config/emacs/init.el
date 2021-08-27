@@ -7,7 +7,7 @@
 (require 'use-package)
 (setq use-package-always-ensure t)
 
-(use-package solarized-theme)
-(load-theme 'solarized-dark t)
+(use-package base16-theme)
+(load-theme 'base16-solarized-dark t)
 
 (setq org-agenda-files '("~/org/"))
