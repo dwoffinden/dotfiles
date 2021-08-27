@@ -65,8 +65,8 @@ if &t_Co > 2 || has("gui_running")
   set background=dark
   colorscheme desert
   if &t_Co >= 88 || has("gui_running")
-    if filereadable(expand("~/.vimrc_background"))
-      source ~/.vimrc_background
+    if !exists('g:colors_name') || g:colors_name != 'base16-solarized-dark'
+      colorscheme base16-solarized-dark
     endif
   endif
 endif

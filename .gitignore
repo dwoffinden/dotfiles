@@ -19,6 +19,7 @@ __pycache__
 !/.config/base16-shell
 !/.config/base16-xresources
 !/.config/emacs/
+/.config/emacs/elpa/
 !/.config/fontconfig/
 !/.config/foot
 !/.config/git/
