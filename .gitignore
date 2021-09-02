@@ -28,6 +28,7 @@ __pycache__
 !/.config/sway/
 !/.config/swaylock/
 !/.config/taffybar/
+!/.config/waybar/
 
 !/.elvish/
 /.elvish/db
