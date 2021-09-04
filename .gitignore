@@ -85,6 +85,8 @@ __pycache__
 !/.stack/global-project/stack.yaml
 !/.stack/global-project/taffybar
 
+!/.tigrc
+
 !/.vim/
 /.vim/.netrwhist
 
