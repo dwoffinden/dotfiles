@@ -38,6 +38,7 @@ __pycache__
 !/.emacs.d/
 
 !/.gitconfig
+!/.github/
 !/.gitignore
 !/.gitmodules
 !/.gnupg/
