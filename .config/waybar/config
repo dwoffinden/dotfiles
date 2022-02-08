@@ -16,7 +16,9 @@
       "keyboard-state",
       "battery",
       "clock",
+      // TODO: remove
       // https://github.com/Alexays/Waybar/issues/668
+      // https://github.com/Alexays/Waybar/issues/1402
       "custom/clock",
       "tray",
     ],
@@ -45,11 +47,12 @@
     },
     "clock": {
         "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
-        "format-alt": "{:%Y-%m-%d}"
+        "format": "{:%a %F %H:%M:%S}",
+        "interval": 1,
     },
-     "custom/clock": {
+    "custom/clock": {
         "exec": "date +'%a %Y-%m-%d %k:%M:%S'",
-        "interval": 1
+        "interval": 1,
     },
     "cpu": {
         "format": "{usage}% ",
