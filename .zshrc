@@ -67,19 +67,6 @@ alias mountc='mount | column -t'
 alias hd='hexdump -C'
 alias cp="${aliases[cp]:-cp} --reflink=auto"
 
-if [[ $_IS_WORK = false ]]; then
-  ### DROPBOX ###
-  alias dstat='dropbox-cli status'
-  alias dls='dropbox-cli filestatus -l'
-  alias dwstat='watch -n 1 dropbox-cli status'
-
-  function find-dropbox-conflicts {
-    find ~/Dropbox/ \( -name "*'s conflicted copy *" -o -name "*(Case Conflict)*" \) "$@"
-  }
-fi
-
-alias git-repack-aggressive='git repack -Adf --depth=300 --window=300'
-
 alias ga='git add'
 alias gca='git commit -av'
 alias gf='git fetch'
@@ -106,19 +93,6 @@ function bckground {
 
 function find-loose-git-objects {
   find ./ -wholename "*/.git/*objects/*" -type d \! \( -name info -o -name pack \) "$@"
-}
-
-#TODO update this
-function sbt-clean {
-  echo "Cleaning ~/.sbt:"
-  rm -rfv ~/.sbt/{boot,staging,plugins/{project,target}}
-
-  echo "Cleaning current project:"
-  for d in ./{,project/{,project/{,project/}}}target ; do
-    [[ -d "$d" ]] && echo "${d}:" && rm -rv "$d"
-  done
-
-  return 0
 }
 
 if [[ $_IS_SUDOER = true ]]; then
@@ -191,7 +165,6 @@ echo -n $FG[normal]
 
 #####[ CLEAN UP ]###########################################################
 
-[[ -f ~/Dropbox/desktop.ini ]] && rm -v ~/Dropbox/desktop.ini
 [[ -d ~/Templates ]] && rmdir ~/Templates
 
 ############################################################################

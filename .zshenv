@@ -10,7 +10,6 @@ fi
 _HAS_OPTICAL_DRIVE=false
 _IS_LAPTOP=false
 _IS_SUDOER=false
-_IS_WORK=false
 
 if (( $+commands[lsb_release] )); then
   _DISTRO=`lsb_release -si`
@@ -23,9 +22,8 @@ fi
 _HOST=("${(Ls/./)HOST}")
 
 if [[ $_HOST[-1] = com ]]; then
-  _IS_WORK=true
   case $_HOST[-5] in
-    daw | not-invented-here)
+    liveware-problem | not-invented-here)
       _IS_SUDOER=true
       ;; # break
   esac
