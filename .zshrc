@@ -152,10 +152,10 @@ date
 if command -v fortune &> /dev/null; then
   if command -v cowsay &> /dev/null; then
     # TODO rewrite this with zsh-isms?
-    fortune -as | cowsay -W 74 -f `cowsay -l | tail -n+2 | tr " " "\n" | shuf -n1`
+    fortune -s | cowsay -W 74 -f `cowsay -l | tail -n+2 | tr " " "\n" | shuf -n1`
   else
     echo
-    fortune -a
+    fortune
     echo
   fi
 else
