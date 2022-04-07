@@ -11,3 +11,8 @@
 (load-theme 'base16-solarized-dark t)
 
 (setq org-agenda-files '("~/org/"))
+
+; (setq org-startup-truncated nil)
+; (add-hook 'org-mode-hook #'toggle-word-wrap)
+
+(add-hook 'text-mode-hook 'turn-on-visual-line-mode)
