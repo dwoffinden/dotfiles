@@ -70,7 +70,7 @@ alias cp="${aliases[cp]:-cp} --reflink=auto"
 alias ga='git add'
 alias gca='git commit -av'
 alias gf='git fetch'
-alias gfa='git fetch --all'
+alias gfa='git remote update'
 alias gd='git diff'
 alias gdc='git diff --cached'
 alias gds='git diff --stat'
