@@ -11,7 +11,9 @@
 (load-theme 'base16-solarized-dark t)
 
 (setq org-agenda-files '("~/org/"))
-(setq org-log-repeat nil)
+
+; https://lists.gnu.org/archive/html/emacs-orgmode/2017-07/msg00213.html
+; (setq org-log-repeat nil)
 
 ; (setq org-startup-truncated nil)
 ; (add-hook 'org-mode-hook #'toggle-word-wrap)
