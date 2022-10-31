@@ -30,3 +30,5 @@
   gpgSign = true
 [init]
   defaultBranch = main
+[gc]
+  cruftPacks = true
