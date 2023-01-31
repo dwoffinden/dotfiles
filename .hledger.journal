@@ -1,2 +1,2 @@
-include accounts/*.ldg
+include accounts/hledger.journal
 
