@@ -15,25 +15,25 @@
 	url = https://github.com/chriskempson/base16-vim
 [submodule ".config/base16-xresources"]
 	path = .config/base16-xresources
-	url = https://github.com/chriskempson/base16-xresources
+	url = https://github.com/tinted-theming/base16-xresources
 [submodule ".zprezto"]
 	path = .zprezto
-	url = https://github.com/sorin-ionescu/prezto.git
+	url = https://github.com/sorin-ionescu/prezto
 [submodule ".config/base16-gnome-terminal"]
 	path = .config/base16-gnome-terminal
-	url = https://github.com/chriskempson/base16-gnome-terminal.git
+	url = https://github.com/aarowill/base16-gnome-terminal
 [submodule ".vim/bundle/vim-elvish"]
 	path = .vim/bundle/vim-elvish
-	url = https://github.com/dmix/elvish.vim.git
+	url = https://github.com/dmix/elvish.vim
 [submodule ".vim/bundle/vim-ledger"]
 	path = .vim/bundle/vim-ledger
-	url = https://github.com/ledger/vim-ledger.git
+	url = https://github.com/ledger/vim-ledger
 [submodule ".vim/bundle/vim-nix"]
 	path = .vim/bundle/vim-nix
-	url = https://github.com/LnL7/vim-nix.git
+	url = https://github.com/LnL7/vim-nix
 [submodule ".config/kitty/base16-kitty"]
 	path = .config/kitty/base16-kitty
-	url = https://github.com/kdrag0n/base16-kitty.git
+	url = https://github.com/kdrag0n/base16-kitty
 [submodule ".vim/bundle/syntastic"]
 	path = .vim/bundle/syntastic
-	url = https://github.com/vim-syntastic/syntastic.git
+	url = https://github.com/vim-syntastic/syntastic
