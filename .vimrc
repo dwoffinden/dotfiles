@@ -161,14 +161,15 @@ if !exists(":DiffOrig")
 		  \ | wincmd p | diffthis
 endif
 
-" https://github.com/vim-syntastic/syntastic#3-recommended-settings
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
+let g:ale_fixers = {
+\  '*': ['remove_trailing_lines', 'trim_whitespace'],
+\  'java': ['google_java_format'],
+\  'go': ['gofmt'],
+\  'nix': ['nixpkgs-fmt'],
+\  'python': ['black'],
+\  'sh': ['shfmt'],
+\  'yaml': ['yamlfmt'],
+\}
 
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 0
-
-let g:syntastic_python_checkers = ['mypy', 'flake8']
+let g:ale_fix_on_save = 1
+let g:ale_lint_on_save = 1
