@@ -12,6 +12,11 @@
 
 (setq org-agenda-files '("~/org/"))
 
+; https://orgmode.org/manual/Activation.html
+(global-set-key (kbd "C-c l") #'org-store-link)
+(global-set-key (kbd "C-c a") #'org-agenda)
+(global-set-key (kbd "C-c c") #'org-capture)
+
 ; https://lists.gnu.org/archive/html/emacs-orgmode/2017-07/msg00213.html
 ; (setq org-log-repeat nil)
 
