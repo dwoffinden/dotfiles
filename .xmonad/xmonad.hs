@@ -311,5 +311,7 @@ myConfig = do
     }
 
 main :: IO ()
-main = myConfig >>= launch
-
+main = do
+  config <- myConfig
+  dirs <- getDirectories
+  launch config dirs

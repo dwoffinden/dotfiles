@@ -20,27 +20,29 @@
 # stack install --resolver=lts hledger-lib-1.16.1 hledger-1.16.1 hledger-ui-1.16.1 hledger-web-1.16.1
 # which is probably saner and I should use for xmonad too...
 packages: []
-resolver: lts-16.20
+resolver: lts-22.27
 extra-deps:
-  - taffybar-3.2.3
-  - xmonad-contrib-0.16
+  - taffybar-4.0.2
+  - xmonad-contrib-0.18.0
 # https://github.com/haskell-gi/haskell-gi/issues/318
-  - gi-atk-2.0.22
-  - gi-cairo-1.0.24
-  - gi-cairo-connector-0.1.0
-  - gi-cairo-render-0.1.0
-  - gi-dbusmenu-0.4.8
-  - gi-dbusmenugtk3-0.4.9
-  - gi-gdk-3.0.23 #4.0.2
-  - gi-gdkpixbuf-2.0.24
-  - gi-gdkx11-3.0.10 #4.0.2
-  - gi-gio-2.0.27
-  - gi-glib-2.0.24
-  - gi-gobject-2.0.24
-  - gi-gtk-3.0.36 #4.0.2
-  - gi-gtk-hs-0.3.9
-  - gi-harfbuzz-0.0.3
-  - gi-pango-1.0.23
-  - gi-xlib-2.0.9
-  - haskell-gi-0.24.5
-  - haskell-gi-base-0.24.4
+  - gi-atk-2.0.28
+  - gi-cairo-1.0.30
+  - gi-cairo-connector-0.1.1
+  - gi-cairo-render-0.1.2
+  - gi-dbusmenu-0.4.14
+  - gi-dbusmenugtk3-0.4.15
+  - gi-gdk-3.0.29
+  - gi-gdkpixbuf-2.0.32
+  - gi-gdkx11-3.0.16
+  - gi-gio-2.0.34
+  - gi-glib-2.0.30
+  - gi-gobject-2.0.31
+  - gi-gtk-3.0.43
+  - gi-gtk-hs-0.3.16
+  - gi-harfbuzz-0.0.10
+  - gi-pango-1.0.30
+  - gi-xlib-2.0.14
+  - gtk-sni-tray-0.1.8.1
+  - haskell-gi-0.26.10
+  - haskell-gi-base-0.26.6
+  - xdg-desktop-entry-0.1.1.2
