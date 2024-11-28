@@ -233,6 +233,8 @@ bindsym --locked XF86MonBrightnessDown exec light -U 8
 
 bindsym $mod+Shift+s exec swaylock
 
+# Screenshot
+bindsym $mod+Shift+p exec slurp -d | grim -g- -tpng -l9 - | wl-copy -t image/png
 
 bar {
     swaybar_command waybar
