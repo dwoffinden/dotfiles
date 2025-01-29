@@ -23,6 +23,10 @@
 ; (setq org-startup-truncated nil)
 ; (add-hook 'org-mode-hook #'toggle-word-wrap)
 
+;; Hide unnecessary toolbars
+(tool-bar-mode -1)
+(menu-bar-mode -1)
+
 (add-hook 'text-mode-hook 'turn-on-visual-line-mode)
 
 (custom-set-variables
