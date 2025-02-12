@@ -11,6 +11,7 @@
 (load-theme 'base16-solarized-dark t)
 
 (setq org-agenda-files '("~/org/"))
+(setq calendar-week-start-day 1)
 
 ; https://orgmode.org/manual/Activation.html
 (global-set-key (kbd "C-c l") #'org-store-link)
