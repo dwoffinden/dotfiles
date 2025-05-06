@@ -228,8 +228,8 @@ bindsym XF86Search exec $menu
 # Backlight up/down
 # TODO: logarithmic with brillo or like https://redd.it/fk08lu
 # TODO: volume etc
-bindsym --locked XF86MonBrightnessUp exec light -A 8
-bindsym --locked XF86MonBrightnessDown exec light -U 8
+bindsym --locked XF86MonBrightnessUp exec brightnessctl set 10%+
+bindsym --locked XF86MonBrightnessDown exec brightnessctl set 10%-
 
 bindsym $mod+Shift+s exec swaylock
 
@@ -243,4 +243,3 @@ bar {
 include /etc/sway/config.d/*
 
 exec mako
-
