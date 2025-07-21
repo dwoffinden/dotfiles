@@ -19,6 +19,7 @@ __pycache__
 !/.config/base16-shell
 !/.config/base16-xresources
 !/.config/emacs/
+/.config/emacs/eln-cache
 /.config/emacs/elpa/
 !/.config/fontconfig/
 !/.config/foot
@@ -110,4 +111,3 @@ __pycache__
 /.zprofile
 /.zshenv
 /.zshrc
-
