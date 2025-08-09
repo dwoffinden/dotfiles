@@ -26,6 +26,7 @@ __pycache__
 !/.config/foot
 !/.config/git/
 !/.config/htop/
+!/.config/hypr/
 !/.config/kitty/
 !/.config/nix
 !/.config/sway/
