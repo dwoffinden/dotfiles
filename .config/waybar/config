@@ -1,10 +1,15 @@
 {
     "height": 21,
     "modules-left": [
+      "hyprland/workspaces",
+      "hyprland/submap",
       "sway/workspaces",
       "sway/mode",
     ],
-    "modules-center": ["sway/window"],
+    "modules-center": [
+      "hyprland/window",
+      "sway/window",
+    ],
     "modules-right": [
       "idle_inhibitor",
       "pulseaudio",
