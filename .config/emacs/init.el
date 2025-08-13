@@ -9,6 +9,8 @@
 
 (use-package base16-theme)
 (load-theme 'base16-solarized-dark t)
+(set-frame-parameter nil 'alpha-background 90)
+(add-to-list 'default-frame-alist '(alpha-background . 90))
 
 (setq org-agenda-files '("~/org/"))
 (setq calendar-week-start-day 1)
