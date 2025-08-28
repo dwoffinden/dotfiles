@@ -21,7 +21,7 @@ set $term kitty -1
 # TODO: investigate bemenu?
 #set $menu dmenu_path | dmenu | xargs swaymsg exec --
 
-set $menu wofi --show run --lines 8 --prompt ""
+set $menu wofi --show drun --prompt ""
 
 include /etc/sway/config-vars.d/*
 
