@@ -4,11 +4,11 @@
       "hyprland/workspaces",
       "hyprland/submap",
       "sway/workspaces",
-      "sway/mode",
+      "sway/mode"
     ],
     "modules-center": [
       "hyprland/window",
-      "sway/window",
+      "sway/window"
     ],
     "modules-right": [
       "idle_inhibitor",
@@ -21,7 +21,8 @@
       "keyboard-state",
       "battery",
       "clock",
-      "tray",
+      "bluetooth",
+      "tray"
     ],
     "keyboard-state": {
         "numlock": true,
@@ -49,6 +50,7 @@
     "clock": {
         "format": "{:%a %F %H:%M:%S}",
         "interval": 1,
+        "tooltip": false
     },
     "cpu": {
         "format": "{usage}% ",
@@ -61,7 +63,6 @@
         // "thermal-zone": 2,
         // "hwmon-path": "/sys/class/hwmon/hwmon2/temp1_input",
         "critical-threshold": 80,
-        // "format-critical": "{temperatureC}°C {icon}",
         "format": "{temperatureC}°C {icon}",
         "format-icons": ["", "", "", "", ""]
     },
@@ -110,5 +111,18 @@
         },
         "on-click": "pavucontrol"
     },
+    "bluetooth": {
+        "format": " {num_connections}",
+        "format-off": " {status}",
+        "format-disabled": " {status}",
+        "format-no-controller": "",
+        "interval": 30,
+        "on-click": "blueman-manager",
+        "on-click-right": "(printf show | bluetoothctl | rg 'Powered: yes') && (printf 'power off' | bluetoothctl) || (printf 'power on' | bluetoothctl)",
+        "tooltip-format": "{controller_alias} {status}",
+        "tooltip-format-connected": "Connected devices: {num_connections} connected\n\n{device_enumerate}",
+        "tooltip-format-enumerate-connected": "{device_alias}",
+        "tooltip-format-enumerate-connected-battery": "{device_alias}\t| Battery life: {device_battery_percentage}%"
+    }
 }
 
