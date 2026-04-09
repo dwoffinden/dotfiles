@@ -233,7 +233,7 @@ bindsym XF86Search exec $menu
 bindsym --locked XF86MonBrightnessUp exec brightnessctl set 10%+
 bindsym --locked XF86MonBrightnessDown exec brightnessctl set 10%-
 
-bindsym $mod+Shift+s exec swaylock
+bindsym $mod+Shift+s exec hyprlock
 
 # Screenshot
 bindsym $mod+Shift+p exec slurp -d | grim -g- -tpng -l9 - | wl-copy -t image/png
