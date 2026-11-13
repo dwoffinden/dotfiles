@@ -4,3 +4,4 @@ updates:
     schedule:
       interval: monthly
     directory: /
+    open-pull-requests-limit: 10
