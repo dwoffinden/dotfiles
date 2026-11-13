@@ -43,8 +43,14 @@ bindkey "\e[6~" end-of-history # PageDown
 bindkey "\e[7~" beginning-of-line # Home
 bindkey "\e[8~" end-of-line # End
 
-bindkey "^[[A" history-search-backward
-bindkey "^[[B" history-search-forward
+# Raw console / ANSI mode
+bindkey "^[[A" history-substring-search-up
+bindkey "^[[B" history-substring-search-down
+
+# Kitty / Application keypad mode
+bindkey "^[OA" history-substring-search-up
+bindkey "^[OB" history-substring-search-down
+
 bindkey ' ' magic-space # history expansion on space
 
 #####[ ALIASES ]############################################################
