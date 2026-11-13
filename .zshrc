@@ -67,6 +67,11 @@ alias mountc='mount | column -t'
 alias hd='hexdump -C'
 alias cp="${aliases[cp]:-cp} --reflink=auto"
 
+# Debian installs bat as batcat, to avoid a clash with bacula-console-qt
+if (( ! $+commands[bat] && $+commands[batcat] )); then
+  alias bat='batcat'
+fi
+
 alias ga='git add'
 alias gca='git commit -av'
 alias gf='git fetch'
