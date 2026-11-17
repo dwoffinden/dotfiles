@@ -1,8 +1,15 @@
 #####[ PREZTO ]#############################################################
 
+export PURE_PROMPT_SYMBOL=';'
+
 # Source Prezto.
 if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
   source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
+fi
+
+# Replace Pure's SSH-only user@host slot with always-on 'host HH:MM'
+if zstyle -t ':prezto:module:prompt' theme 'pure'; then
+  PROMPT=${PROMPT/'%(13V.'*'%m%f .)'/'%F{$prompt_pure_colors[host]}%m%f %F{grey42}%D{%H:%M}%f '}
 fi
 
 #####[ ZSH OPTIONS ]########################################################

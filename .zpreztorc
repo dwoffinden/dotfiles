@@ -91,7 +91,8 @@ zstyle ':prezto:module:pacman' frontend 'yaourt'
 
 #zstyle ':prezto:module:prompt' theme 'sorin'
 #zstyle ':prezto:module:prompt' theme 'steeef'
-zstyle ':prezto:module:prompt' theme 'peepcode' ';'
+#zstyle ':prezto:module:prompt' theme 'peepcode' ';'
+zstyle ':prezto:module:prompt' theme 'pure'
 
 #
 # Ruby
